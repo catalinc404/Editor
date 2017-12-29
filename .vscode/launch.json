@@ -10,7 +10,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome",
-            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/2/index.html",
+            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/3/Editor/index.html",
             "webRoot": "${workspaceRoot}/main.html",
             "runtimeArgs": [
                 "--allow-file-access-from-files"
@@ -22,7 +22,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome - editor.html",
-            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/2/editor.html",
+            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/3/Editor/editor.html",
             "webRoot": "${workspaceRoot}/editor.html",
             "runtimeArgs": [
                 "--allow-file-access-from-files"
