@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": 
+    [
+        
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome",
+            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/2/index.html",
+            "webRoot": "${workspaceRoot}/main.html",
+            "runtimeArgs": [
+                "--allow-file-access-from-files"
+            ]
+            
+        },
+
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome - editor.html",
+            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/2/editor.html",
+            "webRoot": "${workspaceRoot}/editor.html",
+            "runtimeArgs": [
+                "--allow-file-access-from-files"
+            ]
+            
+        }
+        
+    ]
+}
