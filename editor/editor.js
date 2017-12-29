@@ -340,13 +340,14 @@ function init()
     var canvas;
     
     canvas = document.getElementById( 'view1' );
-    new View( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0 );
+    new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0 );
     canvas = document.getElementById( 'view2' );
-    new View( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0 );
+    new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 1 );
     canvas = document.getElementById( 'view3' );
-    new View( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0 );
+    new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 2 );
     canvas = document.getElementById( 'view4' );
-    new View( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0 );
+    //new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 3 );
+    new View( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 3 );
 
     initScene();
 }
