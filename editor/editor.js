@@ -1,49 +1,3 @@
-function resizer( resizerID, mousemove, cursor ) 
-{
-    var resizer = document.getElementById( resizerID );
-    resizer.style.cursor = cursor;
-    resizer.mousemove = mousemove;
-
-    resizer.onmousedown = function( e ) 
-    {
-        try
-        {
-            document.documentElement.addEventListener( 'mousemove', resizer.doDrag, false );
-            document.documentElement.addEventListener( 'mouseup', resizer.stopDrag, false );
-        } 
-        catch (e) 
-        {
-            console.log( "resizer.onmousedown(...) failed! Your browser does not support this feature. " + e.message );
-        }
-    }
-
-    resizer.doDrag = function( e ) 
-    {
-        if( e.which != 1 )
-        {
-            resizer.stopDrag( e );
-            return;
-        }
-        resizer.mousemove( e );
-    }
-
-    resizer.stopDrag = function( e ) 
-    {
-        document.documentElement.removeEventListener( 'mousemove', resizer.doDrag, false );
-        document.documentElement.removeEventListener( 'mouseup', resizer.stopDrag, false );
-    }
-}
-
-function resizerX( resizerID, mousemoveCallback ) 
-{
-    resizer( resizerID, mousemoveCallback, "e-resize");
-}
-
-function resizerY( resizerID, mousemoveCallback ) 
-{
-    resizer( resizerID, mousemoveCallback, "n-resize" );
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var EView       = { TL: 0, TR: 1, BL: 2, BR: 3  };
 var EViewMode   = { TL_TR_BL_BR: 0, TL_TR_BL: 1, TL_TR: 2, TL_BL_BR: 3, TL_BL: 4, TL: 5  };
@@ -165,6 +119,7 @@ function resizePanelsXTop( x )
     } 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function resizePanelsXBottom( x ) 
 {
     switch( currentViewMode  )
@@ -198,6 +153,7 @@ function resizePanelsXBottom( x )
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function resizePanelsY( y ) 
 {
     switch( currentViewMode  )
