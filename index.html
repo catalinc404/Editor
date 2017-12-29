@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <!-- ----------------------------------------------------------------------------- -->
+    <head>
+        <title>Example 01.01 - Basic skeleton</title>
+        
+        <script src="./libs/three.js"></script>
+        <script src="./libs/dat.gui.js"></script>
+        <script src="./libs/stats.min.js"></script>
+        <!--
+        <script type="text/javascript" src="http://benvanik.github.io/WebGL-Inspector/core/lib/gli.all.js"></script>
+        <script type="text/javascript" src="../../core/embed.js"></script>
+        <link rel="stylesheet" href="http://benvanik.github.io/WebGL-Inspector/core/lib/gli.all.css">
+        <script type="text/javascript" src="http://benvanik.github.io/WebGL-Inspector/core/embed.js"></script>
+        -->
+
+
+        <!--<script src="scene1.js"></script>-->
+
+        <style>
+            body
+            {
+                /* set margin to 0 and overflow to hidden, to use the complete page */
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <!-- ----------------------------------------------------------------------------- -->
+    
+    <!-- ----------------------------------------------------------------------------- -->
+    <body>
+        <!-- Div which will hold the Output -->
+        <div id="WebGL-output">
+            <script src="WIZZ.js"></script>
+            <script src="wizz_test_1.js"></script>
+        </div>
+        <div id="Stats-output"></div>
+        <div id="Select-rectangle" style="position:absolute;top: 0px;left: 0px;z-index: 50;height: 0px;
+            width: 0px;background-color: rgba(235, 235, 235, 0.5);border: 1px #a8a8a8;
+            margin: 0; padding: 0; pointer-events:none;"></div>
+
+        <div id="editor-container" style="resize:both; position:absolute; top:300px; left:100px; width:900px; height:600px;" onresize="resizeEditorFrame()">
+            <script>
+                function resizeEditorFrame()
+                {
+                    var frame = document.getElementById("editor-frame");
+                    frame.style.width = 600;
+                    frame.style.height = 600;
+                }
+            </script>
+            <iframe id="editor-frame" src="editor.html"/>
+        </div>
+    </body>
+    <!-- ----------------------------------------------------------------------------- -->
+</html>
