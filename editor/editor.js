@@ -275,10 +275,10 @@ function View( canvas, width, height, viewId )
         
     var currentControlMode = EControlMode.NONE;    
 
-    canvas.addEventListener( 'mousemove',     function( event ){ views[ viewId ].handleMouseMove ( event ); }, false );
-    canvas.addEventListener( 'mousedown',     function( event ){ views[ viewId ].handleMouseDown ( event ); }, false );
-    canvas.addEventListener( 'mouseup',       function( event ){ views[ viewId ].handleMouseUp   ( event ); }, false );
-    canvas.addEventListener( 'mouseleave',    function( event ){ views[ viewId ].handleMouseUp   ( event ); }, false );    
+    canvas.addEventListener( 'mousemove',  function( event ){ views[ viewId ].handleMouseMove ( event ); }, false );
+    canvas.addEventListener( 'mousedown',  function( event ){ views[ viewId ].handleMouseDown ( event ); }, false );
+    canvas.addEventListener( 'mouseup',    function( event ){ views[ viewId ].handleMouseUp   ( event ); }, false );
+    canvas.addEventListener( 'mouseleave', function( event ){ views[ viewId ].handleMouseUp   ( event ); }, false );    
 
     this.render = function () 
     {
