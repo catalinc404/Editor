@@ -3,8 +3,47 @@ var EView       = { TL: 0, TR: 1, BL: 2, BR: 3  };
 var EViewMode   = { TL_TR_BL_BR: 0, TL_TR_BL: 1, TL_TR: 2, TL_BL_BR: 3, TL_BL: 4, TL: 5  };
 
 var resizerDimensions = { width: 5, height: 5 };
+
 var panelsDimensions = [ [[ 0, 0, 0.5, 0.5 ], [ 0.5, 0, 0.5, 0.5], [0, 0.5, 0.5, 0.5], [0.5, 0.5, 0.5, 0.5]] ];
 var currentViewMode = EViewMode.TL_TR_BL_BR;
+
+function Editor()
+{
+    var EView       = { TL: 0, TR: 1, BL: 2, BR: 3  };
+    var EViewMode   = { TL_TR_BL_BR: 0, TL_TR_BL: 1, TL_TR: 2, TL_BL_BR: 3, TL_BL: 4, TL: 5  };
+
+    var resizerDimensions = { width: 5, height: 5 };
+
+    var panelsDimensions = [ [[ 0, 0, 0.5, 0.5 ], [ 0.5, 0, 0.5, 0.5], [0, 0.5, 0.5, 0.5], [0.5, 0.5, 0.5, 0.5]] ];
+    var currentViewMode = EViewMode.TL_TR_BL_BR;
+
+    var views = [];
+
+    this.init = function()
+    {
+    };
+
+    this.setPanelDimensions = function( panel, left, top, width, height )
+    {
+    };
+
+    this.setupPanels = function()
+    {};
+
+    this.resizePanels = function()
+    {};
+
+    this.resizePanelsXTop = function( x )
+    {};
+
+    this.resizePanelsXBottom = function( x )
+    {};
+
+    this.resizePanelsY = function( y )
+    {};
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function setPanelDimensions( panel, left, top, width, height )
@@ -15,8 +54,8 @@ function setPanelDimensions( panel, left, top, width, height )
     panel.style.width = width + "px";
     panel.style.height = height + "px";
 
-    var view = getView( panel );
-    if( view != undefined )
+    var view = getViewFromPanel( panel );
+    if( view !== undefined )
     {
         view.resize( width, height );
         view.render();
@@ -83,6 +122,31 @@ function resizePanels()
             setPanelDimensions( view4, x, y, docWidth - x, height );
         }
         break;
+        case EViewMode.TL_TR_BL:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL_TR:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL_BL_BR:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL_BL:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL:
+        {
+            //TODO
+        }
+        break;
     }
 }
 
@@ -114,6 +178,31 @@ function resizePanelsXTop( x )
             panelsDimensions[EViewMode.TL_TR_BL_BR][0][2] = width;
             panelsDimensions[EViewMode.TL_TR_BL_BR][1][0] = width;
             panelsDimensions[EViewMode.TL_TR_BL_BR][1][2] = 1.0 - width;
+        }
+        break;
+        case EViewMode.TL_TR_BL:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL_TR:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL_BL_BR:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL_BL:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL:
+        {
+            //TODO
         }
         break;
     } 
@@ -150,6 +239,31 @@ function resizePanelsXBottom( x )
             panelsDimensions[EViewMode.TL_TR_BL_BR][3][2] = 1.0 - width;
         }
         break;
+        case EViewMode.TL_TR_BL:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL_TR:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL_BL_BR:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL_BL:
+        {
+            //TODO
+        }
+        break;
+        case EViewMode.TL:
+        {
+            //TODO
+        }
+        break;       
     }
 }
 
@@ -216,273 +330,28 @@ function resizePanelsY( y )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-var views = [];
 var scene;
-var mouseX = 0, mouseY = 0;
-var windowHalfX = window.innerWidth / 2;
-var windowHalfY = window.innerHeight / 2;
-
 var textureLoader;
 var defaultTexture;
-
-var AxisX = new THREE.Vector3( 1, 0, 0 );
-var AxisY = new THREE.Vector3( 0, 1, 0 );
-var AxisZ = new THREE.Vector3( 0, 0, 1 );
-
-//////////////////////////////////////////////////////////////////////////////
-var EControlMode = { NONE : 0, ORBIT: 1, TRACKBALL :2, PAN : 3, ZOOM : 4, SELECT : 5 };
-var Control_ORBIT_pixel2world_ratio = 0.005;
-var Control_PAN_pixel2world_ratio = 0.05;
-var Control_ZOOM_pixel2world_ratio= 0.05;
-
-//////////////////////////////////////////////////////////////////////////////
-var Epsilon = 0.001;
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function View( canvas, width, height, viewId ) 
-{
-    canvas.width = width * window.devicePixelRatio;
-    canvas.height = height * window.devicePixelRatio;
-
-    var context = canvas.getContext( '2d' );
-    var camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 1000 );
-    camera.position.x = -28.23;
-    camera.position.y =  14.34; 
-    camera.position.z =  31.06;
-    camera.lookAt( new THREE.Vector3( 0.0, 0.0, 0.0 ) );
-
-    var renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.autoClear = false;
-    renderer.setClearColor( 0xaaaaaa );
-
-    var mousePrevX = null;
-    var mousePrevY = null;
-    var mouseX = null;
-    var mouseY = null;
-
-    var viewId = viewId;
-   
-    var selectionRectangle = { left: 0, top: 0, width: 0, height: 0 };
-    var selectionRectangleElement = document.getElementById( "viewSelect" );
-        
-    var currentControlMode = EControlMode.NONE;    
-
-    canvas.addEventListener( 'mousemove',  function( event ){ views[ viewId ].handleMouseMove ( event ); }, false );
-    canvas.addEventListener( 'mousedown',  function( event ){ views[ viewId ].handleMouseDown ( event ); }, false );
-    canvas.addEventListener( 'mouseup',    function( event ){ views[ viewId ].handleMouseUp   ( event ); }, false );
-    canvas.addEventListener( 'mouseleave', function( event ){ views[ viewId ].handleMouseUp   ( event ); }, false );    
-
-    this.render = function () 
-    {
-        if( currentControlMode != EControlMode.NONE )
-        {
-            var deltaMouseX = mouseX - mousePrevX;
-            var deltaMouseY = mouseY - mousePrevY;
-    
-            if( deltaMouseX != 0 || deltaMouseY != 0 )
-            {
-                switch( currentControlMode )
-                {
-                    case EControlMode.ORBIT:
-                    {
-                        //TODO:
-                    }
-                    break;
-    
-                    case EControlMode.TRACKBALL:
-                    {
-                        camera.rotateOnWorldAxis( AxisY,  deltaMouseX * Control_ORBIT_pixel2world_ratio );
-                        camera.rotateOnAxis( AxisX,  deltaMouseY * Control_ORBIT_pixel2world_ratio );
-    
-                        mousePrevX = mouseX;
-                        mousePrevY = mouseY;
-                    }
-                    break;
-                    
-                    case EControlMode.PAN:
-                    {
-                        var translation = new THREE.Vector3();
-                        translation.copy( AxisY );
-                        translation.multiplyScalar( deltaMouseY * Control_PAN_pixel2world_ratio );
-                        translation.add( camera.position );
-    
-                        var translationLocal = camera.worldToLocal( translation );
-                        translationLocal.addScaledVector( AxisX, deltaMouseX * -Control_PAN_pixel2world_ratio );
-    
-                        var distance = translationLocal.length();
-                        if( distance >= Epsilon )
-                        {
-                            translationLocal.multiplyScalar( 1.0 / distance );
-    
-                            camera.translateOnAxis( translationLocal, distance );
-                        }
-    
-                        mousePrevX = mouseX;
-                        mousePrevY = mouseY;
-                    }
-                    break;
-            
-                    case EControlMode.ZOOM:
-                    {
-                        var translationLocal = new THREE.Vector3();
-                        translationLocal.copy( AxisZ );
-                        translationLocal.multiplyScalar( deltaMouseY * Control_ZOOM_pixel2world_ratio );
-    
-                        var distance = translationLocal.length();
-                        if( distance >= Epsilon )
-                        {
-                            translationLocal.multiplyScalar( 1.0 / distance );
-    
-                            camera.translateOnAxis( translationLocal, distance );
-                        }
-    
-                        mousePrevX = mouseX;
-                        mousePrevY = mouseY;
-                    }
-                    break;
-    
-                    case EControlMode.SELECT:
-                    {
-                        selectionRectangle.left    = Math.min( mouseX, mousePrevX );
-                        selectionRectangle.left    = Math.max( selectionRectangle.left, 0 );
-                        selectionRectangle.top     = Math.min( mouseY, mousePrevY );
-                        selectionRectangle.top     = Math.max( selectionRectangle.top, 0 );
-    
-                        var right   = Math.max( mouseX, mousePrevX );
-                        //right       = Math.min( right, screen_width );
-                        var bottom  = Math.max( mouseY, mousePrevY );
-                        //bottom      = Math.min( bottom, screen_height );
-    
-                        selectionRectangle.width  = right  - selectionRectangle.left;
-                        selectionRectangle.height = bottom - selectionRectangle.top; 
-    
-                        selectionRectangleElement.style.left   = selectionRectangle.left   + 'px';
-                        selectionRectangleElement.style.top    = selectionRectangle.top    + 'px';
-                        selectionRectangleElement.style.width  = selectionRectangle.width  + 'px';
-                        selectionRectangleElement.style.height = selectionRectangle.height + 'px';
-                    }
-                    break;                    
-            
-                    default:
-                    {}
-                    break;
-                }
-            }
-        }
-    
-        renderer.setClearColor( 0xaaaaaa );
-        renderer.clear();
-        renderer.render( scene, camera );
-        
-        context.drawImage( renderer.domElement, 0, 0 );
-    };
-
-    this.resize = function( width, height )
-    {
-        renderer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
-
-        canvas.width = width * window.devicePixelRatio;
-        canvas.height = height * window.devicePixelRatio;
-
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-    };
-
-    this.handleMouseMove = function( event ) 
-    {
-        if( currentControlMode != EControlMode.NONE )
-        {
-            mouseX = event.pageX;
-            mouseY = event.pageY;
-    
-            requestAnimationFrame( function(){ views[ viewId ].render(); } );
-        }
-    };
-    
-    this.handleMouseDown = function( event ) 
-    {
-        switch( event.button )
-        {
-            case 0:  
-            { 
-                if( event.shiftKey == true )
-                {
-                    currentControlMode = EControlMode.TRACKBALL;
-                }
-                else
-                if( event.altKey == true )
-                {
-                    currentControlMode = EControlMode.PAN;
-                }
-                else
-                {
-                    currentControlMode = EControlMode.SELECT;
-                }
-            }
-            break;
-    
-            case 1:  { currentControlMode = EControlMode.ZOOM;  } break;
-    
-            case 2:
-            default: {} break;
-        }
-    
-        if( currentControlMode != EControlMode.NONE )
-        {
-            var rect = renderer.domElement.getBoundingClientRect();
-            mouseX = event.clientX - rect.left;
-            mouseY = event.clientY - rect.top;
-    
-            mousePrevX = mouseX;
-            mousePrevY = mouseY;
-    
-            requestAnimationFrame( function(){ views[ viewId ].render(); } );
-        }
-    };
-    
-    this.handleMouseUp = function( event ) 
-    {
-        currentControlMode = EControlMode.NONE;
-
-        selectionRectangleElement.style.left   = '0px';
-        selectionRectangleElement.style.top    = '0px';
-        selectionRectangleElement.style.width  = '0px';
-        selectionRectangleElement.style.height = '0px';
-    
-        mousePrevX = null;
-        mousePrevY = null;
-        
-        mouseX = null;
-        mouseY = null;
-       
-        requestAnimationFrame( function(){ views[ viewId ].render(); } );
-    };
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function init() 
 {
-    var canvas1 = document.getElementById( 'view1' );
-    var canvas2 = document.getElementById( 'view2' );
-    var canvas3 = document.getElementById( 'view3' );
-    var canvas4 = document.getElementById( 'view4' );
-
-    views.push( new View( canvas1, parseInt( canvas1.style.width, 10), parseInt( canvas1.style.height, 10 ), 0 ) );
-    views.push( new View( canvas2, parseInt( canvas2.style.width, 10), parseInt( canvas2.style.height, 10 ), 1 ) );
-    views.push( new View( canvas3, parseInt( canvas3.style.width, 10), parseInt( canvas3.style.height, 10 ), 2 ) );
-    views.push( new View( canvas4, parseInt( canvas4.style.width, 10), parseInt( canvas4.style.height, 10 ), 3 ) );
+    var canvas;
+    
+    canvas = document.getElementById( 'view1' );
+    new View( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0 );
+    canvas = document.getElementById( 'view2' );
+    new View( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0 );
+    canvas = document.getElementById( 'view3' );
+    new View( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0 );
+    canvas = document.getElementById( 'view4' );
+    new View( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0 );
 
     initScene();
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function initScene()
 {
     textureLoader = new THREE.TextureLoader();
@@ -544,45 +413,35 @@ function initScene()
     scene.add( plane );
 }
 
-function onViewMouseDown( event, viewIndex ) 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function getViewFromPanel( panel )
 {
-    views[ viewIndex ].handleMouseDown( event );
+    return panel.editor_view_object;
 }
 
-function onViewMouseMove( event, viewIndex ) 
-{
-    views[ viewIndex ].handleMouseMove( event );
-}
-
-function onViewMouseUp( event, viewIndex ) 
-{
-    views[ viewIndex ].handleMouseUp( event );
-}
-
-function getView( panel )
-{
-    var panelId = panel.id;
-
-    if( panelId == "view1" ) return views[ EView.TL ];
-    if( panelId == "view2" ) return views[ EView.TR ];
-    if( panelId == "view3" ) return views[ EView.BL ];
-    if( panelId == "view4" ) return views[ EView.BR ];
-
-    return undefined;
-}
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function render()
 {
-    for( var i = 0; i < views.length; ++i )
+    var view;
+    
+    view = getViewFromPanel( document.getElementById( "view1" ) );
+    if(view !== undefined)
     {
-        views[ i ].render();
+        view.render();
     }
-    renderView1();
-
-
+    view = getViewFromPanel( document.getElementById( "view2" ) );
+    if( view !== undefined )
+    {
+        view.render();
+    }
+    view = getViewFromPanel( document.getElementById( "view3" ) );
+    if( view !== undefined )
+    {
+        view.render();
+    }
+    view = getViewFromPanel( document.getElementById( "view4" ) );
+    if( view !== undefined )
+    {
+        view.render();
+    }
 }
-
-function renderView1() { views[ EView.TL ].render(); }
-function renderView2() { views[ EView.TR ].render(); }
-function renderView3() { views[ EView.BL ].render(); }
-function renderView4() { views[ EView.BR ].render(); }
