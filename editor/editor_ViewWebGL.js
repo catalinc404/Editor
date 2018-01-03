@@ -265,7 +265,7 @@ var AxisY = new THREE.Vector3( 0, 1, 0 );
 var AxisZ = new THREE.Vector3( 0, 0, 1 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function ViewWebGL( canvas, width, height, viewId ) 
+function ViewWebGL( canvas, width, height, viewId, scene, camera ) 
 {
     View.call( this, canvas, width, height, viewId );
 
@@ -275,12 +275,20 @@ function ViewWebGL( canvas, width, height, viewId )
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.context = canvas.getContext( '2d' );
+    this.scene = scene;
 
-    this.camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 1000 );
-    this.camera.position.x = -28.23;
-    this.camera.position.y =  14.34; 
-    this.camera.position.z =  31.06;
-    this.camera.lookAt( new THREE.Vector3( 0.0, 0.0, 0.0 ) );
+    if( camera === undefined )
+    {
+        this.camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 1000 );
+        this.camera.position.x = -28.23;
+        this.camera.position.y =  14.34; 
+        this.camera.position.z =  31.06;
+        this.camera.lookAt( new THREE.Vector3( 0.0, 0.0, 0.0 ) );
+    }
+    else
+    {
+        this.camera = camera;
+    }
 
     this.renderer = new THREE.WebGLRenderer( { antialias: true } );
     this.renderer.setPixelRatio( window.devicePixelRatio );
@@ -416,9 +424,23 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
     
         this.renderer.setClearColor( 0xaaaaaa );
         this.renderer.clear();
-        this.renderer.render( scene, this.camera );
+        this.renderer.render( this.scene, this.camera );
         
         this.context.drawImage( this.renderer.domElement, 0, 0 );
+    },
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    resize : function( width, height )
+    {
+        View.prototype.resize.call( this, width, height );
+
+        this.renderer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
+
+        this.canvas.width = width * window.devicePixelRatio;
+        this.canvas.height = height * window.devicePixelRatio;
+
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

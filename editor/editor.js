@@ -337,19 +337,19 @@ var defaultTexture;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function init() 
 {
+    initScene();
+
     var canvas;
     var view;
     
     canvas = document.getElementById( 'view1' );
-    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0 );
+    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0, scene );
     canvas = document.getElementById( 'view2' );
-    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 1 );
+    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 1, scene );
     canvas = document.getElementById( 'view3' );
-    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 2 );
+    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 2, scene );
     canvas = document.getElementById( 'view4' );
-    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 3 );
-    
-    initScene();
+    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 3, scene );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
