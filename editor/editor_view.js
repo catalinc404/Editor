@@ -28,27 +28,33 @@ View.prototype = Object.assign( Object.create( Object.prototype ),
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    setView : function( position, lookAt )
+    {
+        //console.log( "View.prototype.setView, viewId = " + this.viewId );
+    },
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     resize : function( width, height )
     {
-        //console.log( "View.prototype.resize, viewId = " + this.viewId );
+        //console.log( "View.prototype.prototype.resize, viewId = " + this.viewId );
     },    
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     handleMouseDown : function( event ) 
     {
-        //console.log( "View.handleMouseDown, viewId = " + this.viewId );
+        //console.log( "View.prototype.handleMouseDown, viewId = " + this.viewId );
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     handleMouseMove : function( event ) 
     {
-        //console.log( "View.handleMouseMove, viewId = " + this.viewId );
+        //console.log( "View.prototype.handleMouseMove, viewId = " + this.viewId );
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     handleMouseUp : function( event ) 
     {
-        //console.log( "View.handleMouseUp, viewId = " + this.viewId );
+        //console.log( "View.prototype.handleMouseUp, viewId = " + this.viewId );
     },
 
 } )
