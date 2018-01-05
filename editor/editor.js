@@ -166,35 +166,35 @@ function resizePanels()
 function resizePanelsXTop( x ) 
 {
     var editor = document.getElementById("editor");
+    var editorLeft   = parseInt( editor.style.left, 10);
+    var editorWidth  = parseInt( editor.style.width,  10); //document.body.clientWidth;
+    x = x - editorLeft;
 
     switch( currentViewMode  )
     {
         default:
         case EViewMode.TL_TR_BL_BR:
         {
-            var editorLeft   = parseInt( editor.style.left, 10);
-            var editorWidth  = parseInt( editor.style.width,  10); //document.body.clientWidth;
-
             var view1 = document.getElementById("view1");
             setPanelDimensions( view1, parseInt( view1.style.left, 10 ), 
                                        parseInt( view1.style.top, 10 ), 
-                                       (x - editorLeft), 
+                                       x, 
                                        parseInt( view1.style.height, 10 ) );
           
             var resizerX1 = document.getElementById("resizerX1");
-            resizerX1.style.left = (x - editorLeft) + 'px';
+            resizerX1.style.left = x + 'px';
             
             var view2 = document.getElementById("view2");
             var resizerWidth = parseInt( resizerX1.style.width, 10 );
-            setPanelDimensions( view2, (x + resizerWidth - editorLeft), 
+            setPanelDimensions( view2, (x + resizerWidth), 
                                        parseInt( view2.style.top, 10), 
                                        (editorWidth - ( parseInt( resizerX1.style.left, 10) + resizerWidth ) ), 
                                        parseInt( view2.style.height, 10 ) );
 
-            var width = (x - editorLeft) / editorWidth;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][0][2] = width;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][1][0] = width;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][1][2] = 1.0 - width;
+            var ratio = x / editorWidth;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][0][2] = ratio;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][1][0] = ratio;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][1][2] = 1.0 - ratio;
         }
         break;
         case EViewMode.TL_TR_BL:
@@ -229,35 +229,35 @@ function resizePanelsXTop( x )
 function resizePanelsXBottom( x ) 
 {
     var editor = document.getElementById("editor");
+    var editorLeft   = parseInt( editor.style.left, 10);
+    var editorWidth  = parseInt( editor.style.width,  10); //document.body.clientWidth;
+    x = x - editorLeft;
 
     switch( currentViewMode  )
     {
         default:
         case EViewMode.TL_TR_BL_BR:
         {
-            var editorLeft   = parseInt( editor.style.left, 10);
-            var editorWidth  = parseInt( editor.style.width,  10); //document.body.clientWidth;
-
             var view3 = document.getElementById("view3");
             setPanelDimensions( view3, parseInt( view3.style.left, 10 ), 
                                        parseInt( view3.style.top, 10 ), 
-                                       (x - editorLeft), 
+                                       x, 
                                        parseInt( view3.style.height, 10 ) );
           
             var resizerX2 = document.getElementById("resizerX2");
-            resizerX2.style.left = (x - editorLeft) + 'px';
+            resizerX2.style.left = x + 'px';
             
             var view4 = document.getElementById("view4");
             var resizerWidth = parseInt( resizerX2.style.width, 10 );
-            setPanelDimensions( view4, (x + resizerWidth - editorLeft), 
+            setPanelDimensions( view4, (x + resizerWidth), 
                                        parseInt( view4.style.top, 10), 
                                        (editorWidth - ( parseInt( resizerX2.style.left, 10) + resizerWidth ) ), 
                                        parseInt( view4.style.height, 10 ) );
 
-            var width = (x - editorLeft) / editorWidth;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][2][2] = width;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][3][0] = width;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][3][2] = 1.0 - width;
+            var ratio = x / editorWidth;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][2][2] = ratio;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][3][0] = ratio;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][3][2] = 1.0 - ratio;
         }
         break;
         case EViewMode.TL_TR_BL:
@@ -292,34 +292,34 @@ function resizePanelsXBottom( x )
 function resizePanelsY( y ) 
 {
     var editor = document.getElementById("editor");
+    var editorTop    = parseInt( editor.style.top,  10);            
+    var editorHeight = parseInt( editor.style.height, 10); //Math.max( window.innerHeight, document.body.clientHeight );
+    y = y - editorTop;
 
     switch( currentViewMode  )
     {
         default:
         case EViewMode.TL_TR_BL_BR:
         {
-            var editorTop    = parseInt( editor.style.top,  10);            
-            var editorHeight = parseInt( editor.style.height, 10); //Math.max( window.innerHeight, document.body.clientHeight );
-
             var view1 = document.getElementById("view1");
             setPanelDimensions( view1, parseInt( view1.style.left, 10 ), 
                                        parseInt( view1.style.top, 10 ), 
                                        parseInt( view1.style.width, 10 ), 
-                                       (y - editorTop) );
+                                       y );
 
             var resizerX1 = document.getElementById("resizerX1");
-            resizerX1.style.height = (y - editorTop) + 'px';
+            resizerX1.style.height = y + 'px';
             
             var view2 = document.getElementById("view2");
             setPanelDimensions( view2, parseInt( view2.style.left, 10 ),
                                        parseInt( view2.style.top, 10 ), 
                                        parseInt( view2.style.width, 10 ), 
-                                       (y - editorTop) );
+                                       y );
 
             var resizerY = document.getElementById("resizerY");
-            resizerY.style.top = (y - editorTop) + "px";
+            resizerY.style.top = y + "px";
             
-            var top = ( ((y - editorTop)) + parseInt( resizerY.style.height ) );
+            var top = y + parseInt( resizerY.style.height );
             var height = editorHeight - top;
 
             var view3 = document.getElementById("view3");
@@ -338,14 +338,14 @@ function resizePanelsY( y )
                                        parseInt( view4.style.width, 10 ),
                                        height );
 
-            var height = (y - editorTop) / editorHeight;
+            var ratio = y / editorHeight;
             
-            panelsDimensions[EViewMode.TL_TR_BL_BR][0][3] = height;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][1][3] = height;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][2][1] = height;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][2][3] = 1.0 - height;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][3][1] = height;
-            panelsDimensions[EViewMode.TL_TR_BL_BR][3][3] = 1.0 - height;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][0][3] = ratio;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][1][3] = ratio;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][2][1] = ratio;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][2][3] = 1.0 - ratio;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][3][1] = ratio;
+            panelsDimensions[EViewMode.TL_TR_BL_BR][3][3] = 1.0 - ratio;
         }
         break;
     }
