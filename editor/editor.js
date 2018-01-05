@@ -4,8 +4,16 @@ var EViewMode   = { TL_TR_BL_BR: 0, TL_TR_BL: 1, TL_TR: 2, TL_BL_BR: 3, TL_BL: 4
 
 var resizerDimensions = { width: 2.5, height: 2.5 };
 
-var panelsDimensions = [ [[ 0, 0, 0.5, 0.5 ], [ 0.5, 0, 0.5, 0.5], [0, 0.5, 0.5, 0.5], [0.5, 0.5, 0.5, 0.5]] ];
-var currentViewMode = EViewMode.TL_TR_BL_BR;
+var panelsDimensions = 
+[ 
+    [[ 0, 0, 0.5, 0.5 ], [ 0.5, 0, 0.5, 0.5], [0, 0.5, 0.5, 0.5], [0.5, 0.5, 0.5, 0.5]],
+    [[ 0, 0, 0, 0]],
+    [[ 0, 0, 0, 0]],
+    [[ 0, 0, 0, 0]],
+    [[ 0, 0, 0, 0]],
+    [[0.0, 0.0, 1.0, 1.0]]
+ ];
+var currentViewMode = EViewMode.TL;
 
 function Editor()
 {
@@ -156,7 +164,9 @@ function resizePanels()
         break;
         case EViewMode.TL:
         {
-            //TODO
+            width  = editorWidth  * panelsDimensions[EViewMode.TL][0][2];
+            height = editorHeight * panelsDimensions[EViewMode.TL][0][3];
+            setPanelDimensions( view1, x, y, width, height );
         }
         break;
     }
