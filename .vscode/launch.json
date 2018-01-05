@@ -28,7 +28,21 @@
                 "--allow-file-access-from-files"
             ]
             
+        },
+
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome - editor2.html",
+            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/3/Editor/editor2.html",
+            "webRoot": "${workspaceRoot}/editor2.html",
+            "runtimeArgs": [
+                "--allow-file-access-from-files"
+            ]
+            
         }
+        
+
         
     ]
 }

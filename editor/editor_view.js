@@ -9,10 +9,10 @@ function View( canvas, width, height, viewId )
     canvas.editor_view_object = this;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    canvas.addEventListener( 'mousedown',  this.handleMouseDown.bind( this ), false );
-    canvas.addEventListener( 'mousemove',  this.handleMouseMove.bind( this ), false );    
-    canvas.addEventListener( 'mouseup',    this.handleMouseUp.bind( this ),   false );
-    canvas.addEventListener( 'mouseleave', this.handleMouseUp.bind( this ),   false );    
+    canvas.addEventListener( 'mousedown',  this.handleMouseDown.bind( this ),  false );
+    canvas.addEventListener( 'mousemove',  this.handleMouseMove.bind( this ),  false );    
+    canvas.addEventListener( 'mouseup',    this.handleMouseUp.bind( this ),    false );
+    canvas.addEventListener( 'mouseleave', this.handleMouseLeave.bind( this ), false );    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,5 +57,10 @@ View.prototype = Object.assign( Object.create( Object.prototype ),
         //console.log( "View.prototype.handleMouseUp, viewId = " + this.viewId );
     },
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    handleMouseLeave : function( event ) 
+    {
+        //console.log( "View.prototype.handleMouseLeave, viewId = " + this.viewId );
+    },
 } )
 

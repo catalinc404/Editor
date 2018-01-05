@@ -302,6 +302,17 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
         requestAnimationFrame( this.fnRender );        
     },
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    handleMouseLeave : function( event ) 
+    {
+        View.prototype.handleMouseLeave.call( this, event );
+
+        //console.log( "ViewWebGL2.prototype.handleMouseLeave, viewId = " + this.viewId );
+
+        ViewWebGL.prototype.handleMouseUp.call( this, event );
+    },
+    
+
 } )
 
 
