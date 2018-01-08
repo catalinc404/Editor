@@ -224,6 +224,12 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
         {
             case 0:  
             { 
+                this.currentControlMode = EControlMode.SELECT;
+            }
+            break;
+    
+            case 1:  
+            { 
                 if( event.shiftKey == true )
                 {
                     this.currentControlMode = EControlMode.TRACKBALL;
@@ -234,15 +240,9 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
                     this.currentControlMode = EControlMode.PAN;
                 }
                 else
-                {
-                    this.currentControlMode = EControlMode.SELECT;
+                {                
+                    this.currentControlMode = EControlMode.ZOOM;
                 }
-            }
-            break;
-    
-            case 1:  
-            { 
-                this.currentControlMode = EControlMode.ZOOM;
             }
             break;
     

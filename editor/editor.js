@@ -3,6 +3,7 @@ var EView       = { TL: 0, TR: 1, BL: 2, BR: 3  };
 var EViewMode   = { TL_TR_BL_BR: 0, TL_TR_BL: 1, TL_TR: 2, TL_BL_BR: 3, TL_BL: 4, TL: 5  };
 
 var resizerDimensions = { width: 2.5, height: 2.5 };
+var panelMenubarHeight = 20;
 
 var panelsDimensions = 
 [ 
@@ -13,7 +14,7 @@ var panelsDimensions =
     [[ 0, 0, 0, 0]],
     [[0.0, 0.0, 1.0, 1.0]]
  ];
-var currentViewMode = EViewMode.TL;
+var currentViewMode = EViewMode.TL_TR_BL_BR;
 
 function Editor()
 {
@@ -63,10 +64,36 @@ function setPanelDimensions( panel, left, top, width, height )
     panel.style.width = width + "px";
     panel.style.height = height + "px";
 
-    var view = getViewFromPanel( panel );
+    var _top = 0;
+    var _height = height;
+
+    var menuElement = panel.getElementsByClassName( "horizontalmenu" )[0];
+    if( menuElement !== undefined )
+    {
+        menuElement.style.visibility = "visible";
+        menuElement.style.left = 0 + "px";
+        menuElement.style.top = 0 + "px";
+        menuElement.style.width = width + "px";
+        menuElement.style.height = panelMenubarHeight + "px";
+
+        _top = panelMenubarHeight;
+        _height = height - panelMenubarHeight;
+    }
+    
+    var viewElement = panel.getElementsByClassName( "element" )[0];
+    if( viewElement !== undefined )
+    {
+        viewElement.style.visibility = "visible";
+        viewElement.style.left = 0 + "px";
+        viewElement.style.top = _top + "px";
+        viewElement.style.width = width + "px";
+        viewElement.style.height = _height + "px";
+    }
+
+    var view = getViewFromPanel( viewElement );
     if( view !== undefined )
     {
-        view.resize( width, height );
+        view.resize( width, _height );
         view.render();
     }
 }
@@ -89,10 +116,10 @@ function resizePanels()
 {
     var editor = document.getElementById("editor");
 
-    var view1 = document.getElementById("view1");
-    var view2 = document.getElementById("view2");
-    var view3 = document.getElementById("view3");
-    var view4 = document.getElementById("view4");
+    var view1 = document.getElementById("panelView1");
+    var view2 = document.getElementById("panelView2");
+    var view3 = document.getElementById("panelView3");
+    var view4 = document.getElementById("panelView4");
 
     var resizerX1 = document.getElementById("resizerX1");
     var resizerX2 = document.getElementById("resizerX2");
@@ -113,32 +140,32 @@ function resizePanels()
         default:
         case EViewMode.TL_TR_BL_BR:
         {
-            width  = editorWidth  * panelsDimensions[EViewMode.TL_TR_BL_BR][0][2];
-            height = editorHeight * panelsDimensions[EViewMode.TL_TR_BL_BR][0][3];
+            width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.TL_TR_BL_BR][0][2] );
+            height = Math.floor( editorHeight * panelsDimensions[EViewMode.TL_TR_BL_BR][0][3] );
             setPanelDimensions( view1, x, y, (width - resizerDimensions.width), (height - resizerDimensions.height) );
 
             x += width - resizerDimensions.width;
             setPanelDimensions( resizerX1, x, y, resizerDimensions.width * 2, (height - resizerDimensions.height) );
 
             x += resizerDimensions.width * 2;
-            width = editorWidth * panelsDimensions[EViewMode.TL_TR_BL_BR][1][2];
+            width = Math.floor( editorWidth * panelsDimensions[EViewMode.TL_TR_BL_BR][1][2] );
             setPanelDimensions( view2, x, y, (width - resizerDimensions.width), (height - resizerDimensions.height) );
 
             x = 0; //editorLeft;
             y += height - resizerDimensions.width;
             setPanelDimensions( resizerY, x, y, editorWidth, resizerDimensions.height * 2 );
 
-            width = editorWidth  * panelsDimensions[EViewMode.TL_TR_BL_BR][2][2]; 
+            width = Math.floor( editorWidth  * panelsDimensions[EViewMode.TL_TR_BL_BR][2][2] ); 
             y += resizerDimensions.height * 2;
-            height = editorHeight * panelsDimensions[EViewMode.TL_TR_BL_BR][2][3];
+            height = Math.floor( editorHeight * panelsDimensions[EViewMode.TL_TR_BL_BR][2][3] );
             setPanelDimensions( view3, x, y, (width - resizerDimensions.width), (height - resizerDimensions.height) );
 
             x += width - resizerDimensions.width;
             setPanelDimensions( resizerX2, x, y, resizerDimensions.width * 2, height );
 
             x += resizerDimensions.width * 2;
-            width = editorWidth * panelsDimensions[EViewMode.TL_TR_BL_BR][3][2];
-            height = editorHeight * panelsDimensions[EViewMode.TL_TR_BL_BR][3][3];
+            width = Math.floor( editorWidth * panelsDimensions[EViewMode.TL_TR_BL_BR][3][2] );
+            height = Math.floor( editorHeight * panelsDimensions[EViewMode.TL_TR_BL_BR][3][3] );
             setPanelDimensions( view4, x, y, (width - resizerDimensions.width), (height - resizerDimensions.height) );
         }
         break;
@@ -164,8 +191,8 @@ function resizePanels()
         break;
         case EViewMode.TL:
         {
-            width  = editorWidth  * panelsDimensions[EViewMode.TL][0][2];
-            height = editorHeight * panelsDimensions[EViewMode.TL][0][3];
+            width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.TL][0][2] );
+            height = Math.floor( editorHeight * panelsDimensions[EViewMode.TL][0][3] );
             setPanelDimensions( view1, x, y, width, height );
         }
         break;
@@ -185,7 +212,7 @@ function resizePanelsXTop( x )
         default:
         case EViewMode.TL_TR_BL_BR:
         {
-            var view1 = document.getElementById("view1");
+            var view1 = document.getElementById("panelView1");
             setPanelDimensions( view1, parseInt( view1.style.left, 10 ), 
                                        parseInt( view1.style.top, 10 ), 
                                        x, 
@@ -194,7 +221,7 @@ function resizePanelsXTop( x )
             var resizerX1 = document.getElementById("resizerX1");
             resizerX1.style.left = x + 'px';
             
-            var view2 = document.getElementById("view2");
+            var view2 = document.getElementById("panelView2");
             var resizerWidth = parseInt( resizerX1.style.width, 10 );
             setPanelDimensions( view2, (x + resizerWidth), 
                                        parseInt( view2.style.top, 10), 
@@ -248,7 +275,7 @@ function resizePanelsXBottom( x )
         default:
         case EViewMode.TL_TR_BL_BR:
         {
-            var view3 = document.getElementById("view3");
+            var view3 = document.getElementById("panelView3");
             setPanelDimensions( view3, parseInt( view3.style.left, 10 ), 
                                        parseInt( view3.style.top, 10 ), 
                                        x, 
@@ -257,7 +284,7 @@ function resizePanelsXBottom( x )
             var resizerX2 = document.getElementById("resizerX2");
             resizerX2.style.left = x + 'px';
             
-            var view4 = document.getElementById("view4");
+            var view4 = document.getElementById("panelView4");
             var resizerWidth = parseInt( resizerX2.style.width, 10 );
             setPanelDimensions( view4, (x + resizerWidth), 
                                        parseInt( view4.style.top, 10), 
@@ -311,7 +338,7 @@ function resizePanelsY( y )
         default:
         case EViewMode.TL_TR_BL_BR:
         {
-            var view1 = document.getElementById("view1");
+            var view1 = document.getElementById("panelView1");
             setPanelDimensions( view1, parseInt( view1.style.left, 10 ), 
                                        parseInt( view1.style.top, 10 ), 
                                        parseInt( view1.style.width, 10 ), 
@@ -320,7 +347,7 @@ function resizePanelsY( y )
             var resizerX1 = document.getElementById("resizerX1");
             resizerX1.style.height = y + 'px';
             
-            var view2 = document.getElementById("view2");
+            var view2 = document.getElementById("panelView2");
             setPanelDimensions( view2, parseInt( view2.style.left, 10 ),
                                        parseInt( view2.style.top, 10 ), 
                                        parseInt( view2.style.width, 10 ), 
@@ -332,7 +359,7 @@ function resizePanelsY( y )
             var top = y + parseInt( resizerY.style.height );
             var height = editorHeight - top;
 
-            var view3 = document.getElementById("view3");
+            var view3 = document.getElementById("panelView3");
             setPanelDimensions( view3, parseInt( view3.style.left, 10 ), 
                                        top, 
                                        parseInt( view3.style.width, 10 ), 
@@ -342,7 +369,7 @@ function resizePanelsY( y )
             resizerX2.style.top = top + 'px';
             resizerX2.style.height = height + 'px';
             
-            var view4 = document.getElementById("view4");
+            var view4 = document.getElementById("panelView4");
             setPanelDimensions( view4, parseInt( view4.style.left, 10 ), 
                                        top, 
                                        parseInt( view4.style.width, 10 ),
@@ -375,19 +402,19 @@ function init()
     var canvas;
     var view;
     
-    canvas = document.getElementById( 'view1' );
+    canvas = document.getElementById( "view1" );
     view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0, scene );
     view.setView( new THREE.Vector3( -28.23, 14.34, 31.06 ), Zero );
 
-    canvas = document.getElementById( 'view2' );
+    canvas = document.getElementById( "view2" );
     view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 1, scene );
     view.setView( new THREE.Vector3( -50, 5, 0 ), Zero );
 
-    canvas = document.getElementById( 'view3' );
+    canvas = document.getElementById( "view3" );
     view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 2, scene );
     view.setView( new THREE.Vector3( 0, 5, -50 ), Zero );
 
-    canvas = document.getElementById( 'view4' );
+    canvas = document.getElementById( "view4" );
     view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 3, scene );
     view.setView( new THREE.Vector3( 0, 55, 0 ), Zero );
 }
@@ -457,7 +484,10 @@ function initScene()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function getViewFromPanel( panel )
 {
-    return panel.editor_view_object;
+    if( panel !== undefined )
+    {
+        return panel.editor_view_object;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -62,6 +62,90 @@
                 position: absolute;
                 overflow: hidden;
             }
+
+            .horizontalmenu ul {
+                z-index: 50;
+                list-style: none;
+                padding: 0;
+                margin-top:0;
+                margin-bottom: 0;
+              }
+              
+              .horizontalmenu > ul:after{
+                  clear:both;
+                  content:"";
+                  display:block;
+              }
+              
+              .horizontalmenu > ul > li {
+                float: left;
+                position: relative;
+                border: 1px solid #CC55FF;
+              }
+              
+              .horizontalmenu > ul > li > a {
+                  text-decoration: none;
+                  padding: 1px 1px;
+                  display:block;
+                  color: black;
+              }
+              
+              .horizontalmenu > ul > li > a:hover {
+                  background-color: lightgreen;
+              }
+              
+              
+              .horizontalmenu > ul > li > ul {
+                  background-color:red;
+                   display: none;
+                width:150px;
+                top:100%;
+                left:0;
+                position: absolute;
+              }
+              
+              .horizontalmenu > ul > li > ul > li {
+                position: relative;
+                width:100%;
+                display: block;
+              }
+              
+              .horizontalmenu > ul > li > ul > li > a {
+                text-decoration: none;
+                  padding: 1px 1px;
+                  display:block;
+                  color: black;
+              }
+              
+              .horizontalmenu > ul > li > ul > li > a:hover {
+                background-color:white;
+              }
+              
+              .horizontalmenu > ul > li:hover > ul {
+                display: block;
+              }
+              
+              .horizontalmenu > ul > li > ul > li > ul {
+                  display:none;
+                  background-color:lightblue;
+                  position:absolute;
+                  left:100%;
+                  top:0;
+                  width: 150px;
+                background-color: green;
+              }
+              
+              .horizontalmenu > ul > li > ul > li > ul > li > a {
+                text-decoration: none;
+                  padding: 1px 1px;
+                  display:block;
+                  color: black;
+              }
+              
+              .horizontalmenu > ul > li > ul > li > ul > li > a:hover 
+              {
+                  background-color:yellow;
+              }
         </style>
 
         <script src="./libs/three.js"></script>
@@ -83,9 +167,87 @@
             <!-- ----------------------------------------------------------------------------- -->
             <!-- First row                                                                     -->
             <!-- ----------------------------------------------------------------------------- -->
-            <canvas id="view1" class="element"></canvas>
+            <div id="panelView1" class="page_element">
+                    <div id="menuView1" class="horizontalmenu">
+                            <ul>
+                                <li>
+                                    <a href="#">News</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">National</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">International</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Sport</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Hollybood</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="#">Technology</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">IT/Software</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Hardware</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Iphone</a>
+                                            <ul class="horizontal">
+                                                <li>
+                                                    <a href="#">IT/Software</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <a href="#">Neuro-Science</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="#">Sports</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">Cricket</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Tenis</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Badminton</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Hockey</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="#">Country</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">India</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">America</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">France</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div> 
+                <canvas id="view1" class="element"></canvas>
+            </div>
             <div id="resizerX1" class="resizerX"></div>
-            <canvas id="view2" class="element"></canvas>
+            <div id="panelView2" class="page_element">
+                <canvas id="view2" class="element"></canvas>
+            </div>
 
             <!-- ----------------------------------------------------------------------------- -->
             <!-- Horizontal resizer                                                            -->
@@ -95,10 +257,13 @@
             <!-- ----------------------------------------------------------------------------- -->
             <!-- Second row                                                                    -->
             <!-- ----------------------------------------------------------------------------- -->
-            <canvas id="view3" class="element"></canvas>
+            <div id="panelView3" class="page_element">
+                <canvas id="view3" class="element"></canvas>
+            </div>
             <div id="resizerX2" class="resizerX"></div>
-            <canvas id="view4" class="element"></canvas>
-
+            <div id="panelView4" class="page_element">
+                <canvas id="view4" class="element"></canvas>
+            </div>
         </div>
         <div id="viewSelect" class="selectionRectangle"></div>
         <div id="right" class="page_element" style="background-color:rgb(143, 102, 255)"></div>
