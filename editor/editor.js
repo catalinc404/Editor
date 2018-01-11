@@ -70,7 +70,6 @@ function setPanelDimensions( panel, left, top, width, height )
     var menuElement = panel.getElementsByClassName( "horizontalmenu" )[0];
     if( menuElement !== undefined )
     {
-        menuElement.style.visibility = "visible";
         menuElement.style.left = 0 + "px";
         menuElement.style.top = 0 + "px";
         menuElement.style.width = width + "px";
@@ -403,20 +402,32 @@ function init()
     var view;
     
     canvas = document.getElementById( "view1" );
-    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0, scene );
-    view.setView( new THREE.Vector3( -28.23, 14.34, 31.06 ), Zero );
+    if( canvas != null )
+    {
+        view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 0, scene );
+        view.setView( new THREE.Vector3( -28.23, 14.34, 31.06 ), Zero );
+    }
 
     canvas = document.getElementById( "view2" );
-    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 1, scene );
-    view.setView( new THREE.Vector3( -50, 5, 0 ), Zero );
+    if( canvas != null )
+    {
+        view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 1, scene );
+        view.setView( new THREE.Vector3( -50, 5, 0 ), Zero );
+    }
 
     canvas = document.getElementById( "view3" );
-    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 2, scene );
-    view.setView( new THREE.Vector3( 0, 5, -50 ), Zero );
+    if( canvas != null )
+    {
+        view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 2, scene );
+        view.setView( new THREE.Vector3( 0, 5, -50 ), Zero );
+    }
 
     canvas = document.getElementById( "view4" );
-    view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 3, scene );
-    view.setView( new THREE.Vector3( 0, 55, 0 ), Zero );
+    if( canvas != null )
+    {
+        view = new ViewWebGL( canvas, parseInt( canvas.style.width, 10), parseInt( canvas.style.height, 10 ), 3, scene );
+        view.setView( new THREE.Vector3( 0, 55, 0 ), Zero );
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -484,7 +495,7 @@ function initScene()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function getViewFromPanel( panel )
 {
-    if( panel !== undefined )
+    if( panel != null )
     {
         return panel.editor_view_object;
     }
