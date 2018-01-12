@@ -16,7 +16,8 @@ var panelsDimensions =
     [[0.0, 0.0, 1.0, 1.0]],
     [[0.0, 0.0, 1.0, 1.0]],
     [[0.0, 0.0, 1.0, 1.0]]
- ];
+];
+
 var currentViewMode = EViewMode.TL;
 
 function Editor()
@@ -300,9 +301,12 @@ function resizePanelsXTop( x )
             //TODO
         }
         break;
+
         case EViewMode.TL:
+        case EViewMode.TR:
+        case EViewMode.BL:
+        case EViewMode.BR:
         {
-            //TODO
         }
         break;
     } 
