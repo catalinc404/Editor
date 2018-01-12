@@ -2,11 +2,11 @@
 var pageLayout = { header: 52, left: 200, right: 200, footer: 100 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function setElementDimensions( element, left, top, width, height )
+function setElementDimensions( element, left, top, width, height, visibility )
 {
     console.log( "setElementDimensions: element=" + element.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
 
-    element.style.visibility = "visible";
+    element.style.visibility = ( visibility !== undefined ) ? visibility : "visible";
     element.style.left = left + "px";
     element.style.top = top + "px";
     element.style.width = width + "px";

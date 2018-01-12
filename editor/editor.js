@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var EView       = { TL: 0, TR: 1, BL: 2, BR: 3  };
-var EViewMode   = { TL_TR_BL_BR: 0, TL_TR_BL: 1, TL_TR: 2, TL_BL_BR: 3, TL_BL: 4, TL: 5  };
+var EViewMode   = { TL_TR_BL_BR: 0, TL_TR_BL: 1, TL_TR: 2, TL_BL_BR: 3, TL_BL: 4, TL: 5, TR: 6, BL:7, BR: 8  };
 
 var resizerDimensions = { width: 2.5, height: 2.5 };
 var panelMenubarHeight = 20;
@@ -12,9 +12,12 @@ var panelsDimensions =
     [[ 0, 0, 0, 0]],
     [[ 0, 0, 0, 0]],
     [[ 0, 0, 0, 0]],
+    [[0.0, 0.0, 1.0, 1.0]],
+    [[0.0, 0.0, 1.0, 1.0]],
+    [[0.0, 0.0, 1.0, 1.0]],
     [[0.0, 0.0, 1.0, 1.0]]
  ];
-var currentViewMode = EViewMode.TL_TR_BL_BR;
+var currentViewMode = EViewMode.TL;
 
 function Editor()
 {
@@ -54,15 +57,13 @@ function Editor()
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function setPanelDimensions( panel, left, top, width, height )
+function setPanelDimensions( panel, left, top, width, height, visibility )
 {
     console.log( "setPanelDimensions: panel=" + panel.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
 
-    panel.style.visibility = "visible";
-    panel.style.left = left + "px";
-    panel.style.top = top + "px";
-    panel.style.width = width + "px";
-    panel.style.height = height + "px";
+    visibility = (visibility === undefined) ? "visible" : visibility;
+
+    setElementDimensions( panel, left, top, width, height, visibility );
 
     var _top = 0;
     var _height = height;
@@ -70,27 +71,20 @@ function setPanelDimensions( panel, left, top, width, height )
     var menuElement = panel.getElementsByClassName( "horizontalmenu" )[0];
     if( menuElement !== undefined )
     {
-        menuElement.style.left = 0 + "px";
-        menuElement.style.top = 0 + "px";
-        menuElement.style.width = width + "px";
-        menuElement.style.height = panelMenubarHeight + "px";
+        setElementDimensions( menuElement, left, top, width, panelMenubarHeight, visibility );
 
-        _top = panelMenubarHeight;
-        _height = height - panelMenubarHeight;
+        //_top = panelMenubarHeight;
+        //_height = height - panelMenubarHeight;
     }
     
     var viewElement = panel.getElementsByClassName( "element" )[0];
     if( viewElement !== undefined )
     {
-        viewElement.style.visibility = "visible";
-        viewElement.style.left = 0 + "px";
-        viewElement.style.top = _top + "px";
-        viewElement.style.width = width + "px";
-        viewElement.style.height = _height + "px";
+        setElementDimensions( viewElement, 0, _top, width, _height, visibility );
     }
 
     var view = getViewFromPanel( viewElement );
-    if( view !== undefined )
+    if( view !== undefined && visibility !== undefined && visibility === "visible" )
     {
         view.resize( width, _height );
         view.render();
@@ -190,9 +184,62 @@ function resizePanels()
         break;
         case EViewMode.TL:
         {
+            setPanelDimensions( view2, 0, 0, 0, 0, "hidden" );
+            setPanelDimensions( view3, 0, 0, 0, 0, "hidden" );
+            setPanelDimensions( view4, 0, 0, 0, 0, "hidden" );
+
+            setElementDimensions( resizerX1, 0, 0, 0, 0, "hidden" );
+            setElementDimensions( resizerX2, 0, 0, 0, 0, "hidden" );
+            setElementDimensions( resizerY,  0, 0, 0, 0, "hidden" );
+
             width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.TL][0][2] );
             height = Math.floor( editorHeight * panelsDimensions[EViewMode.TL][0][3] );
             setPanelDimensions( view1, x, y, width, height );
+        }
+        break;
+        case EViewMode.TR:
+        {
+            setPanelDimensions( view1, 0, 0, 0, 0, "hidden" );
+            setPanelDimensions( view3, 0, 0, 0, 0, "hidden" );
+            setPanelDimensions( view4, 0, 0, 0, 0, "hidden" );
+
+            setElementDimensions( resizerX1, 0, 0, 0, 0, "hidden" );
+            setElementDimensions( resizerX2, 0, 0, 0, 0, "hidden" );
+            setElementDimensions( resizerY,  0, 0, 0, 0, "hidden" );
+
+            width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.TR][0][2] );
+            height = Math.floor( editorHeight * panelsDimensions[EViewMode.TR][0][3] );
+            setPanelDimensions( view2, x, y, width, height );
+        }
+        break;
+        case EViewMode.BL:
+        {
+            setPanelDimensions( view1, 0, 0, 0, 0, "hidden" );
+            setPanelDimensions( view2, 0, 0, 0, 0, "hidden" );
+            setPanelDimensions( view4, 0, 0, 0, 0, "hidden" );
+
+            setElementDimensions( resizerX1, 0, 0, 0, 0, "hidden" );
+            setElementDimensions( resizerX2, 0, 0, 0, 0, "hidden" );
+            setElementDimensions( resizerY,  0, 0, 0, 0, "hidden" );
+
+            width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.BL][0][2] );
+            height = Math.floor( editorHeight * panelsDimensions[EViewMode.BL][0][3] );
+            setPanelDimensions( view3, x, y, width, height );
+        }
+        break;
+        case EViewMode.BR:
+        {
+            setPanelDimensions( view1, 0, 0, 0, 0, "hidden" );
+            setPanelDimensions( view2, 0, 0, 0, 0, "hidden" );
+            setPanelDimensions( view3, 0, 0, 0, 0, "hidden" );
+
+            setElementDimensions( resizerX1, 0, 0, 0, 0, "hidden" );
+            setElementDimensions( resizerX2, 0, 0, 0, 0, "hidden" );
+            setElementDimensions( resizerY,  0, 0, 0, 0, "hidden" );
+
+            width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.BR][0][2] );
+            height = Math.floor( editorHeight * panelsDimensions[EViewMode.BR][0][3] );
+            setPanelDimensions( view4, x, y, width, height );
         }
         break;
     }
@@ -387,6 +434,16 @@ function resizePanelsY( y )
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function setPanelsLayout( mode )
+{
+    if( (mode !== undefined) && (mode != currentViewMode) )
+    {
+        currentViewMode = mode;
+
+        resizePanels();
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var scene;
