@@ -128,6 +128,8 @@ function resizePanels()
     var y = 0; //editorTop;
     var width = 0;
     var height = 0;
+
+    //TODO: min dimensions
     
     switch( currentViewMode )
     {
