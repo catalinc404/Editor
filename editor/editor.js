@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var EView       = { TL: 0, TR: 1, BL: 2, BR: 3  };
-var EViewMode   = { TL_TR_BL_BR: 0, TL_TR_BL: 1, TL_TR: 2, TL_BL_BR: 3, TL_BL: 4, TL: 5, TR: 6, BL:7, BR: 8  };
+var EViewMode   = { TL_TR_BL_BR: 0, TL_TR_BL: 1, TL_BL_BR: 2, TL_TR: 3, TL_BL_BR: 4, TL_BL: 5, TL: 6, TR: 7, BL: 8, BR: 9  };
 
 var resizerDimensions = { width: 2.5, height: 2.5 };
 var panelMenubarHeight = 20;
@@ -8,6 +8,7 @@ var panelMenubarHeight = 20;
 var panelsDimensions = 
 [ 
     [[ 0, 0, 0.5, 0.5 ], [ 0.5, 0, 0.5, 0.5], [0, 0.5, 0.5, 0.5], [0.5, 0.5, 0.5, 0.5]],
+    [[ 0, 0, 0, 0]],
     [[ 0, 0, 0, 0]],
     [[ 0, 0, 0, 0]],
     [[ 0, 0, 0, 0]],
