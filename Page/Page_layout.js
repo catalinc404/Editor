@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var pageLayout = { header: 52, left: 200, right: 200, footer: 100 };
+var pageLayout = { header: 52, header_tabs: 38, left: 200, right: 200, footer: 100 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function setElementDimensions( element, left, top, width, height, visibility )
@@ -22,14 +22,18 @@ function setupPageLayout()
     var element = document.getElementById("header");
     setElementDimensions( element, 0, 0, width, pageLayout.header );
 
+    var element = document.getElementById("header-tabs");
+    setElementDimensions( element, 0, pageLayout.header, width, pageLayout.header_tabs );
+
+
     var element = document.getElementById("left");
-    setElementDimensions( element, 0, pageLayout.header, pageLayout.left, height - (pageLayout.header + pageLayout.footer) );
+    setElementDimensions( element, 0, pageLayout.header + pageLayout.header_tabs, pageLayout.left, height - (pageLayout.header + pageLayout.footer) );
 
     var element = document.getElementById("editor");
-    setElementDimensions( element, pageLayout.left, pageLayout.header, width - (pageLayout.left + pageLayout.right ), height - (pageLayout.header + pageLayout.footer) );
+    setElementDimensions( element, pageLayout.left, pageLayout.header + pageLayout.header_tabs, width - (pageLayout.left + pageLayout.right ), height - (pageLayout.header + pageLayout.footer) );
     
     var element = document.getElementById("right");
-    setElementDimensions( element, width - pageLayout.right, pageLayout.header, pageLayout.right, height - (pageLayout.header + pageLayout.footer) );
+    setElementDimensions( element, width - pageLayout.right, pageLayout.header + pageLayout.header_tabs, pageLayout.right, height - (pageLayout.header + pageLayout.footer) );
 
     var element = document.getElementById("footer");
     setElementDimensions( element, 0, height - pageLayout.footer, width, pageLayout.footer );
