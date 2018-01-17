@@ -96,7 +96,7 @@ function setPanelDimensions( panel, left, top, width, height, visibility )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function setupPanels()
 {
-    resizerX( "resizerX1", function( e ) { resizePanelsXTop( e.pageX ); } );
+    resizerX( "resizerX1", function( e ) { resizePanelsXTop( e.pageX ); console.log("resizerX1 x=" + e.pageX ); } );
     resizerX( "resizerX2", function( e ) { resizePanelsXBottom( e.pageX ); } );
     resizerY( "resizerY",  function( e ) { resizePanelsY( e.pageY ); } );
     

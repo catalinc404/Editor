@@ -1,19 +1,12 @@
-function resizer( resizerID, mousemove ) 
+function resizer( resizerID, mousemoveCallback ) 
 {
     var resizer = document.getElementById( resizerID );
-    resizer.mousemove = mousemove;
+    resizer.mousemoveCallback = mousemoveCallback;
 
     resizer.onmousedown = function( e ) 
     {
-        try
-        {
-            document.documentElement.addEventListener( 'mousemove', resizer.doDrag, false );
-            document.documentElement.addEventListener( 'mouseup', resizer.stopDrag, false );
-        } 
-        catch (e) 
-        {
-            console.log( "resizer.onmousedown(...) failed! Your browser does not support this feature. " + e.message );
-        }
+        document.documentElement.addEventListener( 'mousemove', resizer.doDrag, false );
+        document.documentElement.addEventListener( 'mouseup', resizer.stopDrag, false );
     }
 
     resizer.doDrag = function( e ) 
@@ -23,7 +16,7 @@ function resizer( resizerID, mousemove )
             resizer.stopDrag( e );
             return;
         }
-        resizer.mousemove( e );
+        resizer.mousemoveCallback( e );
     }
 
     resizer.stopDrag = function( e ) 
