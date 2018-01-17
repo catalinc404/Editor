@@ -1,7 +1,6 @@
-function resizer( resizerID, mousemove, cursor ) 
+function resizer( resizerID, mousemove ) 
 {
     var resizer = document.getElementById( resizerID );
-    resizer.style.cursor = cursor;
     resizer.mousemove = mousemove;
 
     resizer.onmousedown = function( e ) 
@@ -36,10 +35,10 @@ function resizer( resizerID, mousemove, cursor )
 
 function resizerX( resizerID, mousemoveCallback ) 
 {
-    resizer( resizerID, mousemoveCallback, "e-resize");
+    resizer( resizerID, mousemoveCallback );
 }
 
 function resizerY( resizerID, mousemoveCallback ) 
 {
-    resizer( resizerID, mousemoveCallback, "n-resize" );
+    resizer( resizerID, mousemoveCallback );
 }

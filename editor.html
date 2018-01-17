@@ -21,32 +21,38 @@
                 min-height: 600;                
             }
             .element
-	          {
+	        {
                 overflow:hidden; 
                 /*border:1px solid rgba(0, 0, 0, 0.527);*/
-		            width: 0px; 
+		        width: 0px; 
                 height:0px;
                 visibility: hidden;
                 position: absolute;
-	          }
+	        }
             .resizerX
-	          {
+	        {
                 overflow:hidden; 
-		            background-color: #333;
+		        background-color: #333;
+                cursor: e-resize;
                 width: 0px; 
                 height:0px;
                 visibility: hidden;
                 position: absolute;
-	          }
+                /* TODO: remove this */
+                background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAXAQMAAAD0oWdxAAAABlBMVEUAAACkvtSA7tmIAAAAAXRSTlMAQObYZgAAAA5JREFUeF5jWMDAQDwGAKyuB4FpGQdzAAAAAElFTkSuQmCC) no-repeat center center;
+	        }
             .resizerY
-	          {
+	        {
                 overflow:hidden; 
-		            background-color: #333;
+		        background-color: #333;
+                cursor: n-resize;
                 width: 0px; 
                 height:0px;
                 visibility: hidden;
                 position: absolute;
-	          }
+                /* TODO: remove this */
+                background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAADAQMAAABCowZuAAAABlBMVEUAAACkvtSA7tmIAAAAAXRSTlMAQObYZgAAAA9JREFUCB1jXMUABoxAGgAJaAFXPIkJqAAAAABJRU5ErkJggg==) no-repeat center center;
+	        }
             .selectionRectangle
             {
                 position:absolute;
