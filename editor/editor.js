@@ -19,7 +19,7 @@ var panelsDimensions =
     [[0.0, 0.0, 1.0, 1.0]]
 ];
 
-var currentViewMode = EViewMode.TL;
+var currentViewMode = EViewMode.TL_TR_BL_BR;
 
 function Editor()
 {
@@ -61,7 +61,7 @@ function Editor()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function setPanelDimensions( panel, left, top, width, height, visibility )
 {
-    console.log( "setPanelDimensions: panel=" + panel.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
+    //console.log( "setPanelDimensions: panel=" + panel.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
 
     visibility = (visibility === undefined) ? "visible" : visibility;
 

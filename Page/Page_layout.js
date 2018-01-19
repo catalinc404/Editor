@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var pageLayout = { header: 52, header_tabs: 38, left: 200, right: 200, footer: 100 };
+var pageLayout = { header: 52, header_tabs: 70, left: 200, right: 200, footer: 100 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function setElementDimensions( element, left, top, width, height, visibility )
 {
-    console.log( "setElementDimensions: element=" + element.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
+    //console.log( "setElementDimensions: element=" + element.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
 
     element.style.visibility = ( visibility !== undefined ) ? visibility : "visible";
     element.style.left = left + "px";
