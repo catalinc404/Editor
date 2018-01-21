@@ -19,6 +19,15 @@ var panelsDimensions =
     [[0.0, 0.0, 1.0, 1.0]]
 ];
 
+var panelsLimitDimensions = 
+[ 
+    { minWidth: 100, minHeight: 100, maxWidth: 4096, maxHeight: 4096 },
+    { minWidth: 100, minHeight: 100, maxWidth: 4096, maxHeight: 4096 },
+    { minWidth: 100, minHeight: 100, maxWidth: 4096, maxHeight: 4096 },
+    { minWidth: 100, minHeight: 100, maxWidth: 4096, maxHeight: 4096 }
+]
+
+
 var currentViewMode = EViewMode.TL_TR_BL_BR;
 
 function Editor()
@@ -137,33 +146,36 @@ function resizePanels()
         default:
         case EViewMode.TL_TR_BL_BR:
         {
-            width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.TL_TR_BL_BR][0][2] );
-            height = Math.floor( editorHeight * panelsDimensions[EViewMode.TL_TR_BL_BR][0][3] );
-            setPanelDimensions( view1, x, y, (width - resizerDimensions.width), (height - resizerDimensions.height) );
+            width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.TL_TR_BL_BR][0][2] - resizerDimensions.width );
+            height = Math.floor( editorHeight * panelsDimensions[EViewMode.TL_TR_BL_BR][0][3] - resizerDimensions.height );
+            width  = Math.max( Math.min( width,  panelsLimitDimensions[EView.TL].maxWidth  ), panelsLimitDimensions[EView.TL].minWidth  );
+            height = Math.max( Math.min( height, panelsLimitDimensions[EView.TL].maxHeight ), panelsLimitDimensions[EView.TL].minHeight );
+            setPanelDimensions( view1, x, y, width, height );
 
-            x += width - resizerDimensions.width;
-            setPanelDimensions( resizerX1, x, y, resizerDimensions.width * 2, (height - resizerDimensions.height) );
+            x += width;
+            setPanelDimensions( resizerX1, x, y, resizerDimensions.width * 2, height );
 
             x += resizerDimensions.width * 2;
-            width = Math.floor( editorWidth * panelsDimensions[EViewMode.TL_TR_BL_BR][1][2] );
-            setPanelDimensions( view2, x, y, (width - resizerDimensions.width), (height - resizerDimensions.height) );
+            width  = Math.max( Math.min( editorWidth - x,  panelsLimitDimensions[EView.TR].maxWidth  ), panelsLimitDimensions[EView.TR].minWidth  );
+            setPanelDimensions( view2, x, y, width, height );
 
-            x = 0; //editorLeft;
-            y += height - resizerDimensions.width;
+            x = 0;
+            y += height;
             setPanelDimensions( resizerY, x, y, editorWidth, resizerDimensions.height * 2 );
 
-            width = Math.floor( editorWidth  * panelsDimensions[EViewMode.TL_TR_BL_BR][2][2] ); 
+            width = Math.floor( editorWidth  * panelsDimensions[EViewMode.TL_TR_BL_BR][2][2] - resizerDimensions.width ); 
+            width = Math.max( Math.min( width,  panelsLimitDimensions[EView.BL].maxWidth  ), panelsLimitDimensions[EView.BL].minWidth  );
             y += resizerDimensions.height * 2;
-            height = Math.floor( editorHeight * panelsDimensions[EViewMode.TL_TR_BL_BR][2][3] );
-            setPanelDimensions( view3, x, y, (width - resizerDimensions.width), (height - resizerDimensions.height) );
+            height = Math.floor( editorHeight - y );
+            height = Math.max( Math.min( height, panelsLimitDimensions[EView.BL].maxHeight ), panelsLimitDimensions[EView.BL].minHeight );
+            setPanelDimensions( view3, x, y, width, height );
 
-            x += width - resizerDimensions.width;
+            x += width;
             setPanelDimensions( resizerX2, x, y, resizerDimensions.width * 2, height );
 
             x += resizerDimensions.width * 2;
-            width = Math.floor( editorWidth * panelsDimensions[EViewMode.TL_TR_BL_BR][3][2] );
-            height = Math.floor( editorHeight * panelsDimensions[EViewMode.TL_TR_BL_BR][3][3] );
-            setPanelDimensions( view4, x, y, (width - resizerDimensions.width), (height - resizerDimensions.height) );
+            width  = Math.max( Math.min( editorWidth - x,  panelsLimitDimensions[EView.BR].maxWidth  ), panelsLimitDimensions[EView.BR].minWidth  );
+            setPanelDimensions( view4, x, y, width, height );
         }
         break;
         case EViewMode.TL_TR_BL:
@@ -198,6 +210,8 @@ function resizePanels()
 
             width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.TL][0][2] );
             height = Math.floor( editorHeight * panelsDimensions[EViewMode.TL][0][3] );
+            width  = Math.max( Math.min( width,  panelsLimitDimensions[EView.TL].maxWidth  ), panelsLimitDimensions[EView.TL].minWidth  );
+            height = Math.max( Math.min( height, panelsLimitDimensions[EView.TL].maxHeight ), panelsLimitDimensions[EView.TL].minHeight );
             setPanelDimensions( view1, x, y, width, height );
         }
         break;
@@ -213,6 +227,8 @@ function resizePanels()
 
             width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.TR][0][2] );
             height = Math.floor( editorHeight * panelsDimensions[EViewMode.TR][0][3] );
+            width  = Math.max( Math.min( width,  panelsLimitDimensions[EView.TR].maxWidth ), panelsLimitDimensions[EView.TR].minWidth  );
+            height = Math.max( Math.min( height, panelsLimitDimensions[EView.TR].maxHeight ), panelsLimitDimensions[EView.TR].minHeight );
             setPanelDimensions( view2, x, y, width, height );
         }
         break;
@@ -228,6 +244,8 @@ function resizePanels()
 
             width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.BL][0][2] );
             height = Math.floor( editorHeight * panelsDimensions[EViewMode.BL][0][3] );
+            width  = Math.max( Math.min( width,  panelsLimitDimensions[EView.BL].maxWidth  ), panelsLimitDimensions[EView.BL].minWidth  );
+            height = Math.max( Math.min( height, panelsLimitDimensions[EView.BL].maxHeight ), panelsLimitDimensions[EView.BL].minHeight );
             setPanelDimensions( view3, x, y, width, height );
         }
         break;
@@ -243,6 +261,8 @@ function resizePanels()
 
             width  = Math.floor( editorWidth  * panelsDimensions[EViewMode.BR][0][2] );
             height = Math.floor( editorHeight * panelsDimensions[EViewMode.BR][0][3] );
+            width  = Math.max( Math.min( width,  panelsLimitDimensions[EView.BR].maxWidth  ), panelsLimitDimensions[EView.BR].minWidth  );
+            height = Math.max( Math.min( height, panelsLimitDimensions[EView.BR].maxHeight ), panelsLimitDimensions[EView.BR].minHeight );
             setPanelDimensions( view4, x, y, width, height );
         }
         break;
@@ -262,6 +282,9 @@ function resizePanelsXTop( x )
         default:
         case EViewMode.TL_TR_BL_BR:
         {
+            x = Math.max( x, panelsLimitDimensions[EView.TL].minWidth );
+            x = Math.min( x, ( editorWidth - panelsLimitDimensions[EView.TR].minWidth ) );
+
             var view1 = document.getElementById("panelView1");
             setPanelDimensions( view1, parseInt( view1.style.left, 10 ), 
                                        parseInt( view1.style.top, 10 ), 
@@ -273,12 +296,13 @@ function resizePanelsXTop( x )
             
             var view2 = document.getElementById("panelView2");
             var resizerWidth = parseInt( resizerX1.style.width, 10 );
-            setPanelDimensions( view2, (x + resizerWidth), 
+            x += resizerWidth;
+            setPanelDimensions( view2, x, 
                                        parseInt( view2.style.top, 10), 
-                                       (editorWidth - ( parseInt( resizerX1.style.left, 10) + resizerWidth ) ), 
+                                       editorWidth -x,
                                        parseInt( view2.style.height, 10 ) );
 
-            var ratio = x / editorWidth;
+            var ratio = (x - resizerWidth/2) / editorWidth;
             panelsDimensions[EViewMode.TL_TR_BL_BR][0][2] = ratio;
             panelsDimensions[EViewMode.TL_TR_BL_BR][1][0] = ratio;
             panelsDimensions[EViewMode.TL_TR_BL_BR][1][2] = 1.0 - ratio;
@@ -328,6 +352,9 @@ function resizePanelsXBottom( x )
         default:
         case EViewMode.TL_TR_BL_BR:
         {
+            x = Math.max( x, panelsLimitDimensions[EView.BL].minWidth );
+            x = Math.min( x, ( editorWidth - panelsLimitDimensions[EView.BR].minWidth ) );
+
             var view3 = document.getElementById("panelView3");
             setPanelDimensions( view3, parseInt( view3.style.left, 10 ), 
                                        parseInt( view3.style.top, 10 ), 
@@ -339,12 +366,14 @@ function resizePanelsXBottom( x )
             
             var view4 = document.getElementById("panelView4");
             var resizerWidth = parseInt( resizerX2.style.width, 10 );
-            setPanelDimensions( view4, (x + resizerWidth), 
+            x += resizerWidth;
+
+            setPanelDimensions( view4, x, 
                                        parseInt( view4.style.top, 10), 
-                                       (editorWidth - ( parseInt( resizerX2.style.left, 10) + resizerWidth ) ), 
+                                       editorWidth - x, 
                                        parseInt( view4.style.height, 10 ) );
 
-            var ratio = x / editorWidth;
+            var ratio = (x - resizerWidth/2) / editorWidth;
             panelsDimensions[EViewMode.TL_TR_BL_BR][2][2] = ratio;
             panelsDimensions[EViewMode.TL_TR_BL_BR][3][0] = ratio;
             panelsDimensions[EViewMode.TL_TR_BL_BR][3][2] = 1.0 - ratio;
@@ -383,7 +412,7 @@ function resizePanelsY( y )
 {
     var editor = document.getElementById("editor");
     var editorTop    = parseInt( editor.style.top,  10);            
-    var editorHeight = parseInt( editor.style.height, 10); //Math.max( window.innerHeight, document.body.clientHeight );
+    var editorHeight = parseInt( editor.style.height, 10);
     y = y - editorTop;
 
     switch( currentViewMode  )
@@ -391,6 +420,9 @@ function resizePanelsY( y )
         default:
         case EViewMode.TL_TR_BL_BR:
         {
+            y = Math.max( y, panelsLimitDimensions[EView.TL].minHeight );
+            y = Math.min( y, ( editorHeight - panelsLimitDimensions[EView.BL].minHeight ) );
+            
             var view1 = document.getElementById("panelView1");
             setPanelDimensions( view1, parseInt( view1.style.left, 10 ), 
                                        parseInt( view1.style.top, 10 ), 
@@ -408,6 +440,7 @@ function resizePanelsY( y )
 
             var resizerY = document.getElementById("resizerY");
             resizerY.style.top = y + "px";
+            var resizerYHeight = parseInt( resizerY.style.height, 10 );
             
             var top = y + parseInt( resizerY.style.height );
             var height = editorHeight - top;
@@ -428,8 +461,7 @@ function resizePanelsY( y )
                                        parseInt( view4.style.width, 10 ),
                                        height );
 
-            var ratio = y / editorHeight;
-            
+            var ratio = (y - resizerYHeight/2) / editorHeight;
             panelsDimensions[EViewMode.TL_TR_BL_BR][0][3] = ratio;
             panelsDimensions[EViewMode.TL_TR_BL_BR][1][3] = ratio;
             panelsDimensions[EViewMode.TL_TR_BL_BR][2][1] = ratio;

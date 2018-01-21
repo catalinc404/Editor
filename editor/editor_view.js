@@ -42,25 +42,25 @@ View.prototype = Object.assign( Object.create( Object.prototype ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     handleMouseDown : function( event ) 
     {
-        console.log( "View.prototype.handleMouseDown, viewId = " + this.viewId );
+        //console.log( "View.prototype.handleMouseDown, viewId = " + this.viewId );
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     handleMouseMove : function( event ) 
     {
-        console.log( "View.prototype.handleMouseMove, viewId = " + this.viewId );
+        //console.log( "View.prototype.handleMouseMove, viewId = " + this.viewId );
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     handleMouseUp : function( event ) 
     {
-        console.log( "View.prototype.handleMouseUp, viewId = " + this.viewId );
+        //console.log( "View.prototype.handleMouseUp, viewId = " + this.viewId );
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     handleMouseLeave : function( event ) 
     {
-        console.log( "View.prototype.handleMouseLeave, viewId = " + this.viewId );
+        //console.log( "View.prototype.handleMouseLeave, viewId = " + this.viewId );
     },
 } )
 
