@@ -277,6 +277,18 @@ function resizePanelsXTop( x )
     var editorWidth  = parseInt( editor.style.width,  10); //document.body.clientWidth;
     x = x - editorLeft;
 
+    var resizerX1 = document.getElementById("resizerX1");
+    var resizerX1Left  = parseInt( resizerX1.style.left,  10 );
+    var resizerX1Right = resizerX1Left + parseInt( resizerX1.style.width, 10 );
+
+    if( (x > resizerX1Left) && (x >= resizerX1Right) )
+    {
+        //x = resizerX1Left;
+    }
+    
+    
+
+
     switch( currentViewMode  )
     {
         default:
@@ -291,7 +303,6 @@ function resizePanelsXTop( x )
                                        x, 
                                        parseInt( view1.style.height, 10 ) );
           
-            var resizerX1 = document.getElementById("resizerX1");
             resizerX1.style.left = x + 'px';
             
             var view2 = document.getElementById("panelView2");

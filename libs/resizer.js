@@ -2,10 +2,12 @@ function resizer( resizerID, mousemoveCallback )
 {
     var resizer = document.getElementById( resizerID );
     resizer.mousemoveCallback = mousemoveCallback;
+    var initialDrag = false;
 
     resizer.onmousedown = function( e ) 
     {
         console.log( "resizer onmousedown" );
+        initialDrag = true;
         document.documentElement.addEventListener( 'mousemove', resizer.doDrag, false );
         document.documentElement.addEventListener( 'mouseup', resizer.stopDrag, false );
     }
@@ -13,14 +15,28 @@ function resizer( resizerID, mousemoveCallback )
     resizer.doDrag = function( e ) 
     {
         console.log( "resizer doDrag" );
-        if( e.which != 1 )
+
+        if( e !== undefined )
         {
-            console.log( "resizer doDrag stop" );
-            resizer.stopDrag( e );
-            return;
+            
+            //seems to be nonstandard
+            //if( e.which != 1 )
+            if( e.buttons & 1 == 0 )
+            {
+                console.log( "resizer doDrag stop" );
+                resizer.stopDrag( e );
+                return;
+            }
+            
+            if( initialDrag == false )
+            {
+                resizer.mousemoveCallback( e );
+            }
+            else
+            {
+                initialDrag = false;
+            }
         }
-        
-        resizer.mousemoveCallback( e );
     }
 
     resizer.stopDrag = function( e ) 
