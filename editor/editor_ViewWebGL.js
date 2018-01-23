@@ -218,7 +218,7 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
     {
         View.prototype.handleMouseDown.call( this, event );
 
-        console.log( "ViewWebGL2.prototype.handleMouseDown, viewId = " + this.viewId );
+        //console.log( "ViewWebGL2.prototype.handleMouseDown, viewId = " + this.viewId );
 
         switch( event.button )
         {
@@ -272,8 +272,6 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
 
         if( this.currentControlMode != EControlMode.NONE )
         {
-            console.log( "ViewWebGL2.prototype.handleMouseMove, viewId = " + this.viewId );
-
             this.mouseX = event.pageX;
             this.mouseY = event.pageY;
     
@@ -286,7 +284,7 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
     {
         View.prototype.handleMouseUp.call( this, event );
 
-        console.log( "ViewWebGL2.prototype.handleMouseUp, viewId = " + this.viewId );
+        //console.log( "ViewWebGL2.prototype.handleMouseUp, viewId = " + this.viewId );
 
         if( this.currentControlMode != EControlMode.NONE )
         {
@@ -312,7 +310,7 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
     {
         View.prototype.handleMouseLeave.call( this, event );
 
-        console.log( "ViewWebGL2.prototype.handleMouseLeave, viewId = " + this.viewId );
+        //console.log( "ViewWebGL2.prototype.handleMouseLeave, viewId = " + this.viewId );
 
         ViewWebGL.prototype.handleMouseUp.call( this, event );
     },

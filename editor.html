@@ -177,6 +177,7 @@
         <script src="./libs/three.js"></script>
         <script src="./libs/resizer.js"></script>
         <script src="./editor/editor_Basics.js"></script>
+        <script src="./editor/editor_Data.js"></script>
         <script src="./editor/editor_View.js"></script>
         <script src="./editor/editor_ViewWebGL.js"></script>
         <script src="./editor/editor.js"></script>        
@@ -197,11 +198,11 @@
                   <a class="dropdown-toggle" data-toggle="dropdown" href="#">View
                   <span class="caret"></span></a>
                   <ul class="dropdown-menu">
-                    <li><a href="#" onclick="setPanelsLayout(EViewMode.TL_TR_BL_BR);">TL TR BL BR</a></li>
-                    <li><a href="#" onclick="setPanelsLayout(EViewMode.TL);">TL</a></li>
-                    <li><a href="#" onclick="setPanelsLayout(EViewMode.TR);">TR</a></li>
-                    <li><a href="#" onclick="setPanelsLayout(EViewMode.BL);">BL</a></li>
-                    <li><a href="#" onclick="setPanelsLayout(EViewMode.BR);">BR</a></li>
+                    <li><a href="#" onclick="editor.setPanelsLayout(EViewMode.TL_TR_BL_BR);">TL TR BL BR</a></li>
+                    <li><a href="#" onclick="editor.setPanelsLayout(EViewMode.TL);">TL</a></li>
+                    <li><a href="#" onclick="editor.setPanelsLayout(EViewMode.TR);">TR</a></li>
+                    <li><a href="#" onclick="editor.setPanelsLayout(EViewMode.BL);">BL</a></li>
+                    <li><a href="#" onclick="editor.setPanelsLayout(EViewMode.BR);">BR</a></li>
                   </ul>
                 </li>
               </ul>

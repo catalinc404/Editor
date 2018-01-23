@@ -4,7 +4,7 @@ var pageLayout = { header: 52, header_tabs: 70, left: 200, right: 200, footer: 1
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function setElementDimensions( element, left, top, width, height, visibility )
 {
-    console.log( "setElementDimensions: element=" + element.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
+    //console.log( "setElementDimensions: element=" + element.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
 
     element.style.visibility = ( visibility !== undefined ) ? visibility : "visible";
     element.style.left = left + "px";
@@ -25,7 +25,6 @@ function setupPageLayout()
     var element = document.getElementById("header-tabs");
     setElementDimensions( element, 0, pageLayout.header, width, pageLayout.header_tabs );
 
-
     var element = document.getElementById("left");
     setElementDimensions( element, 0, pageLayout.header + pageLayout.header_tabs, pageLayout.left, height - (pageLayout.header + pageLayout.header_tabs + pageLayout.footer) );
 
@@ -37,18 +36,4 @@ function setupPageLayout()
 
     var element = document.getElementById("footer");
     setElementDimensions( element, 0, height - pageLayout.footer, width, pageLayout.footer );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function setupPageElements()
-{
-    setupPageLayout();
-    setupPanels();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function resizePageElements()
-{
-    setupPageLayout();
-    resizePanels();
 }
