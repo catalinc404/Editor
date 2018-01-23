@@ -29,5 +29,17 @@
             
         },
 
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome W - editor_layout.html",
+            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/3/Editor/editor_layout.html",
+            "webRoot": "${workspaceRoot}/editor_layout.html",
+            "runtimeArgs": [
+                "--allow-file-access-from-files"
+            ]
+            
+        },
+
     ]
 }
