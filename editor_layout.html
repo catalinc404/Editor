@@ -69,7 +69,7 @@
             {
                 position: absolute;
                 overflow: hidden;
-                background-color: #222;
+                background-color: #333;
             }
             .noselect 
             {
@@ -201,12 +201,6 @@
                   </ul>
                 </li>
               </ul>
-              <!--
-              <ul class="nav navbar-nav navbar-right">
-                  <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-                  <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-              </ul>                  
-              -->
             </div>
         </nav>
         <div id="header-tabs" class="container" style="position:absolute; margin-right:10px; background-color:#222;border:#000 solid 1px;">
@@ -231,10 +225,14 @@
                 </div>
             </div>
         </div>
+
         <div id="left" class="page_element" style="border:#000 solid 1px;"></div>
-        <div id="editor" class="page_element"style="border:#000 solid 1px;"></div>
-        <div id="viewSelect" class="selectionRectangle"></div>
+        <div id="resizerLeft" class="resizerX" style="position:relative"></div>
+        
+        <div id="editor" class="page_element" style="border:#000 solid 1px; overflow:visible;"></div>
+        <div id="resizerRight" class="resizerX"></div>
         <div id="right" class="page_element" style="border:#000 solid 1px;"></div>
+        
         <div id="footer" class="page_element" style="border:#000 solid 1px;"></div>
     </body>
     <!-- ----------------------------------------------------------------------------- -->
