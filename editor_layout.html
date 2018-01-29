@@ -25,20 +25,20 @@
                 overflow:hidden; 
                 /*border:1px solid rgba(0, 0, 0, 0.527);*/
 		        width: 0px; 
-                height:0px;
+                height: 0px;
                 visibility: hidden;
                 position: absolute;
 	        }
             .resizerX
 	        {
-                overflow:hidden; 
-		        background-color: #333;
+                overflow: hidden; 
                 cursor: e-resize;
                 width: 0px; 
-                height:0px;
+                height: 0px;
                 visibility: hidden;
                 position: absolute;
                 background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAARCAYAAAAYNhYvAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAGElEQVQYV2P4++c/CIBpBhADhoe8zP//AJT5qfyyqEgyAAAAAElFTkSuQmCC')  no-repeat center center;
+                background-color: rgba(51, 51, 51, 1);
 	        }
             .resizerY
 	        {
@@ -50,6 +50,7 @@
                 visibility: hidden;
                 position: absolute;
                 background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAADCAYAAAB1c+RqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAG0lEQVQYV2P4++c/CFBEM4AYlGKibMJP//8PAO7Dqfz5wz1UAAAAAElFTkSuQmCC')  no-repeat center center;
+                background-color: rgba(51, 51, 51, 1);
 	        }
             .selectionRectangle
             {
@@ -175,8 +176,8 @@
         </style>
 
         <script src="./libs/resizer.js"></script>
-        <script src="./Page/Page_layout.js"></script>        
-        <script src="./Page/layout.js"></script>        
+        <script src="./Page/Page_Layout.js"></script>        
+        <script src="./Page/Layout.js"></script>        
     </head>
     <!-- ----------------------------------------------------------------------------- -->
     
@@ -227,12 +228,13 @@
         </div>
 
         <div id="left" class="page_element" style="border:#000 solid 1px;"></div>
-        <div id="resizerLeft" class="resizerX" style="position:relative"></div>
-        
-        <div id="editor" class="page_element" style="border:#000 solid 1px; overflow:visible;"></div>
+        <div id="resizerLeft" class="resizerX"></div>
+        <div id="editorTop" class="page_element" style="border:#000 solid 1px; overflow:visible;"></div>
+        <div id="editorTopBottomSeparator" class="page_element"></div>
+        <div id="editorBottom" class="page_element" style="border:#000 solid 1px; overflow:visible;"></div>
         <div id="resizerRight" class="resizerX"></div>
         <div id="right" class="page_element" style="border:#000 solid 1px;"></div>
-        
+        <div id="resizerBottom" class="resizerY"></div>
         <div id="footer" class="page_element" style="border:#000 solid 1px;"></div>
     </body>
     <!-- ----------------------------------------------------------------------------- -->
