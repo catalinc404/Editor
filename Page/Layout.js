@@ -17,11 +17,26 @@ UI.prototype.setupPage = function()
 {
     console.log( "UI.prototype.setupPage:" );
 
+    if( this.UIData === undefined )
+    {
+        console.log( "UI.prototype.setupPage: undefined layout!" );
+
+        return;
+    }
+    if( this.UIData.rows === undefined && this.UIData.colons === undefined )
+    {
+        console.log( "UI.prototype.setupPage: layout contains no colons or rows!" );
+
+        return;
+    }
+
+    this.setupLayoutClasses( this.UIData );
+
     var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
     var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     var area = { left: 0, top: 0, width: width, height: height };
 
-    this.setupPageLayout( area, this.UIData );
+    this.setupLayout( area, this.UIData );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,34 +44,52 @@ UI.prototype.resizePage = function()
 {
     console.log( "UI.prototype.resizePage:" );
 
-    var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    var width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
     var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     var area = { left: 0, top: 0, width: width, height: height };
 
-    this.setupPageLayout( area, this.UIData );
+    this.setupLayout( area, this.UIData );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UI.prototype.setupPageLayout = function( area )
+UI.prototype.setupLayoutClasses = function( uiData )
 {
-    console.log( "UI.prototype.setupPageLayout: left=" + area.left + ", top=" + area.top + ", width=" + area.width + ", height=" + area.height );
+    console.log( "UI.prototype.setupLayoutClasses:" );
 
-    if( this.UIData === undefined )
+    if( uiData.rows !== undefined )
     {
-        console.log( "UI.prototype.setupPageLayout: undefined layout!" );
+        for( var i = 0; i < uiData.rows.length; ++i) 
+        {
+            this.setupLayoutClasses( uiData.rows[i] );
 
-        return;
+            if( ( uiData.rows[i].class !== undefined ) && ( uiData.rows[i].id !== undefined ) )
+            {
+                var element = document.getElementById( uiData.rows[i].id );
+                if( element != null )
+                {
+                    this.setupElementClass( element, uiData.rows[i].class );
+                }
+            }
+        }
     }
-
-    if( this.UIData.rows === undefined && this.UIData.colons === undefined )
+    if( uiData.colons !== undefined )
     {
-        console.log( "UI.prototype.setupPageLayout: layout contains no colons or rows!" );
+        for( var i = 0; i < uiData.colons.length; ++i) 
+        {
+            this.setupLayoutClasses( uiData.colons[i] );
 
-        return;
+            if( ( uiData.colons[i].class !== undefined ) && ( uiData.colons[i].id !== undefined ) )
+            {
+                var element = document.getElementById( uiData.colons[i].id );
+                if( element != null )
+                {
+                    this.setupElementClass( element, uiData.colons[i].class );
+                }
+            }
+        }
     }
-
-    this.setupLayout( area, this.UIData );
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UI.prototype.setupLayout = function( area, uiData )
@@ -131,12 +164,7 @@ UI.prototype.setupLayoutRows = function( area, rows )
         var element = document.getElementById( rows[i].id );
         if( element != null )
         {
-            if( rows[i].type !== undefined )
-            {
-                this.setupElementType( element, rows[i], this.getElementsTop( rows[i-1] ), this.getElementsBottom( rows[i+1] ) );
-            }
             setElementDimensions( element , newArea.left, newArea.top, newArea.width, newArea.height );
-
         }
         currentTop += heights[i];
 
@@ -187,10 +215,6 @@ UI.prototype.setupLayoutColons = function( area, colons )
         var element = document.getElementById( colons[i].id );
         if( element != null )
         {
-            if( colons[i].type !== undefined )
-            {
-                this.setupElementType( element, colons[i], this.getElementsLeft( colons[i-1] ), this.getElementsRight( colons[i+1] ) );
-            }
             setElementDimensions( element , newArea.left, newArea.top, newArea.width, newArea.height );
         }
         currentLeft += widths[i];
@@ -302,204 +326,228 @@ UI.prototype.getWidth = function( colon )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UI.prototype.getElementsLeft = function( uiElement )
+UI.prototype.setupResizerData = function( uiClass )
 {
-    if( uiElement.id !== undefined )
+    var elementsPrev = [];
+    for( var i = 0; i < uiClass.prev.length; ++i )
     {
-        return [uiElement];
+        var size_min = 0;
+        var elementUIData = this.findUIDatabyId( this.UIData, uiClass.prev[i] )
+        if( elementUIData !== undefined &&  elementUIData.size_min !== undefined )
+        {
+            size_min = elementUIData.size_min;
+        }
+        elementsPrev.push( { element: document.getElementById( uiClass.prev[i] ), size_min: size_min } );
     }
-    else
-    if( uiElement.rows !== undefined )
+    var elementsNext = [];
+    for( var i = 0; i < uiClass.next.length; ++i )
     {
-        return uiElement.rows;
+        var size_min = 0;
+        var elementUIData = this.findUIDatabyId( this.UIData, uiClass.next[i] );
+        if( elementUIData !== undefined &&  elementUIData.size_min !== undefined )
+        {
+            size_min = elementUIData.size_min;
+        }
+        elementsNext.push( { element: document.getElementById( uiClass.next[i] ), size_min: size_min } );
     }
 
-    return undefined;
+    return [ elementsPrev, elementsNext ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UI.prototype.getElementsRight = function( uiElement )
-{
-    if( uiElement.id !== undefined )
-    {
-        return [uiElement];
-    }
-    else
-    if( uiElement.rows !== undefined )
-    {
-        return uiElement.rows;
-    }
-
-    return undefined;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UI.prototype.getElementsTop = function( uiElement )
-{
-    if( uiElement.id !== undefined )
-    {
-        return [uiElement];
-    }
-    else
-    if( uiElement.colons !== undefined )
-    {
-        return uiElement.colons;
-    }
-
-    return undefined;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UI.prototype.getElementsBottom = function( uiElement )
-{
-    if( uiElement.id !== undefined )
-    {
-        return [uiElement];
-    }
-    else
-    if( uiElement.colons !== undefined )
-    {
-        return uiElement.colons;
-    }
-
-    return undefined;
-   
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UI.prototype.setupElementType = function( element, uiElement, uiElementsLeft, uiElementsRight )
+UI.prototype.setupElementClass = function( element, uiClass )
 {
     console.log( "UI.prototype.setupElementType" );
     
-    if( uiElement.type === undefined )
+    if( uiClass.type === undefined )
     {
         return;
     }
 
-    switch( uiElement.type )
+    switch( uiClass.type )
     {
         case "resizerX":
         {
-            resizerX(   uiElement.id, 
-                        function( e ) 
-                        {
-                            var element = document.getElementById( uiElement.id );
-                            var elementLeft  = document.getElementById( uiElementsLeft[0].id );
-                            var elementRight = document.getElementById( uiElementsRight[0].id );
-                           
-                            var elementWidth       = parseInt( element.style.width,        10 );
-                            var elementsLeftWidth  = parseInt( elementLeft.style.width,    10 );
-                            var elementsRightWidth = parseInt( elementRight.style.width,    10 );
-
-                            var left  = parseInt( elementLeft.style.left, 10 );
-                            var right = left + elementsLeftWidth + elementWidth + elementsRightWidth;
-
-                            var elementLeftMinWidth  = ( uiElementsLeft[0].width_min  !== undefined ) ? uiElementsLeft[0].width_min  : 0;
-                            var elementRightMinWidth = ( uiElementsRight[0].width_min !== undefined ) ? uiElementsRight[0].width_min : 0;
-
-                            var x = e.pageX;
-                            if( ((left + elementLeftMinWidth ) >= x) || (x >= (right - elementRightMinWidth)) )
-                            {
-                                return;
-                            }
-
-                            setElementDimensions( elementLeft,  parseInt( elementLeft.style.left,   10 ), 
-                                                                parseInt( elementLeft.style.top,    10 ), 
-                                                                x - left,
-                                                                parseInt( elementLeft.style.height, 10 ) 
-                                                );
-
-                            for( var i = 1; i < uiElementsLeft.length; ++i )
-                            {
-                                elementLeft = document.getElementById( uiElementsLeft[i].id );
-
-                                setElementDimensions( elementLeft,  parseInt( elementLeft.style.left,   10 ), 
-                                                                    parseInt( elementLeft.style.top,    10 ), 
-                                                                    x - left,
-                                                                    parseInt( elementLeft.style.height, 10 ) 
-                                                    );
-                            }
-
-                            setElementDimensions( element,      x, 
-                                                                parseInt( element.style.top,        10 ), 
-                                                                elementWidth, 
-                                                                parseInt( element.style.height,     10 )
-                                                );
-                                                
-                            setElementDimensions( elementRight,  x + elementWidth, 
-                                                                parseInt( elementRight.style.top,    10 ), 
-                                                                right - (x + elementWidth), 
-                                                                parseInt( elementRight.style.height, 10 )
-                                                );
-
-                            for( var i = 1; i < uiElementsRight.length; ++i )
-                            {
-                                elementRight = document.getElementById( uiElementsRight[i].id );
-
-                                setElementDimensions( elementRight,  x + elementWidth, 
-                                                                    parseInt( elementRight.style.top,    10 ), 
-                                                                    right - (x + elementWidth), 
-                                                                    parseInt( elementRight.style.height, 10 )
-                                                    );
-                            }
-                        }
-                    );
+            var resizerData = this.setupResizerData( uiClass );
+            this.setupResizerX( element, resizerData[0], resizerData[1] );
         }
         break;
         case "resizerY":
         {
-            resizerX( uiElement.id, 
-                        function( e ) 
-                        {
-                            
-                            var element = document.getElementById( uiElement.id );
-                            var element = document.getElementById( uiElementPrev.id );
-                            var elementNext = document.getElementById( uiElementNext.id );
-                        
-                            var elementHeight     = parseInt( element.style.height,     10 );
-                            var elementPrevHeight = parseInt( elementPrev.style.height, 10 );
-                            var elementNextHeight = parseInt( elementNext.style.height, 10 );
-
-                            var top    = parseInt( elementPrev.style.top, 10 );
-                            var bottom = top + elementPrevHeight + elementHeight + elementNextHeight;
-
-                            var elementPrevMinHeight = ( uiElementPrev.height_min !== undefined ) ? uiElementPrev.height_min : 0;
-                            var elementNextMinHeight = ( uiElementNext.height_min !== undefined ) ? uiElementNext.height_min : 0;
-
-                            var y = e.pageY;
-                            if( ((top + elementPrevMinHeight ) >= y) || (y >= (bottom - elementNextMinHeight)) )
-                            {
-                                return;
-                            }
-
-                            setElementDimensions( elementPrev,  parseInt( elementPrev.style.left,   10 ), 
-                                                                parseInt( elementPrev.style.top,    10 ), 
-                                                                parseInt( elementPrev.style.width,  10 ), 
-                                                                y - top 
-                                                );
-
-                            setElementDimensions( element,      parseInt( element.style.left,       10 ),  
-                                                                y - top, 
-                                                                parseInt( element.style.width,      10 ),
-                                                                elementHeight, 
-                                                );
-                                                                
-                            setElementDimensions( elementNext,  parseInt( elementNext.style.top,    10 ), 
-                                                                y + elementHeight, 
-                                                                parseInt( elementNext.style.width,  10 ), 
-                                                                bottom - (y + elementHeight)
-                                                );
-                        }
-                    );
+            var resizerData = this.setupResizerData( uiClass );
+            this.setupResizerY( element, resizerData[0], resizerData[1] );
         }
         break;
         default:
-        {
-
-        }
+        {}
         break;
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+UI.prototype.findUIDatabyId = function( uiData, id )
+{
+    if( uiData.id === id )
+    {
+        return uiData;
+    }
+    if( uiData.colons !== undefined )
+    {
+        for( var i = 0; i < uiData.colons.length; ++i )
+        {
+            var result = this.findUIDatabyId( uiData.colons[i], id );
+            if( result !== undefined )
+            {
+                return result;
+            }
+        }
+    }
+    if( uiData.rows !== undefined )
+    {
+        for( var i = 0; i < uiData.rows.length; ++i )
+        {
+            var result = this.findUIDatabyId( uiData.rows[i], id );
+            if( result !== undefined )
+            {
+                return result;
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+UI.prototype.setupResizerX = function( element, elementsPrev, elementsNext )
+{
+    resizerX(   element.id, 
+                function( e ) 
+                {
+                    var elementWidth = parseInt( element.style.width, 10 );
+
+                    var limitPrev = 0;
+                    var crtLimitPrev = 0;
+                    for( var i = 0; i < elementsPrev.length; ++i )
+                    {
+                        crtLimitPrev = parseInt( elementsPrev[i].element.style.left, 10 ) + elementsPrev[i].size_min;
+                        if( crtLimitPrev > limitPrev )
+                        {
+                            limitPrev = crtLimitPrev;
+                        }
+                    }
+
+                    var limitNext = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                    var crtLimitNext = 0;
+                    for( var i = 0; i < elementsNext.length; ++i )
+                    {
+                        crtLimitNext = parseInt( elementsNext[i].element.style.left, 10 ) + 
+                                       parseInt( elementsNext[i].element.style.width, 10 ) - elementsNext[i].size_min;
+                        if( crtLimitNext < limitNext )
+                        {
+                            limitNext = crtLimitNext;
+                        }
+                    }
+
+                    var x = e.pageX;
+                    if( ( x <= limitPrev ) || ( x >= limitNext ) )
+                    {
+                        return;
+                    }
+
+                    for( var i = 0; i < elementsPrev.length; ++i )
+                    {
+                        elementPrev = elementsPrev[i].element;
+
+                        var crtLeft = parseInt( elementPrev.style.left, 10 );
+                        setElementDimensions( elementPrev,  crtLeft, 
+                                                            parseInt( elementPrev.style.top,    10 ), 
+                                                            x - crtLeft,
+                                                            parseInt( elementPrev.style.height, 10 ) );
+                    }
+
+                    setElementDimensions( element, x, 
+                                                   parseInt( element.style.top,    10 ), 
+                                                   elementWidth, 
+                                                   parseInt( element.style.height, 10 ) );
+                                        
+                    for( var i = 0; i < elementsNext.length; ++i )
+                    {
+                        elementNext = elementsNext[i].element;
+
+                        var crtRight = parseInt( elementNext.style.left, 10 ) + parseInt( elementNext.style.width, 10 );
+                        setElementDimensions( elementNext,  x + elementWidth, 
+                                                            parseInt( elementNext.style.top,    10 ), 
+                                                            crtRight - (x + elementWidth), 
+                                                            parseInt( elementNext.style.height, 10 ) );
+                    }
+                } );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+UI.prototype.setupResizerY = function( element, elementsPrev, elementsNext )
+{
+    resizerY(   element.id, 
+                function( e ) 
+                {
+                    var elementHeight = parseInt( element.style.height, 10 );
+
+                    var limitPrev = 0;
+                    var crtLimitPrev = 0;
+                    for( var i = 0; i < elementsPrev.length; ++i )
+                    {
+                        crtLimitPrev = parseInt( elementsPrev[i].element.style.top, 10 ) + elementsPrev[i].size_min;
+                        if( crtLimitPrev > limitPrev )
+                        {
+                            limitPrev = crtLimitPrev;
+                        }
+                    }
+
+                    var limitNext = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                    var crtLimitNext = 0;
+                    for( var i = 0; i < elementsNext.length; ++i )
+                    {
+                        crtLimitNext = parseInt( elementsNext[i].element.style.top, 10 ) + 
+                                       parseInt( elementsNext[i].element.style.height, 10 ) - elementsNext[i].size_min;
+                        if( crtLimitNext < limitNext )
+                        {
+                            limitNext = crtLimitNext;
+                        }
+                    }
+
+                    var y = e.pageY;
+                    if( ( y <= limitPrev ) || ( y >= limitNext ) )
+                    {
+                        return;
+                    }
+
+                    for( var i = 0; i < elementsPrev.length; ++i )
+                    {
+                        elementPrev = elementsPrev[i].element;
+
+                        var crtTop = parseInt( elementPrev.style.top, 10 );
+                        setElementDimensions( elementPrev, parseInt( elementPrev.style.left,   10 ),
+                                                           crtTop, 
+                                                           parseInt( elementPrev.style.width, 10 ),
+                                                           y - crtTop );
+                    }
+
+                    setElementDimensions( element, parseInt( element.style.left, 10 ),
+                                                   y, 
+                                                   parseInt( element.style.width,    10 ), 
+                                                   elementHeight );
+                                        
+                    for( var i = 0; i < elementsNext.length; ++i )
+                    {
+                        elementNext = elementsNext[i].element;
+
+                        var crtBottom = parseInt( elementNext.style.top, 10 ) + parseInt( elementNext.style.height, 10 );
+                        setElementDimensions( elementNext,  parseInt( elementNext.style.left,  10 ), 
+                                                            y + elementHeight, 
+                                                            parseInt( elementNext.style.width, 10 ), 
+                                                            crtBottom - (y + elementHeight) );
+                    }
+                } );
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var pageLayout = 
@@ -514,13 +562,13 @@ var pageLayout =
                     name: "header_menu",
                     id: "header",
                     height: 52,
-                    height_min: 52
+                    size_min: 52
                 },
                 { 
                     name: "header_toolbar",
                     id: "header-tabs",
                     height: 70,
-                    height_min: 70
+                    size_min: 70
                 }
             ]
         },
@@ -532,14 +580,19 @@ var pageLayout =
                     name: "body_left",
                     id: "left",
                     width: 200,
-                    width_min: 200
+                    size_min: 200
                 },
                 {
                     name: "resizer_left",
                     id: "resizerLeft",
-                    type: "resizerX",
+                    class:
+                    {
+                        type: "resizerX",
+                        prev: [ "left" ],
+                        next: [ "editorTop", "editorTopBottomSeparator", "editorBottom" ]
+                    },
                     width: 5,
-                    width_min: 5
+                    size_min: 5
                 },                
                 {
                     name: "body_middle",
@@ -547,46 +600,54 @@ var pageLayout =
                     [
                         {
                             id: "editorTop",
-                            width_min: 200
+                            size_min: 200
                         },
                         {
                             id: "editorTopBottomSeparator",
                             height: 5,
-                            width_min: 200
+                            size_min: 200
                         },
                         {
                             id: "editorBottom",
-                            width_min: 200
+                            size_min: 200
                         },
                     ]
                 },
                 {
                     name: "resizer_right",
                     id: "resizerRight",
-                    type: "resizerX",
+                    class:
+                    {
+                        type: "resizerX",
+                        prev: [ "editorTop", "editorTopBottomSeparator", "editorBottom" ],
+                        next: [ "right" ]
+                    },
                     width: 5,
-                    width_min: 5
                 },                
                 {
                     name: "body_right",
                     id: "right",
                     width: 200,
-                    width_min: 200
+                    size_min: 200
                 }
             ]
         },
         {
             name: "resizer_bottom",
             id: "resizerBottom",
-            type: "resizerY",
+            class:
+            {
+                type: "resizerY",
+                prev: [ "left", "resizerLeft", "editorBottom", "resizerRight", "right" ],
+                next: [ "footer" ]
+            },
             height: 5,
-            height_min: 5
         },                
         {
             name: "footer",
             id: "footer",
             height: 100,
-            height_min: 100
+            size_min: 100
         },
     ] 
 }
