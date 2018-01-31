@@ -11,6 +11,11 @@ function setElementDimensions( element, left, top, width, height, visibility )
     element.style.top = top + "px";
     element.style.width = width + "px";
     element.style.height = height + "px";
+
+    if( element.onresize != null )
+    {
+        element.onresize();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

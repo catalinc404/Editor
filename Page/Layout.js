@@ -1,4 +1,3 @@
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function UI( UIData )
 {
@@ -13,49 +12,8 @@ UI.prototype = Object.assign( Object.create( Object.prototype ),
 } );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UI.prototype.setupPage = function()
-{
-    console.log( "UI.prototype.setupPage:" );
-
-    if( this.UIData === undefined )
-    {
-        console.log( "UI.prototype.setupPage: undefined layout!" );
-
-        return;
-    }
-    if( this.UIData.rows === undefined && this.UIData.colons === undefined )
-    {
-        console.log( "UI.prototype.setupPage: layout contains no colons or rows!" );
-
-        return;
-    }
-
-    this.setupLayoutClasses( this.UIData );
-
-    var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-    var area = { left: 0, top: 0, width: width, height: height };
-
-    this.setupLayout( area, this.UIData );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UI.prototype.resizePage = function()
-{
-    console.log( "UI.prototype.resizePage:" );
-
-    var width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-    var area = { left: 0, top: 0, width: width, height: height };
-
-    this.setupLayout( area, this.UIData );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UI.prototype.setupLayoutClasses = function( uiData )
 {
-    console.log( "UI.prototype.setupLayoutClasses:" );
-
     if( uiData.rows !== undefined )
     {
         for( var i = 0; i < uiData.rows.length; ++i) 
@@ -90,12 +48,26 @@ UI.prototype.setupLayoutClasses = function( uiData )
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+UI.prototype.onresize = function()
+{
+    var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+    if( this.parent !== undefined && this.parent != null )
+    {
+        width  = parseInt( this.parent.style.width,  10 ) || width;
+        height = parseInt( this.parent.style.height, 10 ) || geight;
+    }
+    var area = { left: 0, top: 0, width: width, height: height };
+    
+    this.setupLayout( area, this.UIData );
+    
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UI.prototype.setupLayout = function( area, uiData )
 {
-    console.log( "UI.prototype.setupLayout:" );
-
     if( uiData.rows !== undefined )
     {
         this.setupLayoutRows( area, uiData.rows );
@@ -105,17 +77,11 @@ UI.prototype.setupLayout = function( area, uiData )
     {
         this.setupLayoutColons( area, uiData.colons );
     }
-    else
-    {
-        console.log( "UI.prototype.setupLayout: no rows or colons defined!" );
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UI.prototype.setupLayoutRows = function( area, rows )
 {
-    console.log( "UI.prototype.setupLayoutRows:" );
-
     var heightRows = 0;
     var heights = [];
 
@@ -175,8 +141,6 @@ UI.prototype.setupLayoutRows = function( area, rows )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UI.prototype.setupLayoutColons = function( area, colons )
 {
-    console.log( "UI.prototype.setupLayoutColons:" );
-
     var widthColons = 0;
     var widths = [];
 
@@ -357,8 +321,6 @@ UI.prototype.setupResizerData = function( uiClass )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UI.prototype.setupElementClass = function( element, uiClass )
 {
-    console.log( "UI.prototype.setupElementType" );
-    
     if( uiClass.type === undefined )
     {
         return;
@@ -376,6 +338,14 @@ UI.prototype.setupElementClass = function( element, uiClass )
         {
             var resizerData = this.setupResizerData( uiClass );
             this.setupResizerY( element, resizerData[0], resizerData[1] );
+        }
+        break;
+        case "layoutContainer":
+        {
+            element.ui = new UI( uiClass.layout );
+            element.ui.setupLayoutClasses( element.ui.UIData );
+            element.ui.parent = element;
+            element.onresize = element.ui.onresize.bind( element.ui );
         }
         break;
         default:
@@ -421,6 +391,12 @@ UI.prototype.setupResizerX = function( element, elementsPrev, elementsNext )
     resizerX(   element.id, 
                 function( e ) 
                 {
+                    var x = e.pageX;
+                    if( element.parentElement != null )
+                    {
+                        x = x - ( parseInt( element.parentElement.style.left, 10 ) || 0); 
+                    }
+
                     var elementWidth = parseInt( element.style.width, 10 );
 
                     var limitPrev = 0;
@@ -446,10 +422,13 @@ UI.prototype.setupResizerX = function( element, elementsPrev, elementsNext )
                         }
                     }
 
-                    var x = e.pageX;
-                    if( ( x <= limitPrev ) || ( x >= limitNext ) )
+                    if( x <= limitPrev )
                     {
-                        return;
+                        x = limitPrev;
+                    }
+                    if( x >= limitNext )
+                    {
+                        x = limitNext;
                     }
 
                     for( var i = 0; i < elementsPrev.length; ++i )
@@ -487,6 +466,12 @@ UI.prototype.setupResizerY = function( element, elementsPrev, elementsNext )
     resizerY(   element.id, 
                 function( e ) 
                 {
+                    var y = e.pageY;
+                    if( element.parentElement != null )
+                    {
+                        y = y - ( parseInt( element.parentElement.style.top, 10 ) || 0); 
+                    }
+
                     var elementHeight = parseInt( element.style.height, 10 );
 
                     var limitPrev = 0;
@@ -512,7 +497,6 @@ UI.prototype.setupResizerY = function( element, elementsPrev, elementsNext )
                         }
                     }
 
-                    var y = e.pageY;
                     if( ( y <= limitPrev ) || ( y >= limitNext ) )
                     {
                         return;
@@ -547,7 +531,78 @@ UI.prototype.setupResizerY = function( element, elementsPrev, elementsNext )
                 } );
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var editorLayout = 
+{
+    rows: 
+    [
+        {
+            name: "top",
+            colons:
+            [
+                { 
+                    name: "panelView1",
+                    id: "panelView1",
+                    size_min: 128
+                },
+                { 
+                    name: "resizerX1",
+                    id: "resizerX1",
+                    class:
+                    {
+                        type: "resizerX",
+                        prev: [ "panelView1" ],
+                        next: [ "panelView2" ]
+                    },
+                    width: 5,
+                },
+                { 
+                    name: "panelView2",
+                    id: "panelView2",
+                    size_min: 128
+                }
+            ]
+        },
+        {
+            name: "resizerY",
+            id: "resizerY",
+            class:
+            {
+                type: "resizerY",
+                prev: [ "panelView1", "resizerX1", "panelView2" ],
+                next: [ "panelView3", "resizerX2", "panelView4" ]
+            },
+            height: 5
+        },
+        {
+            name: "bottom",
+            colons:
+            [
+                { 
+                    name: "panelView3",
+                    id: "panelView3",
+                    size_min: 128
+                },
+                { 
+                    name: "resizerX2",
+                    id: "resizerX2",
+                    class:
+                    {
+                        type: "resizerX",
+                        prev: [ "panelView3" ],
+                        next: [ "panelView4" ]
+                    },
+                    width: 5,
+                },
+                { 
+                    name: "panelView4",
+                    id: "panelView4",
+                    size_min: 128
+                }
+            ]
+        }
+    ] 
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var pageLayout = 
@@ -589,29 +644,20 @@ var pageLayout =
                     {
                         type: "resizerX",
                         prev: [ "left" ],
-                        next: [ "editorTop", "editorTopBottomSeparator", "editorBottom" ]
+                        next: [ "editor" ]
                     },
                     width: 5,
                     size_min: 5
                 },                
                 {
                     name: "body_middle",
-                    rows:
-                    [
-                        {
-                            id: "editorTop",
-                            size_min: 200
-                        },
-                        {
-                            id: "editorTopBottomSeparator",
-                            height: 5,
-                            size_min: 200
-                        },
-                        {
-                            id: "editorBottom",
-                            size_min: 200
-                        },
-                    ]
+                    id: "editor",
+                    class:
+                    {
+                        type: "layoutContainer",
+                        layout: editorLayout,
+                    },
+                    size_min: 200
                 },
                 {
                     name: "resizer_right",
@@ -619,7 +665,7 @@ var pageLayout =
                     class:
                     {
                         type: "resizerX",
-                        prev: [ "editorTop", "editorTopBottomSeparator", "editorBottom" ],
+                        prev: [ "editor" ],
                         next: [ "right" ]
                     },
                     width: 5,
@@ -638,7 +684,7 @@ var pageLayout =
             class:
             {
                 type: "resizerY",
-                prev: [ "left", "resizerLeft", "editorBottom", "resizerRight", "right" ],
+                prev: [ "left", "resizerLeft", "editor", "resizerRight", "right" ],
                 next: [ "footer" ]
             },
             height: 5,
@@ -652,6 +698,20 @@ var pageLayout =
     ] 
 }
 
-var ui = new UI( pageLayout );
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var uiPage = new UI( pageLayout );
 
+function setupPage()
+{
+    uiPage.setupLayoutClasses( uiPage.UIData );
+    resizePage();
+}
 
+function resizePage()
+{
+    var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    var area = { left: 0, top: 0, width: width, height: height };
+    
+    uiPage.setupLayout( area, uiPage.UIData );
+}

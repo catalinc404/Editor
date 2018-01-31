@@ -4,9 +4,6 @@
     <!-- ----------------------------------------------------------------------------- -->
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <style>
             html,
             body
@@ -23,7 +20,6 @@
             .element
 	        {
                 overflow:hidden; 
-                /*border:1px solid rgba(0, 0, 0, 0.527);*/
 		        width: 0px; 
                 height: 0px;
                 visibility: hidden;
@@ -70,7 +66,8 @@
             {
                 position: absolute;
                 overflow: hidden;
-                background-color: #333;
+                background-color: #a8a8a8;
+                
                 -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
                 -moz-box-sizing: border-box;    /* Firefox, other Gecko */
                 box-sizing: border-box;         /* Opera/IE 8+ */
@@ -185,60 +182,45 @@
     <!-- ----------------------------------------------------------------------------- -->
     
     <!-- ----------------------------------------------------------------------------- -->
-    <body onload="ui.setupPage();" onresize="ui.resizePage();">
-        <nav id="header" class="navbar navbar-inverse noselect" style="border-radius:0px;">
-            <div class="container-fluid">
-              <div class="navbar-header">
-                <a class="navbar-brand" href="#">WebGL Editor</a>
-              </div>
-              <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li class="dropdown">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">View
-                  <span class="caret"></span></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#" onclick="">TL TR BL BR</a></li>
-                    <li><a href="#" onclick="">TL</a></li>
-                    <li><a href="#" onclick="">TR</a></li>
-                    <li><a href="#" onclick="">BL</a></li>
-                    <li><a href="#" onclick="">BR</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-        </nav>
-        <div id="header-tabs" class="container" style="position:absolute; margin-right:10px; background-color:#222;border:#000 solid 1px;">
-            <ul class="nav nav-tabs" style="top:4px; border-bottom: 1px solid #000;">
-                <li class="active"><a data-toggle="tab" style="padding:4px 6px; background-color:#222; color:rgb(157, 157, 157);" href="#menu1">Menu 1</a></li>
-                <li ><a data-toggle="tab" style="padding:4px 6px; background-color:#222; color:rgb(157, 157, 157);" href="#menu2">Menu 2</a></li>
-                <li><a data-toggle="tab" style="padding:4px 6px; background-color:#222; color:rgb(157, 157, 157);" href="#menu3">Menu 3</a></li>
-                <li><a data-toggle="tab" style="padding:4px 6px; background-color:#222; color:rgb(157, 157, 157);" href="#menu4">Menu 4</a></li>
-            </ul>
-            <div class="tab-content" style="position:absolute; top:40px;">
-                <div id="menu1" class="tab-pane active">
-                    <p style="color:rgb(157, 157, 157);">Some content in menu 1.</p>
-                </div>
-                <div id="menu2" class="tab-pane">
-                    <p style="color:rgb(157, 157, 157);">Some content in menu 2.</p>
-                </div>
-                <div id="menu3" class="tab-pane">
-                    <p style="color:rgb(157, 157, 157);">Some content in menu 3.</p>
-                </div>
-                <div id="menu4" class="tab-pane">
-                    <p style="color:rgb(157, 157, 157);">Some content in menu 4.</p>
-                </div>
-            </div>
-        </div>
+    <body onload="setupPage();" onresize="resizePage();">
+        <div id="header" class="page_element" style="background-color:#757575;"></div>
+        <div id="header-tabs" class="page_element" style="background-color:#757575;"></div>
 
-        <div id="left" class="page_element" style="border:#000 solid 1px;"></div>
+        <div id="left" class="page_element"></div>
         <div id="resizerLeft" class="resizerX"></div>
-        <div id="editorTop" class="page_element" style="border:#000 solid 1px; overflow:visible;"></div>
-        <div id="editorTopBottomSeparator" class="page_element"></div>
-        <div id="editorBottom" class="page_element" style="border:#000 solid 1px; overflow:visible;"></div>
+        <div id="editor" class="page_element" style="overflow:visible;">
+            <!-- ----------------------------------------------------------------------------- -->
+            <!-- First row                                                                     -->
+            <!-- ----------------------------------------------------------------------------- -->
+            <div id="panelView1" class="page_element" style="background-color:#a8a8a8;">
+                <canvas id="view1" class="element noselect"></canvas>
+            </div>
+            <div id="resizerX1" class="resizerX"></div>
+            <div id="panelView2" class="page_element" style="background-color:#a8a8a8;">
+                <canvas id="view2" class="element noselect"></canvas>
+            </div>
+
+            <!-- ----------------------------------------------------------------------------- -->
+            <!-- Horizontal resizer                                                            -->
+            <!-- ----------------------------------------------------------------------------- -->
+            <div id="resizerY" class="resizerY"></div>
+
+            <!-- ----------------------------------------------------------------------------- -->
+            <!-- Second row                                                                    -->
+            <!-- ----------------------------------------------------------------------------- -->
+            <div id="panelView3" class="page_element" style="background-color:#a8a8a8;">
+                <canvas id="view3" class="element noselect"></canvas>
+            </div>
+            <div id="resizerX2" class="resizerX"></div>
+            <div id="panelView4" class="page_element" style="background-color:#a8a8a8;">
+                <canvas id="view4" class="element noselect"></canvas>
+            </div>
+            <div id="viewSelect" class="selectionRectangle"></div>
+        </div>
         <div id="resizerRight" class="resizerX"></div>
-        <div id="right" class="page_element" style="border:#000 solid 1px;"></div>
+        <div id="right" class="page_element"></div>
         <div id="resizerBottom" class="resizerY"></div>
-        <div id="footer" class="page_element" style="border:#000 solid 1px;"></div>
+        <div id="footer" class="page_element" style="background-color:#757575;"></div>
     </body>
     <!-- ----------------------------------------------------------------------------- -->
 </html>
