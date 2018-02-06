@@ -13,6 +13,9 @@ function Editor( vieMode, editorData )
     this.scene = new THREE.Scene();
     this.textureLoader = new THREE.TextureLoader();
     this.defaultTexture = undefined;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.scenePicking = new THREE.Scene();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -480,6 +483,29 @@ Editor.prototype.init = function()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.addSceneObject = function( object )
+{
+    this.scene.add( object );
+
+    switch( object.type )
+    {
+        case "Mesh" :
+        {
+            var pickingObject = object.clone();
+            var pickingMaterial = new THREE.MeshBasicMaterial( { color: object.id } );
+            pickingObject.material = pickingMaterial;
+
+            this.scenePicking.add( pickingObject );
+        }
+        break;
+        default:
+        {
+        }
+        break;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.initScene = function()
 {
     this.defaultTexture = this.textureLoader.load( "textures/UV_Grid_Sm.jpg", this.render.bind( this ) );
@@ -497,10 +523,10 @@ Editor.prototype.initScene = function()
     spotLight.shadow.camera.near = 1;
     spotLight.shadow.camera.far = 200;
     spotLight.castShadow = true;
-    this.scene.add( spotLight );
+    this.addSceneObject( spotLight );
 
     var spotLightHelper = new THREE.CameraHelper( spotLight.shadow.camera );
-    this.scene.add( spotLightHelper );
+    this.addSceneObject( spotLightHelper );
               
     var helper = new THREE.GridHelper( 100, 40 );
     helper.position.x = 0;
@@ -508,25 +534,25 @@ Editor.prototype.initScene = function()
     helper.position.z = 0;
     helper.material.opacity = 0.25;
     helper.material.transparent = true;
-    this.scene.add( helper );
+    this.addSceneObject( helper );
 
     var cubeGeometry = new THREE.BoxGeometry( 4, 4, 4 )
     var cubeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: this.defaultTexture } );
-    cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
     cube.position.x = -4;
     cube.position.y = 3;
     cube.position.z = 0;
     cube.castShadow = true;
-    this.scene.add(cube);
+    this.addSceneObject( cube );
 
     var sphereGeometry = new THREE.SphereGeometry( 4, 20, 20 );
     var sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: this.defaultTexture } );
-    sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
     sphere.position.x = 20;
     sphere.position.y = 4;
     sphere.position.z = 2;
     sphere.castShadow = true;
-    this.scene.add( sphere );
+    this.addSceneObject( sphere );
 
     var planeGeometry = new THREE.PlaneGeometry( 60, 20 );
     var planeMaterial = new THREE.MeshPhongMaterial( {  color:0xffffff } );
@@ -536,7 +562,7 @@ Editor.prototype.initScene = function()
     plane.position.y = 0;
     plane.position.z = 0;
     plane.receiveShadow = true;
-    this.scene.add( plane );
+    this.addSceneObject( plane );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

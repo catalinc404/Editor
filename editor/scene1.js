@@ -9,18 +9,28 @@ var renderer;
 
 var camera;
 var scene;
+var sceneHelpers;
 
 var scenePicking;
 var pickingRenderTarget;
 var pickingTextureSelection;
 var pickingTextureSelectionData = new Uint8Array( screen_width * screen_height * 4 );
 
+var sceneObjectsId = 0;
+var sceneObjects = []; 
+
+var transformControls;
+
 var sceneHUD;
 var cameraHUD;
 
-var cube, plane, sphere;
 var textureGizmo;
 var textureGizmo2;
+
+var colors = [ 0xff00f0, 0xfffff0, 0xffff00, 0x000ff0, 0xff0f00, 0x888880, 0x8800f0, 0x880080, 0x88ff00,
+               0xff00f1, 0xfffff1, 0xffff00, 0x000ff1, 0xffff01, 0x888881, 0x8800f1, 0x880081, 0x88ff01,
+               0xff00f2, 0xfffff2, 0xffff00, 0x000ff2, 0xffff02, 0x888882, 0x8800f2, 0x880082, 0x88ff02,
+               0xff00f3, 0xfffff3, 0xffff00, 0x000ff1, 0xffff03, 0x888883, 0x8800f3, 0x880083, 0x88ff03, ];
 
 var stats;
 
@@ -50,7 +60,87 @@ var currentControlMode = EControlMode.NONE;
 Epsilon = 0.001;
 
 //////////////////////////////////////////////////////////////////////////////
+function addObject( object )
+{
+    var editorObject = { id: sceneObjectsId++ };
 
+    object.updateMatrixWorld();
+    scene.add( object );
+
+    editorObject.object = object;
+    editorObject.helpers = [];
+    
+    if( object instanceof THREE.Mesh )
+    {
+        var selectionHelper = new THREE.BoxHelper( object );
+        selectionHelper.visible = false;
+        editorObject.helpers.push( selectionHelper );
+
+        var objectPicking = object.clone();
+        objectPicking.material = new THREE.MeshBasicMaterial( { color: colors[editorObject.id] } );
+        objectPicking.matrix = object.matrixWorld;
+        objectPicking.matrixAutoUpdate = false;
+        scenePicking.add( objectPicking );
+        editorObject.objectPicking = objectPicking;
+    }
+    else
+    if( object instanceof THREE.Camera )
+    {
+        editorObject.helpers.push( new THREE.CameraHelper( object ) );
+    }
+    else
+    if( object instanceof THREE.PointLight )
+    {
+        editorObject.helpers.push( new THREE.PointLightHelper( object ) );
+    }
+    else
+    if( object instanceof THREE.DirectionalLight )
+    {
+        editorObject.helpers.push( new THREE.DirectionalLightHelper( object ) );
+    }
+    else
+    if( object instanceof THREE.SpotLight )
+    {
+        var objectPickingMaterial = new THREE.MeshBasicMaterial( { color: colors[editorObject.id] } );
+        var objectPicking = new THREE.Mesh( new THREE.TetrahedronGeometry( 0.6, 0 ), objectPickingMaterial );
+        objectPicking.matrix = object.matrixWorld;
+        objectPicking.matrixAutoUpdate = false;
+        scenePicking.add( objectPicking );
+        editorObject.objectPicking = objectPicking;
+
+        var selectionHelper = new THREE.BoxHelper( objectPicking );
+        selectionHelper.visible = false;
+        editorObject.helpers.push( selectionHelper );
+
+        var spotLightHelper1 = new THREE.Mesh(  new THREE.TetrahedronGeometry( 0.6, 0 ), new THREE.MeshBasicMaterial( { color: 0xff00ff } ) );
+        spotLightHelper1.matrix = object.matrixWorld;
+        spotLightHelper1.matrixAutoUpdate = false;
+        editorObject.helpers.push( spotLightHelper1 );
+
+        var spotLightHelper2 = new THREE.SpotLightHelper( object );
+        editorObject.helpers.push( spotLightHelper2 );
+     }
+    else
+    if( object instanceof THREE.HemisphereLight )
+    {
+        editorObject.helpers.push( THREE.HemisphereLightHelper( object ) );
+    }
+    else
+    if( object instanceof THREE.SkinnedMesh )
+    {
+        editorObject.helpers.push( new THREE.SkeletonHelper( object ) );
+    }
+
+    if( editorObject.helpers.length > 0 )
+    {
+        for( var i = 0; i < editorObject.helpers.length; ++i )
+        {
+            sceneHelpers.add( editorObject.helpers[i] );
+        }
+    }
+ 
+    sceneObjects.push( editorObject );
+} 
 
 //////////////////////////////////////////////////////////////////////////////
 function init() 
@@ -59,11 +149,18 @@ function init()
     defaultTexture = textureLoader.load( "textures/UV_Grid_Sm.jpg", render );
 
     scene = new THREE.Scene();
+    sceneHelpers = new THREE.Scene();
     scenePicking = new THREE.Scene();
     sceneHUD = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera( 45, aspect_ratio, 0.1, 1000 );
+    camera.position.x = -28.23;
+    camera.position.y = 14.34;
+    camera.position.z = 31.06;
+    camera.lookAt( scene.position );  
    
-    initScene();
     initPickingScene();
+    initScene();
     initHUDScene();
 
     //stats = initSceneStats();
@@ -74,10 +171,17 @@ function init()
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.autoClear = false;
-    
-    document.getElementById("WebGL-output").appendChild(renderer.domElement);
 
-    selectionRectangleElement = document.getElementById("Select-rectangle");
+    transformControls = new THREE.TransformControls( camera, renderer.domElement );
+    transformControls.addEventListener( 'change', render );
+    scene.add( transformControls );
+    
+    document.getElementById("WebGL-output").appendChild( renderer.domElement );
+    document.getElementById("WebGL-output").addEventListener( 'mousedown',  handleMouseDown,  false );
+    document.getElementById("WebGL-output").addEventListener( 'mousemove',  handleMouseMove,  false );
+    document.getElementById("WebGL-output").addEventListener( 'mouseup',    handleMouseUp,    false );
+
+    selectionRectangleElement = document.getElementById( "Select-rectangle" );
     
     requestAnimationFrame( render );
 }
@@ -85,13 +189,7 @@ function init()
 //////////////////////////////////////////////////////////////////////////////
 function initScene() 
 {
-    camera = new THREE.PerspectiveCamera( 45, aspect_ratio, 0.1, 1000 );
-    camera.position.x = -28.23;
-    camera.position.y = 14.34;
-    camera.position.z = 31.06;
-    camera.lookAt( scene.position );
-
-    scene.add( new THREE.AmbientLight( 0x333333 ) );
+    addObject( new THREE.AmbientLight( 0x222222 ) );
     
     var spotLight = new THREE.SpotLight( 0xffffff );
     spotLight.position.set( -10, 15, -5 );
@@ -103,12 +201,7 @@ function initScene()
     spotLight.shadow.mapSize.height = 1024;
     spotLight.shadow.camera.near = 1;
     spotLight.shadow.camera.far = 200;
-    spotLight.castShadow = true;
-    scene.add( spotLight );
-
-    var spotLightHelper = new THREE.CameraHelper( spotLight.shadow.camera );
-    scene.add( spotLightHelper );
-        
+    spotLight.castShadow = true;    addObject( spotLight );
       
     var helper = new THREE.GridHelper( 100, 40 );
     helper.position.x = 0;
@@ -120,31 +213,34 @@ function initScene()
 
     var cubeGeometry = new THREE.BoxGeometry( 4, 4, 4 )
     var cubeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: defaultTexture } );
-    cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube.name = "cube1";
     cube.position.x = -4;
     cube.position.y = 3;
     cube.position.z = 0;
     cube.castShadow = true;
-    scene.add(cube);
+    addObject( cube );
 
     var sphereGeometry = new THREE.SphereGeometry( 4, 20, 20 );
     var sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: defaultTexture } );
-    sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    sphere.name = "sphere1";
     sphere.position.x = 20;
     sphere.position.y = 4;
     sphere.position.z = 2;
     sphere.castShadow = true;
-    scene.add( sphere );
+    addObject( sphere );
 
     var planeGeometry = new THREE.PlaneGeometry( 60, 20 );
     var planeMaterial = new THREE.MeshPhongMaterial( {  color:0xffffff } );
     plane = new THREE.Mesh( planeGeometry, planeMaterial );
+    plane.name = "plane1";
     plane.rotation.x = -0.5 * Math.PI;
     plane.position.x = 15;
     plane.position.y = 0;
     plane.position.z = 0;
     plane.receiveShadow = true;
-    scene.add( plane );
+    addObject( plane );
 };
 
 function initSceneStats() 
@@ -169,6 +265,7 @@ function initPickingScene()
     pickingTextureSelection = new THREE.DataTexture( pickingTextureSelectionData, screen_width, screen_height, THREE.RGBAFormat );
     pickingTextureSelection.needsUpdate = true;
 
+    /*
     var planeMaterialPicking = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     var planePicking = new THREE.Mesh( plane.geometry, planeMaterialPicking );
     planePicking.rotation.x = -0.5 * Math.PI;
@@ -192,6 +289,7 @@ function initPickingScene()
     spherePicking.position.z = 2;
     spherePicking.castShadow = true;
     scenePicking.add( spherePicking );
+    */
 }
 
 function initHUDScene()
@@ -220,6 +318,23 @@ function initHUDScene()
 
 function render()
 {
+    transformControls.update();
+
+    for( var i = 0; i < selection.length; ++i )
+    {
+        for( var j = 0; j < selection[i].helpers.length; ++j )
+        {
+            var helper = selection[i].helpers[j];
+            if( helper instanceof THREE.BoxHelper )
+            {
+                helper.update();
+            }
+        }
+    }
+
+    scene.updateMatrixWorld();
+    sceneHelpers.updateMatrixWorld();
+        
     renderer.clear();
     
     renderPickingScene();
@@ -231,48 +346,6 @@ function renderPickingScene()
 {
     if( currentControlMode == EControlMode.SELECT )
     {
-        if( selectionRectangle.width > 0 && selectionRectangle.height > 0 )
-        {
-            renderer.setClearColor( 0x000000 );
-            renderer.render( scenePicking, camera, pickingRenderTarget, true );
-
-            var x = selectionRectangle.left;
-            var y = selectionRectangle.top;
-            var w = selectionRectangle.width;
-            var h = selectionRectangle.height;
-        
-            //create buffer for reading pixels
-            var pixelBuffer = new Uint8Array( w * h * 4 );
-            
-            renderer.readRenderTargetPixels( pickingRenderTarget, 
-                                             x,
-                                             pickingRenderTarget.height - y - h, 
-                                             w,
-                                             h,
-                                             pixelBuffer );
-            
-            pickingTextureSelectionData.set( pixelBuffer );
-            
-            pickingTextureSelection.image.data = pixelBuffer;
-            pickingTextureSelection.image.width = w;
-            pickingTextureSelection.image.height = h;
-            pickingTextureSelection.needsUpdate = true;
-            
-            var ids = {};
-            var count = w * h * 4;
-            for( var i = 0; i < count; i+=4 )
-            {
-                var id = ( pixelBuffer[i + 0] << 16 ) | ( pixelBuffer[i + 1] << 8 ) | ( pixelBuffer[i + 2 ] );
-                ids[ id ] = true;
-            }
-
-            console.log( ">>>>>>>>>>>>>>>>>>>>>>>>" );                        
-            for( var id in ids ) 
-            { 
-                console.log( "0x" + ( "00000000" + (Number(id)).toString( 16 ) ).slice( -8 ) );
-            }
-            console.log( "<<<<<<<<<<<<<<<<<<<<<<<<" );
-        }
     }
 }
 
@@ -377,7 +450,9 @@ function renderScene()
     }
 
     renderer.setClearColor( 0xaaaaaa );
+
     renderer.render( scene, camera );
+    renderer.render( sceneHelpers, camera );
 }
 
 function renderHUDScene()
@@ -388,10 +463,86 @@ function renderHUDScene()
     renderer.render( sceneHUD, cameraHUD );
 }
 
-var controls = new function() 
+function selectObjects()
 {
-    this.rotationSpeed = 0.02;
-    this.bouncingSpeed = 0.03;
+    if( selectionRectangle.width >= 0 && selectionRectangle.height >= 0 )
+    {
+        renderer.setClearColor( 0x000000 );
+        renderer.render( scenePicking, camera, pickingRenderTarget, true );
+
+        var x = selectionRectangle.left;
+        var y = selectionRectangle.top;
+        var w = selectionRectangle.width || 1;
+        var h = selectionRectangle.height || 1;
+
+        //create buffer for reading pixels
+        var pixelBuffer = new Uint8Array( w * h * 4 );
+        
+        renderer.readRenderTargetPixels( pickingRenderTarget, 
+                                        x,
+                                        pickingRenderTarget.height - y - h, 
+                                        w,
+                                        h,
+                                        pixelBuffer );
+        
+        pickingTextureSelectionData.set( pixelBuffer );
+        
+        pickingTextureSelection.image.data = pixelBuffer;
+        pickingTextureSelection.image.width = w;
+        pickingTextureSelection.image.height = h;
+        pickingTextureSelection.needsUpdate = true;
+
+        for( var i = 0; i < selection.length; ++i )
+        {
+            selection[i].helpers[0].visible = false;
+        }
+        selection.length = 0;
+        
+        var ids = {};
+        var count = w * h * 4;
+        for( var i = 0; i < count; i += 4 )
+        {
+            var id = ( pixelBuffer[i + 0] << 16 ) | ( pixelBuffer[i + 1] << 8 ) | ( pixelBuffer[i + 2 ] );
+
+            for( var j = 0; j < colors.length; ++j )
+            {
+                if( colors[j] == id )
+                {
+                    ids[ j ] = j;
+                    break;
+                }
+            }
+        }
+
+        for( var idText in ids ) 
+        { 
+            var id = ids[idText];
+            for( var i = 0; i < sceneObjects.length; ++i ) 
+            {
+                if( sceneObjects[i].id == id )
+                {
+                    selection.push( sceneObjects[i] );
+                    break;
+                }
+            }
+        }
+
+        for( var i = 0; i < selection.length; ++i )
+        {
+            selection[i].helpers[0].visible = true;
+        }
+
+        if( selection.length == 1 )
+        {
+            transformControls.attach( selection[0].object );
+        }
+        else
+        {
+            transformControls.detach();
+        }
+
+        requestAnimationFrame( render );
+    }
 }
 
 function updateHUDScene() 
@@ -429,9 +580,9 @@ function handleMouseMove( event )
     {
         mouseX = event.pageX;
         mouseY = event.pageY;
-
-        requestAnimationFrame( render );
     }
+
+    requestAnimationFrame( render );
 }
 
 function handleMouseDown( event ) 
@@ -471,12 +622,25 @@ function handleMouseDown( event )
         mousePrevX = mouseX;
         mousePrevY = mouseY;
 
+        if( currentControlMode == EControlMode.SELECT )
+        {
+            selectionRectangle.left = mouseX;
+            selectionRectangle.top  = mouseY;
+            selectionRectangle.width  = 0; 
+            selectionRectangle.height = 0; 
+        }
+
         requestAnimationFrame( render);
     }
 }
 
 function handleMouseUp( event ) 
 {
+    if( currentControlMode == EControlMode.SELECT )
+    {
+        selectObjects();
+    }
+
     currentControlMode = EControlMode.NONE;
 
     selectionRectangleElement.style.left   = '0px';
@@ -492,8 +656,3 @@ function handleMouseUp( event )
    
     requestAnimationFrame( render );
 }
-
-
-
-var wizz = new WIZZ();
-wizz.createView( scene, camera, "VIEW-1" );

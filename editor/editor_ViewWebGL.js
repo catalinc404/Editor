@@ -41,6 +41,14 @@ function ViewWebGL( canvas, width, height, viewId, scene, camera )
     this.fnRender = this.render.bind( this );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    this.pickingRenderTarget = new THREE.WebGLRenderTarget( width, height );
+    this.pickingRenderTarget.texture.minFilter = THREE.LinearFilter;
+    this.pickingRenderTarget.texture.maxFilter = THREE.NearestFilter;
+
+    this.pickingTextureSelection = new THREE.DataTexture( this.pickingTextureSelectionData, width, height, THREE.RGBAFormat );
+    this.pickingTextureSelection.needsUpdate = true;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
     this.currentControlMode = EControlMode.NONE;    
 
     this.mousePrevX = null;

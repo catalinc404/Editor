@@ -41,5 +41,17 @@
             
         },
 
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome W - index.html",
+            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/3/Editor/index.html",
+            "webRoot": "${workspaceRoot}/index.html",
+            "runtimeArgs": [
+                "--allow-file-access-from-files"
+            ]
+            
+        },
+
     ]
 }
