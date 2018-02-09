@@ -1,6 +1,9 @@
-var screen_width  = window.innerWidth;
-var screen_height = window.innerHeight;
-var aspect_ratio  = window.innerWidth / window.innerHeight;
+var screen_left;
+var screen_top;
+var screen_width;
+var screen_height;
+
+var screen_aspect_ratio;
 
 var textureLoader;
 var defaultTexture;
@@ -14,11 +17,9 @@ var sceneHelpers;
 var scenePicking;
 var pickingRenderTarget;
 var pickingTextureScene;
-var pickingTextureSceneData = new Uint8Array( screen_width * screen_height * 4 );
 var pickingTextureSelection;
-var pickingTextureSelectionData = new Uint8Array( screen_width * screen_height * 4 );
 
-var sceneObjectsId = 0;
+var sceneObjectsId = 1;
 var sceneObjects = []; 
 
 var transformControls;
@@ -131,7 +132,8 @@ function addObject( object, dontAddToScene  )
     else
     if( object instanceof THREE.SpotLight )
     {
-        var objectPickingMaterial = new THREE.MeshBasicMaterial( { color: colors[editorObject.id] } );
+        //var objectPickingMaterial = new THREE.MeshBasicMaterial( { color: colors[editorObject.id] } );
+        var objectPickingMaterial = new THREE.MeshBasicMaterial( { color: editorObject.id } );
         var objectPicking = new THREE.Mesh( new THREE.TetrahedronGeometry( 0.6, 0 ), objectPickingMaterial );
         objectPicking.matrix = object.matrixWorld;
         objectPicking.matrixAutoUpdate = false;
@@ -178,8 +180,15 @@ function addObject( object, dontAddToScene  )
 } 
 
 //////////////////////////////////////////////////////////////////////////////
-function init() 
-{
+function setupEditor()
+{  
+    var editor = document.getElementById( "editor" );
+    screen_left   = parseInt( editor.style.left, 10 );
+    screen_top    = parseInt( editor.style.top, 10 );
+    screen_width  = parseInt( editor.style.width, 10 );
+    screen_height = parseInt( editor.style.height, 10 );
+    screen_aspect_ratio  = (screen_width / screen_height);
+
     textureLoader = new THREE.TextureLoader();
     defaultTexture = textureLoader.load( "textures/UV_Grid_Sm.jpg", render );
 
@@ -188,7 +197,7 @@ function init()
     scenePicking = new THREE.Scene();
     sceneHUD = new THREE.Scene();
 
-    camera = new THREE.PerspectiveCamera( 45, aspect_ratio, 0.1, 1000 );
+    camera = new THREE.PerspectiveCamera( 45, screen_aspect_ratio, 0.1, 1000 );
     camera.position.x = -28.23;
     camera.position.y = 14.34;
     camera.position.z = 31.06;
@@ -200,7 +209,7 @@ function init()
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( screen_width, screen_height );
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.autoClear = false;
@@ -209,12 +218,14 @@ function init()
     transformControls.addEventListener( 'change', render );
     scene.add( transformControls );
     
-    document.getElementById("WebGL-output").appendChild( renderer.domElement );
-    document.getElementById("WebGL-output").addEventListener( 'mousedown',  handleMouseDown,  false );
-    document.getElementById("WebGL-output").addEventListener( 'mousemove',  handleMouseMove,  false );
-    document.getElementById("WebGL-output").addEventListener( 'mouseup',    handleMouseUp,    false );
+    document.getElementById("editor").appendChild( renderer.domElement );
+    document.getElementById("editor").addEventListener( 'mousedown',  handleMouseDown,  false );
+    document.getElementById("editor").addEventListener( 'mousemove',  handleMouseMove,  false );
+    document.getElementById("editor").addEventListener( 'mouseup',    handleMouseUp,    false );
 
     selectionRectangleElement = document.getElementById( "Select-rectangle" );
+
+    editor.onresize = resizeEditor;
  
     requestAnimationFrame( render );
 }
@@ -225,7 +236,15 @@ function initScene()
     var ambientLight = new THREE.AmbientLight( 0x222222 );
     ambientLight.name = "ambientLight";
     scene.add( ambientLight );
-    
+
+    var helper = new THREE.GridHelper( 100, 40 );
+    helper.position.x = 0;
+    helper.position.y = -1;
+    helper.position.z = 0;
+    helper.material.opacity = 0.25;
+    helper.material.transparent = true;
+    scene.add( helper );
+       
     var spotLight = new THREE.SpotLight( 0xffffff );
     spotLight.position.set( -10, 15, -5 );
     spotLight.angle = Math.PI/4;
@@ -236,16 +255,9 @@ function initScene()
     spotLight.shadow.mapSize.height = 1024;
     spotLight.shadow.camera.near = 1;
     spotLight.shadow.camera.far = 200;
-    spotLight.castShadow = true;    addObject( spotLight );
+    spotLight.castShadow = true;    
+    addObject( spotLight );
       
-    var helper = new THREE.GridHelper( 100, 40 );
-    helper.position.x = 0;
-    helper.position.y = -1;
-    helper.position.z = 0;
-    helper.material.opacity = 0.25;
-    helper.material.transparent = true;
-    scene.add( helper );
-
     var cubeGeometry = new THREE.BoxGeometry( 4, 4, 4 )
     var cubeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: defaultTexture } );
     var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
@@ -257,7 +269,6 @@ function initScene()
     addObject( cube );
 
     /*
-
     var sphereGeometry = new THREE.SphereGeometry( 4, 20, 20 );
     var sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: defaultTexture } );
     var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -333,8 +344,6 @@ function initScene()
 
         addObject( object );
     });
-    
-
 
     /*
     var onProgress = function ( xhr ) 
@@ -370,34 +379,25 @@ function initScene()
                         }, onProgress, onError );
                     });
     */
-};
-
-function initSceneStats() 
-{
-    var stats = new Stats();
-    stats.setMode(0);
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.left = '0px';
-    stats.domElement.style.top = '0px';
-
-    document.getElementById("Stats-output").appendChild( stats.domElement );
-
-    return stats;
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function initPickingScene()
 {
     pickingRenderTarget = new THREE.WebGLRenderTarget( screen_width, screen_height );
     pickingRenderTarget.texture.minFilter = THREE.LinearFilter;
     pickingRenderTarget.texture.maxFilter = THREE.NearestFilter;
 
+    var pickingTextureSceneData = new Uint8Array( screen_width * screen_height * 4 );
     pickingTextureScene = new THREE.DataTexture( pickingTextureSceneData, screen_width, screen_height, THREE.RGBAFormat );
     pickingTextureScene.needsUpdate = true;
 
+    var pickingTextureSelectionData = new Uint8Array( screen_width * screen_height * 4 );
     pickingTextureSelection = new THREE.DataTexture( pickingTextureSelectionData, screen_width, screen_height, THREE.RGBAFormat );
     pickingTextureSelection.needsUpdate = true;
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function initHUDScene()
 {
     cameraHUD = new THREE.OrthographicCamera( -screen_width/2, screen_width/2, screen_height/2, -screen_height/2, -100, 100 );
@@ -417,6 +417,7 @@ function initHUDScene()
     updateHUDScene();
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function render()
 {
     transformControls.update();
@@ -440,9 +441,10 @@ function render()
     
     renderPickingScene();
     renderScene();
-    renderHUDScene();
+    //renderHUDScene();
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function renderPickingScene() 
 {
     if( currentControlMode == EControlMode.SELECT )
@@ -450,6 +452,7 @@ function renderPickingScene()
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function renderScene() 
 {
     //stats.update();
@@ -536,8 +539,9 @@ function renderScene()
                     selectionRectangle.width  = right  - selectionRectangle.left;
                     selectionRectangle.height = bottom - selectionRectangle.top; 
 
-                    selectionRectangleElement.style.left   = selectionRectangle.left   + 'px';
-                    selectionRectangleElement.style.top    = selectionRectangle.top    + 'px';
+                    var rect = renderer.domElement.getBoundingClientRect();
+                    selectionRectangleElement.style.left   = rect.left + selectionRectangle.left   + 'px';
+                    selectionRectangleElement.style.top    = rect.top  + selectionRectangle.top    + 'px';
                     selectionRectangleElement.style.width  = selectionRectangle.width  + 'px';
                     selectionRectangleElement.style.height = selectionRectangle.height + 'px';
                 }
@@ -556,6 +560,7 @@ function renderScene()
     renderer.render( sceneHelpers, camera );
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function renderHUDScene()
 {
     //renderer.setViewport( 0, 100, 0, 100 );
@@ -564,6 +569,7 @@ function renderHUDScene()
     renderer.render( sceneHUD, cameraHUD );
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function selectObjects()
 {
     if( selectionRectangle.width >= 0 && selectionRectangle.height >= 0 )
@@ -578,7 +584,7 @@ function selectObjects()
                                          pickingRenderTarget.width,
                                          pickingRenderTarget.height,
                                          pixelBuffer );
-        pickingTextureSceneData.set( pixelBuffer );
+        
 
         pickingTextureScene.image.data = pixelBuffer;
         pickingTextureScene.image.width = pickingRenderTarget.width;
@@ -598,8 +604,7 @@ function selectObjects()
                                         w,
                                         h,
                                         pixelBuffer );
-        pickingTextureSelectionData.set( pixelBuffer );
-        
+       
         pickingTextureSelection.image.data = pixelBuffer;
         pickingTextureSelection.image.width = w;
         pickingTextureSelection.image.height = h;
@@ -613,6 +618,9 @@ function selectObjects()
 
         if( gui != undefined )
         {
+            var propertiesPanel = document.getElementById( "right" );
+            propertiesPanel.removeChild( propertiesPanel.childNodes[0] );
+
             gui.destroy();
             gui = undefined;
         }
@@ -660,7 +668,12 @@ function selectObjects()
 
             transformControls.attach( object );
 
-            gui = new dat.GUI();
+            var propertiesPanel = document.getElementById( "right" );
+            var width = parseInt( propertiesPanel.style.width, 10 ) - 1;
+            gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width } );
+
+            propertiesPanel.appendChild( gui.domElement );
+
             gui.add( selection[0].object, "name" );
             gui.add( selection[0].object, "type" );
 
@@ -773,19 +786,24 @@ function selectObjects()
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function updateHUDScene() 
 {
     textureGizmo1.position.set( -screen_width/2 + 50 + 5, screen_height/2 - 50 - 5, 1 ); 
     textureGizmo2.position.set( -screen_width/2 + 50 + 5 + 100 + 5, screen_height/2 - 50 - 5, 1 ); 
 }
 
-function resize() 
+//////////////////////////////////////////////////////////////////////////////
+function resizeEditor()
 {
-    screen_width  = window.innerWidth;
-    screen_height = window.innerHeight;
-    aspect_ratio  = (window.innerWidth / window.innerHeight);
+    var editor = document.getElementById( "editor" );
+    screen_left   = parseInt( editor.style.left, 10 );
+    screen_top    = parseInt( editor.style.top, 10 );
+    screen_width  = parseInt( editor.style.width, 10 );
+    screen_height = parseInt( editor.style.height, 10 );
+    screen_aspect_ratio  = (screen_width / screen_height);
         
-    camera.aspect = aspect_ratio;
+    camera.aspect = screen_aspect_ratio;
     camera.updateProjectionMatrix();
     
     cameraHUD.left    = -screen_width/2;
@@ -802,17 +820,20 @@ function resize()
     requestAnimationFrame( render );
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function handleMouseMove( event ) 
 {
     if( currentControlMode != EControlMode.NONE )
     {
-        mouseX = event.pageX;
-        mouseY = event.pageY;
+        var rect = renderer.domElement.getBoundingClientRect();
+        mouseX = event.clientX - rect.left;
+        mouseY = event.clientY - rect.top;
     }
 
     requestAnimationFrame( render );
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function handleMouseDown( event ) 
 {
     switch( event.button )
@@ -862,6 +883,7 @@ function handleMouseDown( event )
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
 function handleMouseUp( event ) 
 {
     if( currentControlMode == EControlMode.SELECT )
@@ -883,4 +905,22 @@ function handleMouseUp( event )
     mouseY = null;
    
     requestAnimationFrame( render );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+function init() 
+{
+    setupPage();
+    setupEditor();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function resize() 
+{
+    resizePage();
+    resizeEditor();
 }

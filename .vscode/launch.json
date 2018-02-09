@@ -53,5 +53,17 @@
             
         },
 
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome W - editor_simple.html",
+            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/3/Editor/editor_simple.html",
+            "webRoot": "${workspaceRoot}/editor_simple.html",
+            "runtimeArgs": [
+                "--allow-file-access-from-files"
+            ]
+            
+        },
+
     ]
 }
