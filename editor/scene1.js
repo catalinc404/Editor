@@ -13,6 +13,8 @@ var sceneHelpers;
 
 var scenePicking;
 var pickingRenderTarget;
+var pickingTextureScene;
+var pickingTextureSceneData = new Uint8Array( screen_width * screen_height * 4 );
 var pickingTextureSelection;
 var pickingTextureSelectionData = new Uint8Array( screen_width * screen_height * 4 );
 
@@ -60,12 +62,39 @@ var currentControlMode = EControlMode.NONE;
 Epsilon = 0.001;
 
 //////////////////////////////////////////////////////////////////////////////
-function addObject( object )
+var gui;
+
+function createMapGUI( gui, map )
+{
+    if( map !== undefined && map != null )
+    {
+        gui.add( map, "name" );
+        if( map.image !== undefined )
+        {
+            gui.add( map.image, "src" );
+        }
+        else
+        {
+            gui.add( { image: "none" }, "image" );
+        }
+    }
+    else
+    {
+        gui.add( { map: "none" }, "map" );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function addObject( object, dontAddToScene  )
 {
     var editorObject = { id: sceneObjectsId++ };
 
     object.updateMatrixWorld();
+
+    if( !dontAddToScene )
+    {
     scene.add( object );
+    }
 
     editorObject.object = object;
     editorObject.helpers = [];
@@ -77,7 +106,8 @@ function addObject( object )
         editorObject.helpers.push( selectionHelper );
 
         var objectPicking = object.clone();
-        objectPicking.material = new THREE.MeshBasicMaterial( { color: colors[editorObject.id] } );
+        //objectPicking.material = new THREE.MeshBasicMaterial( { color: colors[editorObject.id] } );
+        objectPicking.material = new THREE.MeshBasicMaterial( { color: editorObject.id } );
         objectPicking.matrix = object.matrixWorld;
         objectPicking.matrixAutoUpdate = false;
         scenePicking.add( objectPicking );
@@ -140,6 +170,11 @@ function addObject( object )
     }
  
     sceneObjects.push( editorObject );
+
+    for( var i = 0; i < object.children.length; ++i )
+    {
+        addObject( object.children[i], true );
+    }
 } 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -182,14 +217,16 @@ function init()
     document.getElementById("WebGL-output").addEventListener( 'mouseup',    handleMouseUp,    false );
 
     selectionRectangleElement = document.getElementById( "Select-rectangle" );
-    
+ 
     requestAnimationFrame( render );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 function initScene() 
 {
-    addObject( new THREE.AmbientLight( 0x222222 ) );
+    var ambientLight = new THREE.AmbientLight( 0x222222 );
+    ambientLight.name = "ambientLight";
+    scene.add( ambientLight );
     
     var spotLight = new THREE.SpotLight( 0xffffff );
     spotLight.position.set( -10, 15, -5 );
@@ -221,6 +258,8 @@ function initScene()
     cube.castShadow = true;
     addObject( cube );
 
+    /*
+
     var sphereGeometry = new THREE.SphereGeometry( 4, 20, 20 );
     var sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: defaultTexture } );
     var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -241,6 +280,98 @@ function initScene()
     plane.position.z = 0;
     plane.receiveShadow = true;
     addObject( plane );
+    */
+
+    /*
+    // collada
+    var test = LoaderUtils.extractUrlBase( "./test1/test2" ); 
+
+    var dae;
+    var loadingManager = new THREE.LoadingManager( function() 
+    { 
+        dae.scale.x = 10;
+        dae.scale.y = 10;
+        dae.scale.z = 10;
+
+        addObject( dae ); } );
+    var loader = new THREE.ColladaLoader( loadingManager );
+    loader.load( './data/g4jmqcp3hjwg-Sofa/sofa.dae', function ( collada ) { dae = collada.scene; } );
+    */
+
+    /*
+    //3ds files dont store normal maps
+    var loader = new THREE.TextureLoader();
+    var normal = loader.load( './data/g4jmqcp3hjwg-Sofa/WoolNM.jpg' );
+    var loader = new THREE.TDSLoader( );
+    loader.setPath( './data/g4jmqcp3hjwg-Sofa/' );
+    loader.load( './data/g4jmqcp3hjwg-Sofa/sofa.3ds', function ( object ) {
+        object.traverse( function ( child ) {
+            if ( child instanceof THREE.Mesh ) {
+                child.material.normalMap = normal;
+            }
+        } );
+
+        object.scale.x = 10;
+        object.scale.y = 10;
+        object.scale.z = 10;
+
+        addObject( object );
+    });
+    */
+    var loader = new THREE.TextureLoader();
+    var normal = loader.load( './data/portalgun/normal.jpg' );
+    var loader = new THREE.TDSLoader( );
+    loader.setPath( './data/portalgun/' );
+    loader.load( './data/portalgun/portalgun.3ds', function ( object ) {
+        object.traverse( function ( child ) {
+            if ( child instanceof THREE.Mesh ) {
+                child.material.normalMap = normal;
+            }
+        } );
+
+        object.scale.x = 10;
+        object.scale.y = 10;
+        object.scale.z = 10;
+
+        addObject( object );
+    });
+    
+
+
+    /*
+    var onProgress = function ( xhr ) 
+    {
+        if ( xhr.lengthComputable ) 
+        {
+            var percentComplete = xhr.loaded / xhr.total * 100;
+            console.log( Math.round(percentComplete, 2) + '% downloaded' );
+        }
+    };
+
+    var onError = function ( xhr ) {};
+
+    THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
+
+    var mtlLoader = new THREE.MTLLoader();
+    mtlLoader.setPath( './data/g4jmqcp3hjwg-Sofa/' );
+    mtlLoader.load( 'sofa.mtl', 
+                    function( materials ) 
+                    {
+                        materials.preload();
+                        var objLoader = new THREE.OBJLoader();
+                        objLoader.setMaterials( materials );
+                        objLoader.setPath( './data/g4jmqcp3hjwg-Sofa/' );
+                        objLoader.load( 'sofa.obj', function ( object ) 
+                        {
+                            //object.scale.x = 0.1;
+                            //object.scale.y = 0.1;
+                            //object.scale.z = 0.1;
+
+                            //object.position.y = -9.5;
+                            addObject( object );
+                        }, onProgress, onError );
+                    });
+    */
 };
 
 function initSceneStats() 
@@ -262,50 +393,22 @@ function initPickingScene()
     pickingRenderTarget.texture.minFilter = THREE.LinearFilter;
     pickingRenderTarget.texture.maxFilter = THREE.NearestFilter;
 
+    pickingTextureScene = new THREE.DataTexture( pickingTextureSceneData, screen_width, screen_height, THREE.RGBAFormat );
+    pickingTextureScene.needsUpdate = true;
+
     pickingTextureSelection = new THREE.DataTexture( pickingTextureSelectionData, screen_width, screen_height, THREE.RGBAFormat );
     pickingTextureSelection.needsUpdate = true;
-
-    /*
-    var planeMaterialPicking = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    var planePicking = new THREE.Mesh( plane.geometry, planeMaterialPicking );
-    planePicking.rotation.x = -0.5 * Math.PI;
-    planePicking.position.x = 15;
-    planePicking.position.y = 0;
-    planePicking.position.z = 0;
-    scenePicking.add( planePicking );    
-
-    var cubeMaterialPicking = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-    cubePicking = new THREE.Mesh( cube.geometry, cubeMaterialPicking);
-    cubePicking.position.x = -4;
-    cubePicking.position.y = 3;
-    cubePicking.position.z = 0;
-    cubePicking.castShadow = true;
-    scenePicking.add( cubePicking );
-
-    var sphereMaterialPicking = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-    spherePicking = new THREE.Mesh( sphere.geometry, sphereMaterialPicking );
-    spherePicking.position.x = 20;
-    spherePicking.position.y = 4;
-    spherePicking.position.z = 2;
-    spherePicking.castShadow = true;
-    scenePicking.add( spherePicking );
-    */
 }
 
 function initHUDScene()
 {
     cameraHUD = new THREE.OrthographicCamera( -screen_width/2, screen_width/2, screen_height/2, -screen_height/2, -100, 100 );
 
-    var textureGizmoMaterial = new THREE.SpriteMaterial( { map: pickingRenderTarget.texture } );
-
-    textureGizmoMaterial.depthFunc = THREE.AlwaysDepth;
-    //textureGizmoMaterial.depthTest = false;
-    textureGizmoMaterial.depthWrite = false;
-    
-    textureGizmo = new THREE.Sprite( textureGizmoMaterial );
-    textureGizmo.scale.set( 100, 100, 1 );
-    textureGizmo.position.set( 0, 0, 1 );
-    sceneHUD.add( textureGizmo );
+    var textureGizmoMaterial1 = new THREE.SpriteMaterial( { map: pickingTextureScene } );
+    textureGizmo1 = new THREE.Sprite( textureGizmoMaterial1 );
+    textureGizmo1.scale.set( 100, 100, 1 );
+    textureGizmo1.position.set( 0, 0, 1 );
+    sceneHUD.add( textureGizmo1 );
 
     var textureGizmoMaterial2 = new THREE.SpriteMaterial( { map: pickingTextureSelection } );
     textureGizmo2 = new THREE.Sprite( textureGizmoMaterial2 );
@@ -470,6 +573,20 @@ function selectObjects()
         renderer.setClearColor( 0x000000 );
         renderer.render( scenePicking, camera, pickingRenderTarget, true );
 
+        var pixelBuffer = new Uint8Array( pickingRenderTarget.width * pickingRenderTarget.height * 4 );
+        renderer.readRenderTargetPixels( pickingRenderTarget, 
+                                         0,
+                                         0, 
+                                         pickingRenderTarget.width,
+                                         pickingRenderTarget.height,
+                                         pixelBuffer );
+        pickingTextureSceneData.set( pixelBuffer );
+
+        pickingTextureScene.image.data = pixelBuffer;
+        pickingTextureScene.image.width = pickingRenderTarget.width;
+        pickingTextureScene.image.height = pickingRenderTarget.height;
+        pickingTextureScene.needsUpdate = true;
+        
         var x = selectionRectangle.left;
         var y = selectionRectangle.top;
         var w = selectionRectangle.width || 1;
@@ -477,14 +594,12 @@ function selectObjects()
 
         //create buffer for reading pixels
         var pixelBuffer = new Uint8Array( w * h * 4 );
-        
         renderer.readRenderTargetPixels( pickingRenderTarget, 
                                         x,
                                         pickingRenderTarget.height - y - h, 
                                         w,
                                         h,
                                         pixelBuffer );
-        
         pickingTextureSelectionData.set( pixelBuffer );
         
         pickingTextureSelection.image.data = pixelBuffer;
@@ -497,6 +612,12 @@ function selectObjects()
             selection[i].helpers[0].visible = false;
         }
         selection.length = 0;
+
+        if( gui != undefined )
+        {
+            gui.destroy();
+            gui = undefined;
+        }
         
         var ids = {};
         var count = w * h * 4;
@@ -504,6 +625,7 @@ function selectObjects()
         {
             var id = ( pixelBuffer[i + 0] << 16 ) | ( pixelBuffer[i + 1] << 8 ) | ( pixelBuffer[i + 2 ] );
 
+            /*
             for( var j = 0; j < colors.length; ++j )
             {
                 if( colors[j] == id )
@@ -512,6 +634,8 @@ function selectObjects()
                     break;
                 }
             }
+            */
+            ids[id] = id;
         }
 
         for( var idText in ids ) 
@@ -534,7 +658,113 @@ function selectObjects()
 
         if( selection.length == 1 )
         {
-            transformControls.attach( selection[0].object );
+            var object = selection[0].object
+
+            transformControls.attach( object );
+
+            gui = new dat.GUI();
+            gui.add( selection[0].object, "name" );
+            gui.add( selection[0].object, "type" );
+
+            if( object.position !== undefined )
+            {
+                var positionGUI = gui.addFolder( "Position" );
+                positionGUI.add( object.position, "x" ).onChange( render );
+                positionGUI.add( object.position, "y" ).onChange( render );
+                positionGUI.add( object.position, "z" ).onChange( render );
+            }
+
+            if( object.rotation !== undefined  )
+            {
+                var rotationGUI = gui.addFolder( "Rotation" );
+                rotationGUI.add( object.rotation, "x" ).step( 0.100 ).onChange( render );
+                rotationGUI.add( object.rotation, "y" ).step( 0.100 ).onChange( render );
+                rotationGUI.add( object.rotation, "z" ).step( 0.100 ).onChange( render );
+            }
+
+            if( object.scale !== undefined  )
+            {
+                var scaleGUI = gui.addFolder( "Scale" );
+                scaleGUI.add( object.scale, "x" ).min( Epsilon ).onChange( render );
+                scaleGUI.add( object.scale, "y" ).min( Epsilon ).onChange( render );
+                scaleGUI.add( object.scale, "z" ).min( Epsilon ).onChange( render );
+            }
+
+            if( object instanceof THREE.Mesh )
+            {
+                if( object.material !== undefined )
+                {
+                    if( object.material instanceof THREE.MeshPhongMaterial )
+                    {
+                        var materialGUI = gui.addFolder( "Phong Material" );
+                        
+                        materialGUI.add( object.material, "name" );
+                        materialGUI.addColor( object.material, "color" );
+                        
+                        materialGUI.addColor( object.material, "specular" );
+                        materialGUI.add( object.material, "shininess" );
+
+                        var mapGUI = materialGUI.addFolder( "map" );
+                        createMapGUI( mapGUI, object.material.map );
+
+                        var lightMapGUI = materialGUI.addFolder( "lightMap" );
+                        lightMapGUI.add( object.material, "lightMapIntensity" );
+                        createMapGUI( lightMapGUI, object.material.lightMap );
+
+                        var aoMapGUI = materialGUI.addFolder( "aoMap" );
+                        aoMapGUI.add( object.material, "lightMapIntensity" );
+                        createMapGUI( aoMapGUI, object.material.lightMap );
+                    
+                        var emmisiveMapGUI = materialGUI.addFolder( "emmissiveMap" );
+                        emmisiveMapGUI.addColor( object.material, "emissive" );
+                        emmisiveMapGUI.add( object.material, "emissiveIntensity" );
+                        createMapGUI( emmisiveMapGUI, object.material.emissiveMap );
+
+                        var bumpMapGUI = materialGUI.addFolder( "bumpMap" );
+                        bumpMapGUI.add( object.material, "bumpScale" );
+                        createMapGUI( bumpMapGUI, object.material.bumpMap );
+
+                        var normalMapGUI = materialGUI.addFolder( "normalMap" );
+                        var normalMapScaleGUI = normalMapGUI.addFolder( "scale" );
+                        normalMapScaleGUI.add( object.material.normalScale, "x" );
+                        normalMapScaleGUI.add( object.material.normalScale, "y" );
+                        createMapGUI( normalMapGUI, object.material.normalMap );
+
+                        var displacementMapGUI = materialGUI.addFolder( "displacementMap" );
+                        displacementMapGUI.add( object.material, "displacementScale" );
+                        displacementMapGUI.add( object.material, "displacementBias" );
+                        createMapGUI( displacementMapGUI, object.material.displacementMap );
+
+                        var specularMapGUI = materialGUI.addFolder( "specularMap" );
+                        createMapGUI( specularMapGUI, object.material.specularMap );
+
+                        var alphaMapGUI = materialGUI.addFolder( "alphaMap" );
+                        createMapGUI( alphaMapGUI, object.material.alphaMap );
+
+                        var envMapGUI = materialGUI.addFolder( "envMap" );
+                        createMapGUI( envMapGUI, object.material.envMap );
+
+                        materialGUI.add( object.material, "combine", { MultiplyOperation: 0, MixOperation: 1, AddOperation: 2 } );
+
+                        materialGUI.add( object.material, "reflectivity" );
+                        materialGUI.add( object.material, "refractionRatio" );
+
+                        materialGUI.add( object.material, "wireframe" );
+                        materialGUI.add( object.material, "wireframeLinewidth" );
+                        materialGUI.add( object.material, "wireframeLinecap" );
+                        materialGUI.add( object.material, "wireframeLinejoin" );
+                        
+                        materialGUI.add( object.material, "skinning" );
+                        materialGUI.add( object.material, "morphTargets" );
+                        materialGUI.add( object.material, "morphNormals" );
+                    }
+                }
+                if( object.geometry !== undefined )
+                {
+                    var geometryGUI = gui.addFolder( "Geometry" );
+                    geometryGUI.add( object.geometry, "name" );
+                }
+            }
         }
         else
         {
@@ -547,7 +777,7 @@ function selectObjects()
 
 function updateHUDScene() 
 {
-    textureGizmo.position.set( -screen_width/2 + 50 + 5, screen_height/2 - 50 - 5, 1 ); 
+    textureGizmo1.position.set( -screen_width/2 + 50 + 5, screen_height/2 - 50 - 5, 1 ); 
     textureGizmo2.position.set( -screen_width/2 + 50 + 5 + 100 + 5, screen_height/2 - 50 - 5, 1 ); 
 }
 
