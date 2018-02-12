@@ -67,13 +67,13 @@ ul.vtree {
 }
 
 .vtree li.vtree-leaf a.vtree-leaf-label:hover {
-	background-color: #e7f4f9;
-	outline: 1px solid #d8f0fa;
+	background-color: #f3f3f3;
+	outline: 1px dotted #777777;
 }
 
 .vtree li.vtree-leaf.vtree-selected > a.vtree-leaf-label {
-	background-color: #beebff;
-	outline: 1px solid #99defd;
+	background-color: #fdfdfd7c;
+	outline: 1px dotted #000000;
 }
 
 .vtree-contextmenu {
@@ -98,7 +98,7 @@ ul.vtree {
 
 .vtree-contextmenu li:hover {
 	color: #fff;
-	background-color: #3399ff;
+	background-color: #868686;
 }
 
 .vtree li.vtree-leaf, .vtree li.vtree-leaf::before, .vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle {
