@@ -2,10 +2,11 @@
 function UI( UIData )
 {
     this.UIData = UIData;
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UI.prototype = Object.assign( Object.create( Object.prototype ), 
+UI.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     constructor: UI
@@ -346,6 +347,16 @@ UI.prototype.setupElementClass = function( element, uiClass )
             element.ui.setupLayoutClasses( element.ui.UIData );
             element.ui.parent = element;
             element.onresize = element.ui.onresize.bind( element.ui );
+        }
+        break;
+        case "propertyView":
+        {
+            element.ui = new PropertyView( this, element );
+        }
+        break;
+        case "treeView":
+        {
+            element.ui = new TreeView( this, element );
         }
         break;
         default:

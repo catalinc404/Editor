@@ -63,29 +63,6 @@ var currentControlMode = EControlMode.NONE;
 Epsilon = 0.001;
 
 //////////////////////////////////////////////////////////////////////////////
-var gui;
-
-function createMapGUI( gui, map )
-{
-    if( map !== undefined && map != null )
-    {
-        gui.add( map, "name" );
-        if( map.image !== undefined )
-        {
-            gui.add( map.image, "src" );
-        }
-        else
-        {
-            gui.add( { image: "none" }, "image" );
-        }
-    }
-    else
-    {
-        gui.add( { map: "none" }, "map" );
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
 function addObject( object, dontAddToScene  )
 {
     var editorObject = { id: sceneObjectsId++ };
@@ -172,12 +149,14 @@ function addObject( object, dontAddToScene  )
     }
  
     sceneObjects.push( editorObject );
-
+  
     for( var i = 0; i < object.children.length; ++i )
     {
         addObject( object.children[i], true );
     }
-} 
+
+    uiPage.dispatchEvent( "objectAdded", object );
+}
 
 //////////////////////////////////////////////////////////////////////////////
 function setupEditor()
@@ -192,7 +171,9 @@ function setupEditor()
     textureLoader = new THREE.TextureLoader();
     defaultTexture = textureLoader.load( "textures/UV_Grid_Sm.jpg", render );
 
-    scene = new THREE.Scene();
+    scene = new THREE.Scene( { name: "Scene" } );
+    uiPage.dispatchEvent( "sceneCreated", scene );
+
     sceneHelpers = new THREE.Scene();
     scenePicking = new THREE.Scene();
     sceneHUD = new THREE.Scene();
@@ -222,6 +203,9 @@ function setupEditor()
     document.getElementById("editor").addEventListener( 'mousedown',  handleMouseDown,  false );
     document.getElementById("editor").addEventListener( 'mousemove',  handleMouseMove,  false );
     document.getElementById("editor").addEventListener( 'mouseup',    handleMouseUp,    false );
+
+    uiPage.addEventListener( "objectSelected",   onObjectSelected );
+    uiPage.addEventListener( "objectDeselected", onObjectDeselected );
 
     selectionRectangleElement = document.getElementById( "Select-rectangle" );
 
@@ -337,6 +321,8 @@ function initScene()
                 child.material.normalMap = normal;
             }
         } );
+
+        var object = object.children[0];
 
         object.scale.x = 10;
         object.scale.y = 10;
@@ -570,6 +556,47 @@ function renderHUDScene()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+function onObjectSelected( objects )
+{
+    for( var i = 0; i < sceneObjects.length; ++i ) 
+    {
+        if( sceneObjects[i].object == objects[0] )
+        {
+            selection.push( sceneObjects[i] );
+            break;
+        }
+    }
+
+    for( var i = 0; i < selection.length; ++i )
+    {
+        selection[i].helpers[0].visible = true;
+    }
+
+    if( selection.length == 1 )
+    {
+        var object = selection[0].object
+        transformControls.attach( object );
+    }
+
+    requestAnimationFrame( render );    
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function onObjectDeselected()
+{
+    transformControls.detach();
+
+    for( var i = 0; i < selection.length; ++i )
+    {
+        selection[i].helpers[0].visible = false;
+    }
+
+    selection.length = 0;
+    
+    requestAnimationFrame( render );
+}
+
+//////////////////////////////////////////////////////////////////////////////
 function selectObjects()
 {
     if( selectionRectangle.width >= 0 && selectionRectangle.height >= 0 )
@@ -610,40 +637,24 @@ function selectObjects()
         pickingTextureSelection.image.height = h;
         pickingTextureSelection.needsUpdate = true;
 
-        for( var i = 0; i < selection.length; ++i )
+        if( selection.length > 0 )
         {
-            selection[i].helpers[0].visible = false;
+            uiPage.dispatchEvent( "objectDeselected", [selection[0].object] );
         }
-        selection.length = 0;
-
-        if( gui != undefined )
+        else
         {
-            var propertiesPanel = document.getElementById( "right" );
-            propertiesPanel.removeChild( propertiesPanel.childNodes[0] );
-
-            gui.destroy();
-            gui = undefined;
+            uiPage.dispatchEvent( "objectDeselected", [] );
         }
-        
+       
         var ids = {};
         var count = w * h * 4;
         for( var i = 0; i < count; i += 4 )
         {
             var id = ( pixelBuffer[i + 0] << 16 ) | ( pixelBuffer[i + 1] << 8 ) | ( pixelBuffer[i + 2 ] );
-
-            /*
-            for( var j = 0; j < colors.length; ++j )
-            {
-                if( colors[j] == id )
-                {
-                    ids[ j ] = j;
-                    break;
-                }
-            }
-            */
             ids[id] = id;
         }
 
+        var objects = [];
         for( var idText in ids ) 
         { 
             var id = ids[idText];
@@ -651,138 +662,16 @@ function selectObjects()
             {
                 if( sceneObjects[i].id == id )
                 {
-                    selection.push( sceneObjects[i] );
+                    objects.push( sceneObjects[i].object );
                     break;
                 }
             }
         }
 
-        for( var i = 0; i < selection.length; ++i )
+        if( objects.length > 0 )
         {
-            selection[i].helpers[0].visible = true;
+            uiPage.dispatchEvent( "objectSelected", objects );
         }
-
-        if( selection.length == 1 )
-        {
-            var object = selection[0].object
-
-            transformControls.attach( object );
-
-            var propertiesPanel = document.getElementById( "right" );
-            var width = parseInt( propertiesPanel.style.width, 10 ) - 1;
-            gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width } );
-
-            propertiesPanel.appendChild( gui.domElement );
-
-            gui.add( selection[0].object, "name" );
-            gui.add( selection[0].object, "type" );
-
-            if( object.position !== undefined )
-            {
-                var positionGUI = gui.addFolder( "Position" );
-                positionGUI.add( object.position, "x" ).onChange( render );
-                positionGUI.add( object.position, "y" ).onChange( render );
-                positionGUI.add( object.position, "z" ).onChange( render );
-            }
-
-            if( object.rotation !== undefined  )
-            {
-                var rotationGUI = gui.addFolder( "Rotation" );
-                rotationGUI.add( object.rotation, "x" ).step( 0.100 ).onChange( render );
-                rotationGUI.add( object.rotation, "y" ).step( 0.100 ).onChange( render );
-                rotationGUI.add( object.rotation, "z" ).step( 0.100 ).onChange( render );
-            }
-
-            if( object.scale !== undefined  )
-            {
-                var scaleGUI = gui.addFolder( "Scale" );
-                scaleGUI.add( object.scale, "x" ).min( Epsilon ).onChange( render );
-                scaleGUI.add( object.scale, "y" ).min( Epsilon ).onChange( render );
-                scaleGUI.add( object.scale, "z" ).min( Epsilon ).onChange( render );
-            }
-
-            if( object instanceof THREE.Mesh )
-            {
-                if( object.material !== undefined )
-                {
-                    if( object.material instanceof THREE.MeshPhongMaterial )
-                    {
-                        var materialGUI = gui.addFolder( "Phong Material" );
-                        
-                        materialGUI.add( object.material, "name" );
-                        materialGUI.addColor( object.material, "color" );
-                        
-                        materialGUI.addColor( object.material, "specular" );
-                        materialGUI.add( object.material, "shininess" );
-
-                        var mapGUI = materialGUI.addFolder( "map" );
-                        createMapGUI( mapGUI, object.material.map );
-
-                        var lightMapGUI = materialGUI.addFolder( "lightMap" );
-                        lightMapGUI.add( object.material, "lightMapIntensity" );
-                        createMapGUI( lightMapGUI, object.material.lightMap );
-
-                        var aoMapGUI = materialGUI.addFolder( "aoMap" );
-                        aoMapGUI.add( object.material, "lightMapIntensity" );
-                        createMapGUI( aoMapGUI, object.material.lightMap );
-                    
-                        var emmisiveMapGUI = materialGUI.addFolder( "emmissiveMap" );
-                        emmisiveMapGUI.addColor( object.material, "emissive" );
-                        emmisiveMapGUI.add( object.material, "emissiveIntensity" );
-                        createMapGUI( emmisiveMapGUI, object.material.emissiveMap );
-
-                        var bumpMapGUI = materialGUI.addFolder( "bumpMap" );
-                        bumpMapGUI.add( object.material, "bumpScale" );
-                        createMapGUI( bumpMapGUI, object.material.bumpMap );
-
-                        var normalMapGUI = materialGUI.addFolder( "normalMap" );
-                        var normalMapScaleGUI = normalMapGUI.addFolder( "scale" );
-                        normalMapScaleGUI.add( object.material.normalScale, "x" );
-                        normalMapScaleGUI.add( object.material.normalScale, "y" );
-                        createMapGUI( normalMapGUI, object.material.normalMap );
-
-                        var displacementMapGUI = materialGUI.addFolder( "displacementMap" );
-                        displacementMapGUI.add( object.material, "displacementScale" );
-                        displacementMapGUI.add( object.material, "displacementBias" );
-                        createMapGUI( displacementMapGUI, object.material.displacementMap );
-
-                        var specularMapGUI = materialGUI.addFolder( "specularMap" );
-                        createMapGUI( specularMapGUI, object.material.specularMap );
-
-                        var alphaMapGUI = materialGUI.addFolder( "alphaMap" );
-                        createMapGUI( alphaMapGUI, object.material.alphaMap );
-
-                        var envMapGUI = materialGUI.addFolder( "envMap" );
-                        createMapGUI( envMapGUI, object.material.envMap );
-
-                        materialGUI.add( object.material, "combine", { MultiplyOperation: 0, MixOperation: 1, AddOperation: 2 } );
-
-                        materialGUI.add( object.material, "reflectivity" );
-                        materialGUI.add( object.material, "refractionRatio" );
-
-                        materialGUI.add( object.material, "wireframe" );
-                        materialGUI.add( object.material, "wireframeLinewidth" );
-                        materialGUI.add( object.material, "wireframeLinecap" );
-                        materialGUI.add( object.material, "wireframeLinejoin" );
-                        
-                        materialGUI.add( object.material, "skinning" );
-                        materialGUI.add( object.material, "morphTargets" );
-                        materialGUI.add( object.material, "morphNormals" );
-                    }
-                }
-                if( object.geometry !== undefined )
-                {
-                    var geometryGUI = gui.addFolder( "Geometry" );
-                    geometryGUI.add( object.geometry, "name" );
-                }
-            }
-        }
-        else
-        {
-            transformControls.detach();
-        }
-
-        requestAnimationFrame( render );
     }
 }
 
@@ -924,3 +813,4 @@ function resize()
     resizePage();
     resizeEditor();
 }
+

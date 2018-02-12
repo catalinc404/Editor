@@ -29,7 +29,24 @@ var pageLayout =
                     name: "body_left",
                     id: "left",
                     width: 200,
-                    size_min: 100
+                    size_min: 100,
+                    rows:
+                    [
+                        {
+                            name: "tree_view_menu",
+                            id: "tree-view-menu",
+                            height: 0,
+                            size_min: 0,
+                        },
+                        {
+                            name: "tree_view",
+                            id: "tree-view",
+                            class:
+                            {
+                                type: "treeView",
+                            },
+                        }
+                    ]
                 },
                 {
                     name: "resizer_left",
@@ -63,7 +80,11 @@ var pageLayout =
                     name: "body_right",
                     id: "right",
                     width: 260,
-                    size_min: 260
+                    size_min: 260,
+                    class:
+                    {
+                        type: "propertyView",
+                    },
                 }
             ]
         },
