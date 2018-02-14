@@ -35,8 +35,8 @@ var pageLayout =
                         {
                             name: "tree_view_menu",
                             id: "tree-view-menu",
-                            height: 0,
-                            size_min: 0,
+                            height: 30,
+                            size_min: 30,
                         },
                         {
                             name: "tree_view",

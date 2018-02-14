@@ -6,6 +6,7 @@ var screen_height;
 var screen_aspect_ratio;
 
 var textureLoader;
+var TDSloader;
 var defaultTexture;
 
 var renderer;
@@ -149,13 +150,46 @@ function addObject( object, dontAddToScene  )
     }
  
     sceneObjects.push( editorObject );
+
+    uiPage.dispatchEvent( "objectAdded", object );
   
     for( var i = 0; i < object.children.length; ++i )
     {
         addObject( object.children[i], true );
     }
+}
 
-    uiPage.dispatchEvent( "objectAdded", object );
+//////////////////////////////////////////////////////////////////////////////
+function loadTDS( path, normalMapPath )
+{
+    var normalMap = undefined;
+    if( normalMapPath !== undefined )
+    {
+        normalMap = textureLoader.load( normalMapPath );
+    }
+
+    var basePath = path.substr(0, path.lastIndexOf( "/" ) );
+    var name = path.substr( path.lastIndexOf( "/" ) + 1 );
+    TDSloader.setPath( basePath );
+    TDSloader.load( path,   function ( object ) 
+                            {
+                                if( normalMap !== undefined )
+                                {
+                                    object.traverse(    function ( child ) 
+                                                        {
+                                                            if ( child instanceof THREE.Mesh ) 
+                                                            {
+                                                                child.material.normalMap = normalMap;
+                                                            }
+                                                        }
+                                                    );
+                                }
+
+                                object.name = object.name || name;
+
+                                addObject( object );
+                            }
+                  );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -170,6 +204,8 @@ function setupEditor()
 
     textureLoader = new THREE.TextureLoader();
     defaultTexture = textureLoader.load( "textures/UV_Grid_Sm.jpg", render );
+
+    TDSloader = new THREE.TDSLoader( );
 
     scene = new THREE.Scene( { name: "Scene" } );
     uiPage.dispatchEvent( "sceneCreated", scene );
@@ -252,7 +288,6 @@ function initScene()
     cube.castShadow = true;
     addObject( cube );
 
-    /*
     var sphereGeometry = new THREE.SphereGeometry( 4, 20, 20 );
     var sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: defaultTexture } );
     var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -273,7 +308,6 @@ function initScene()
     plane.position.z = 0;
     plane.receiveShadow = true;
     addObject( plane );
-    */
 
     /*
     // collada
@@ -291,45 +325,9 @@ function initScene()
     loader.load( './data/g4jmqcp3hjwg-Sofa/sofa.dae', function ( collada ) { dae = collada.scene; } );
     */
 
-    /*
-    //3ds files dont store normal maps
-    var loader = new THREE.TextureLoader();
-    var normal = loader.load( './data/g4jmqcp3hjwg-Sofa/WoolNM.jpg' );
-    var loader = new THREE.TDSLoader( );
-    loader.setPath( './data/g4jmqcp3hjwg-Sofa/' );
-    loader.load( './data/g4jmqcp3hjwg-Sofa/sofa.3ds', function ( object ) {
-        object.traverse( function ( child ) {
-            if ( child instanceof THREE.Mesh ) {
-                child.material.normalMap = normal;
-            }
-        } );
-
-        object.scale.x = 10;
-        object.scale.y = 10;
-        object.scale.z = 10;
-
-        addObject( object );
-    });
-    */
-    var loader = new THREE.TextureLoader();
-    var normal = loader.load( './data/portalgun/normal.jpg' );
-    var loader = new THREE.TDSLoader( );
-    loader.setPath( './data/portalgun/' );
-    loader.load( './data/portalgun/portalgun.3ds', function ( object ) {
-        object.traverse( function ( child ) {
-            if ( child instanceof THREE.Mesh ) {
-                child.material.normalMap = normal;
-            }
-        } );
-
-        var object = object.children[0];
-
-        object.scale.x = 10;
-        object.scale.y = 10;
-        object.scale.z = 10;
-
-        addObject( object );
-    });
+   loadTDS( './data/portalgun/portalgun.3ds', './data/portalgun/normal.jpg' );
+   //loadTDS( './data/tree9/trees9.3ds' );
+    
 
     /*
     var onProgress = function ( xhr ) 
@@ -569,7 +567,10 @@ function onObjectSelected( objects )
 
     for( var i = 0; i < selection.length; ++i )
     {
-        selection[i].helpers[0].visible = true;
+        if( selection[i].helpers.length > 0 )
+        {
+            selection[i].helpers[0].visible = true;
+        }
     }
 
     if( selection.length == 1 )
@@ -588,7 +589,10 @@ function onObjectDeselected()
 
     for( var i = 0; i < selection.length; ++i )
     {
-        selection[i].helpers[0].visible = false;
+        if( selection[i].helpers.length > 0 )
+        {
+            selection[i].helpers[0].visible = false;
+        }
     }
 
     selection.length = 0;

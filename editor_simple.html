@@ -4,6 +4,7 @@
     <!-- ----------------------------------------------------------------------------- -->
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link href="./libs/vanillatree.css" rel="stylesheet">        
         <style>
             html,
@@ -100,7 +101,7 @@
         </style>
 
         <script src="./libs/vanillatree.js"></script>
-       
+      
         <script src="./libs/dat.gui.js"></script>
         <script src="./libs/three.js/three.js"></script>
         <script src="./libs/three.js/TransformControls.js"></script>
@@ -128,7 +129,14 @@
         <div id="header" class="page_element" style="background-color:#757575;"></div>
         <div id="header-tabs" class="page_element" style="background-color:#757575;"></div>
         <div id="left" class="page_element">
-            <div id="tree-view-menu"></div>
+            <div id="tree-view-menu" style="background-color:#757575; border: 1px solid #000">
+                <div id="tree-view-menu-container" style="left: 4px; top: 2px; width:100%; position:relative">
+                    <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 2px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;"><span class="glyphicon glyphicon-open"></span></button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 2px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;"><span class="glyphicon glyphicon-save"></span></button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 2px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;"><span class="glyphicon glyphicon-file"></span></button>
+                </div>
+            </div>
+
             <div id="tree-view" style="overflow: auto;" ></div>
         </div>
         <div id="resizerLeft" class="resizerX"></div>

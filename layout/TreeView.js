@@ -114,11 +114,6 @@ TreeView.prototype = Object.assign( Object.create( Object.prototype ),
     {
         var name = object.name != "" ? object.name : "untitled object"; 
         this.tree.add( { label: name, parent: parentId, id: object.id, opened: (object.children.length > 0) });
-       
-        for( var i = 0; i < object.children.length; ++i )
-        {
-            this.addObject( object.children[i], object.id );
-        }
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
