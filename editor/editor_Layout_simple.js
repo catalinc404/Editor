@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var pageLayout = 
 {
-    rows: 
+    rows:
     [
         {
             name: "header",
@@ -29,7 +29,7 @@ var pageLayout =
                     name: "body_left",
                     id: "left",
                     width: 200,
-                    size_min: 100,
+                    size_min: 200,
                     rows:
                     [
                         {
@@ -37,6 +37,10 @@ var pageLayout =
                             id: "tree-view-menu",
                             height: 30,
                             size_min: 30,
+                            class:
+                            {
+                                onresize : genericResizeableElementWidth( "tree-view-menu" )
+                            }
                         },
                         {
                             name: "tree_view",
@@ -44,7 +48,8 @@ var pageLayout =
                             class:
                             {
                                 type: "treeView",
-                            },
+                                onresize : genericResizeableElementWidth( "tree-view" )
+                            }
                         }
                     ]
                 },
@@ -90,6 +95,7 @@ var pageLayout =
         },
     ] 
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var uiPage = new UI( pageLayout );

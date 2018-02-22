@@ -1,12 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+eventDispatcher = new EventDispatcher();
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function UI( UIData )
 {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.UIData = UIData;
-    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UI.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
+UI.prototype = Object.assign( Object.create( Object.prototype ), 
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     constructor: UI
@@ -58,7 +61,7 @@ UI.prototype.onresize = function()
     if( this.parent !== undefined && this.parent != null )
     {
         width  = parseInt( this.parent.style.width,  10 ) || width;
-        height = parseInt( this.parent.style.height, 10 ) || geight;
+        height = parseInt( this.parent.style.height, 10 ) || height;
     }
     var area = { left: 0, top: 0, width: width, height: height };
     
@@ -131,7 +134,7 @@ UI.prototype.setupLayoutRows = function( area, rows )
         var element = document.getElementById( rows[i].id );
         if( element != null )
         {
-            setElementDimensions( element , newArea.left, newArea.top, newArea.width, newArea.height );
+            setElementDimensions( element, newArea.left, newArea.top, newArea.width, newArea.height );
         }
         currentTop += heights[i];
 
@@ -322,46 +325,67 @@ UI.prototype.setupResizerData = function( uiClass )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UI.prototype.setupElementClass = function( element, uiClass )
 {
-    if( uiClass.type === undefined )
+    if( uiClass.onresize !== undefined )
     {
-        return;
+        element.onresize = uiClass.onresize;
     }
 
-    switch( uiClass.type )
+    if( uiClass.type !== undefined )
     {
-        case "resizerX":
+        switch( uiClass.type )
         {
-            var resizerData = this.setupResizerData( uiClass );
-            this.setupResizerX( element, resizerData[0], resizerData[1] );
+            case "resizerX":
+            {
+                var resizerData = this.setupResizerData( uiClass );
+                this.setupResizerX( element, resizerData[0], resizerData[1] );
+            }
+            break;
+            case "resizerY":
+            {
+                var resizerData = this.setupResizerData( uiClass );
+                this.setupResizerY( element, resizerData[0], resizerData[1] );
+            }
+            break;
+            case "layoutContainer":
+            {
+                element.ui = new UI( uiClass.layout );
+                element.ui.setupLayoutClasses( element.ui.UIData );
+                element.ui.parent = element;
+                element.onresize = element.ui.onresize.bind( element.ui );
+            }
+            break;
+            case "editorContainer":
+            {
+                element.ui = new Editor( eventDispatcher, uiClass.layout );
+                element.ui.setupLayoutClasses( element.ui.UIData );
+                element.ui.parent = element;
+                element.onresize = element.ui.onresize.bind( element.ui );
+
+                element.ui.init();
+            }
+            break;
+            case "propertyView":
+            {
+                element.ui = new PropertyView( eventDispatcher, element );
+                element.onresize = element.ui.onResize.bind( element.ui );
+            }
+            break;
+            case "treeView":
+            {
+                element.ui = new TreeView( eventDispatcher, element );
+                element.onresize = element.ui.onResize.bind( element.ui );
+            }
+            break;
+            case "viewWebGL":
+            {
+                element.ui = new ViewWebGL( eventDispatcher, element, uiClass.config );
+                element.onresize = element.ui.onResize.bind( element.ui );
+            }
+            break;
+            default:
+            {}
+            break;
         }
-        break;
-        case "resizerY":
-        {
-            var resizerData = this.setupResizerData( uiClass );
-            this.setupResizerY( element, resizerData[0], resizerData[1] );
-        }
-        break;
-        case "layoutContainer":
-        {
-            element.ui = new UI( uiClass.layout );
-            element.ui.setupLayoutClasses( element.ui.UIData );
-            element.ui.parent = element;
-            element.onresize = element.ui.onresize.bind( element.ui );
-        }
-        break;
-        case "propertyView":
-        {
-            element.ui = new PropertyView( this, element );
-        }
-        break;
-        case "treeView":
-        {
-            element.ui = new TreeView( this, element );
-        }
-        break;
-        default:
-        {}
-        break;
     }
 }
 
@@ -543,18 +567,132 @@ UI.prototype.setupResizerY = function( element, elementsPrev, elementsNext )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function setElementDimensions( element, left, top, width, height, visibility )
+function genericResizeableElementWidth( elementId )
 {
-    //console.log( "setElementDimensions: element=" + element.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
+    function resizeWidth()
+    {
+        var element = document.getElementById( elementId );
+        if( element != null )
+        {
+            var width  = parseInt( element.style.width,  10 ) || 0;
+            var height = parseInt( element.style.height, 10 ) || 0;
+            if( element.parentElement != null )
+            {
+                width  = parseInt( element.parentElement.style.width,  10 ) || width;
+            }
+            
+            var left   = parseInt( element.style.left,   10 ) || 0;
+            var top    = parseInt( element.style.top,    10 ) || 0;
+
+            setElementSize( element, left, top, width, height);
+        }
+    };
+
+    return resizeWidth;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function genericResizeableElementHeight( elementId )
+{
+    function resizeHeight()
+    {
+        var element = document.getElementById( elementId );
+        if( element != null )
+        {
+            var width  = parseInt( element.style.width,  10 ) || 0;
+            var height = parseInt( element.style.height, 10 ) || 0;
+            if( element.parentElement != null )
+            {
+                height = parseInt( element.parentElement.style.height, 10 ) || height;
+            }
+            
+            var left   = parseInt( element.style.left,   10 ) || 0;
+            var top    = parseInt( element.style.top,    10 ) || 0;
+
+            setElementSize( element, left, top, width, height);
+        }
+    };
+
+    return resizeHeight;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function genericResizeNotifier( elementId )
+{
+    function resizeNotifier()
+    {
+        var element = document.getElementById( elementId );
+        if( element != null )
+        {
+            notifyChildrensResize( element );
+        }
+    };
+
+    return resizeNotifier;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function setElementSize( element, left, top, width, height, visibility )
+{
+    //console.log( "setElementSize: element=" + element.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
 
     element.style.visibility = ( visibility !== undefined ) ? visibility : "visible";
     element.style.left = left + "px";
     element.style.top = top + "px";
     element.style.width = width + "px";
     element.style.height = height + "px";
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function setElementDimensions( element, left, top, width, height, visibility )
+{
+    //console.log( "setElementDimensions: element=" + element.id + ", left=" + left + ", top=" + top + ", width=" + width + ", height=" + height );
+
+    setElementSize( element, left, top, width, height, visibility );
+
+    notifyResize( element );
+    notifyChildrensResize( element );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function notifyResize( element )
+{
     if( element.onresize != null )
     {
         element.onresize();
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function notifyChildrensResize( element )
+{
+    for( var i = 0; i < element.children.length; ++i )
+    {
+        if( element.children[i].onresize != null )
+        {
+            element.children[i].onresize();
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function getRelativePosition( event )
+{
+    var position = { x : event.clientX, y : event.clientY };
+    for( var i = 0; i < event.path.length; ++i )
+    {
+        var element = event.path[i];
+        if( element instanceof HTMLBodyElement )
+        {
+            break;
+        }
+
+        position.x -= element.offsetLeft;
+        position.y -= element.offsetTop;
+    }
+
+    return position;
+}
+

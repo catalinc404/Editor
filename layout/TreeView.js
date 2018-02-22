@@ -1,8 +1,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function TreeView( dispatcher, element ) 
+function TreeView( eventDispatcher, element ) 
 {
-    this.dispatcher = dispatcher;
+    console.log( "TreeView" );
+
+    this.eventDispatcher = eventDispatcher;
     this.element = element;
 
     if(  this.element !== undefined )
@@ -26,10 +28,10 @@ function TreeView( dispatcher, element )
         this.element.addEventListener( "vtree-deselect", this.onTreeElementDeselected.bind( this ) );
     }
        
-    this.dispatcher.addEventListener( "sceneCreated",     this.onSceneCreated.bind( this ) );
-    this.dispatcher.addEventListener( "objectAdded",      this.onObjectAdded.bind( this ) );
-    this.dispatcher.addEventListener( "objectSelected",   this.onObjectSelected.bind( this ) );
-    this.dispatcher.addEventListener( "objectDeselected", this.onObjectDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneCreated",           this.onSceneCreated.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectAdded",       this.onSceneObjectAdded.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.onSceneObjectsSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectsDeselected", this.onSceneObjectsDeselected.bind( this ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,6 +39,12 @@ TreeView.prototype = Object.assign( Object.create( Object.prototype ),
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     constructor: TreeView,
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    onResize: function()
+    {
+        console.log( "TreeView.prototype.onResize" );
+    },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     onSceneCreated: function( scene )
@@ -48,7 +56,7 @@ TreeView.prototype = Object.assign( Object.create( Object.prototype ),
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    onObjectAdded : function( object )
+    onSceneObjectAdded : function( object )
     {
         if( object === undefined )
         {
@@ -59,7 +67,7 @@ TreeView.prototype = Object.assign( Object.create( Object.prototype ),
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    onObjectSelected : function( selection )
+    onSceneObjectsSelected : function( selection )
     {
         if( this.disableEvents !== undefined  )
         {
@@ -75,7 +83,7 @@ TreeView.prototype = Object.assign( Object.create( Object.prototype ),
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    onObjectDeselected : function( selection )
+    onSceneObjectsDeselected : function( selection )
     {
         if( this.disableEvents !== undefined  )
         {
@@ -135,7 +143,7 @@ TreeView.prototype = Object.assign( Object.create( Object.prototype ),
 
         this.disableEvents = true;
         var object = this.scene.getObjectById( parseInt( event.detail.id ) );
-        this.dispatcher.dispatchEvent( "objectSelected", [object] );
+        this.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", [object] );
         this.disableEvents = undefined;
     },
 
@@ -149,7 +157,7 @@ TreeView.prototype = Object.assign( Object.create( Object.prototype ),
 
         this.disableEvents = true;
         var object = this.scene.getObjectById( parseInt( event.detail.id ) );
-        this.dispatcher.dispatchEvent( "objectDeselected", [object] );
+        this.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", [object] );
         this.disableEvents = undefined;
     }
     

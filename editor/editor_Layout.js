@@ -1,5 +1,38 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var editorLayout = 
+var editorLayout1View = 
+{
+    rows: 
+    [
+        { 
+            name: "panelViewTL",
+            id: "panelViewTL",
+            size_min: 128,
+            class:
+            {
+                onresize : genericResizeNotifier( "panelViewTL" )
+            },
+            rows:
+            [
+                {
+                    name: "viewTL",
+                    id: "viewTL",
+                    class:
+                    {
+                        type: "viewWebGL",
+                        config:
+                        {
+                            cameraPosition: { x: -28.23, y: 14.34, z: 31.06 },
+                            cameraLookat : { x: 0, y: 0, z: 0 },
+                        },
+                    },
+                }
+            ]
+        }
+    ] 
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var editorLayout4Views = 
 {
     rows: 
     [
@@ -8,25 +41,65 @@ var editorLayout =
             colons:
             [
                 { 
-                    name: "panelView1",
-                    id: "panelView1",
-                    size_min: 128
+                    name: "panelViewTL",
+                    id: "panelViewTL",
+                    size_min: 128,
+                    class:
+                    {
+                        onresize : genericResizeNotifier( "panelViewTL" )
+                    },
+                    rows:
+                    [
+                        {
+                            name: "viewTL",
+                            id: "viewTL",
+                            class:
+                            {
+                                type: "viewWebGL",
+                                config:
+                                {
+                                    cameraPosition: { x: -28.23, y: 14.34, z: 31.06 },
+                                    cameraLookat : { x: 0, y: 0, z: 0 },
+                                },
+                            },                            
+                        }
+                    ]
                 },
                 { 
-                    name: "resizerX1",
-                    id: "resizerX1",
+                    name: "resizerXTop",
+                    id: "resizerXTop",
                     class:
                     {
                         type: "resizerX",
-                        prev: [ "panelView1" ],
-                        next: [ "panelView2" ]
+                        prev: [ "panelViewTL" ],
+                        next: [ "panelViewTR" ]
                     },
                     width: 5,
                 },
                 { 
-                    name: "panelView2",
-                    id: "panelView2",
-                    size_min: 128
+                    name: "panelViewTR",
+                    id: "panelViewTR",
+                    size_min: 128,
+                    class:
+                    {
+                        onresize : genericResizeNotifier( "panelViewTR" )
+                    },
+                    rows:
+                    [
+                        {
+                            name: "viewTR",
+                            id: "viewTR",
+                            class:
+                            {
+                                type: "viewWebGL",
+                                config:
+                                {
+                                    cameraPosition: { x: -50, y: 5, z: 0 },
+                                    cameraLookat : { x: 0, y: 0, z: 0 },
+                                },
+                            },                            
+                        }
+                    ]
                 }
             ]
         },
@@ -36,8 +109,8 @@ var editorLayout =
             class:
             {
                 type: "resizerY",
-                prev: [ "panelView1", "resizerX1", "panelView2" ],
-                next: [ "panelView3", "resizerX2", "panelView4" ]
+                prev: [ "panelViewTL", "resizerXTop",    "panelViewTR" ],
+                next: [ "panelViewBL", "resizerXBottom", "panelViewBR" ]
             },
             height: 5
         },
@@ -46,25 +119,65 @@ var editorLayout =
             colons:
             [
                 { 
-                    name: "panelView3",
-                    id: "panelView3",
-                    size_min: 128
+                    name: "panelViewBL",
+                    id: "panelViewBL",
+                    size_min: 128,
+                    class:
+                    {
+                        onresize : genericResizeNotifier( "panelViewBL" )
+                    },
+                    rows:
+                    [
+                        {
+                            name: "viewBL",
+                            id: "viewBL",
+                            class:
+                            {
+                                type: "viewWebGL",
+                                config:
+                                {
+                                    cameraPosition: { x: 0, y: 5, z: -50 },
+                                    cameraLookat : { x: 0, y: 0, z: 0 },
+                                },
+                            },                            
+                        }
+                    ]
                 },
                 { 
-                    name: "resizerX2",
-                    id: "resizerX2",
+                    name: "resizerXBottom",
+                    id: "resizerXBottom",
                     class:
                     {
                         type: "resizerX",
-                        prev: [ "panelView3" ],
-                        next: [ "panelView4" ]
+                        prev: [ "panelViewBL" ],
+                        next: [ "panelViewBR" ]
                     },
                     width: 5,
                 },
                 { 
-                    name: "panelView4",
-                    id: "panelView4",
-                    size_min: 128
+                    name: "panelViewBR",
+                    id: "panelViewBR",
+                    size_min: 128,
+                    class:
+                    {
+                        onresize : genericResizeNotifier( "panelViewBR" )
+                    },
+                    rows:
+                    [
+                        {
+                            name: "viewBR",
+                            id: "viewBR",
+                            class:
+                            {
+                                type: "viewWebGL",
+                                config:
+                                {
+                                    cameraPosition: { x: 0, y: 55, z: 0 },
+                                    cameraLookat : { x: 0, y: 0, z: 0 },
+                                },
+                            },
+                        }
+                    ]
                 }
             ]
         }
@@ -72,7 +185,7 @@ var editorLayout =
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var pageLayout = 
+var editorPageLayout = 
 {
     rows: 
     [
@@ -102,7 +215,31 @@ var pageLayout =
                     name: "body_left",
                     id: "left",
                     width: 200,
-                    size_min: 200
+                    size_min: 200,
+                    width: 200,
+                    size_min: 200,
+                    rows:
+                    [
+                        {
+                            name: "tree_view_menu",
+                            id: "tree-view-menu",
+                            height: 30,
+                            size_min: 30,
+                            class:
+                            {
+                                onresize : genericResizeableElementWidth( "tree-view-menu" )
+                            }
+                        },
+                        {
+                            name: "tree_view",
+                            id: "tree-view",
+                            class:
+                            {
+                                type: "treeView",
+                                onresize : genericResizeableElementWidth( "tree-view" )
+                            }
+                        }
+                    ]
                 },
                 {
                     name: "resizer_left",
@@ -121,8 +258,9 @@ var pageLayout =
                     id: "editor",
                     class:
                     {
-                        type: "layoutContainer",
-                        layout: editorLayout,
+                        type: "editorContainer",
+                        //layout: editorLayout4Views,
+                        layout: editorLayout1View,
                     },
                     size_min: 200
                 },
@@ -140,8 +278,12 @@ var pageLayout =
                 {
                     name: "body_right",
                     id: "right",
-                    width: 200,
-                    size_min: 200
+                    width: 260,
+                    size_min: 260,
+                    class:
+                    {
+                        type: "propertyView",
+                    },                    
                 }
             ]
         },
@@ -165,20 +307,3 @@ var pageLayout =
     ] 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var uiPage = new UI( pageLayout );
-
-function setupPage()
-{
-    uiPage.setupLayoutClasses( uiPage.UIData );
-    resizePage();
-}
-
-function resizePage()
-{
-    var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-    var area = { left: 0, top: 0, width: width, height: height };
-    
-    uiPage.setupLayout( area, uiPage.UIData );
-}

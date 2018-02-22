@@ -103,4 +103,5 @@ ul.vtree {
 
 .vtree li.vtree-leaf, .vtree li.vtree-leaf::before, .vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle {
 	background-image: url('./../textures/vanillatree_images.png');
+	color: #fff;
 }

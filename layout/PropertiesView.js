@@ -1,12 +1,17 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function PropertyView( dispatcher, element ) 
+function PropertyView( eventDispatcher, element ) 
 {
-    this.dispatcher = dispatcher;
+    //////////////////////////////////////////////////////////////////////////////
+    this.eventDispatcher = eventDispatcher;
     this.element = element;
    
-    this.dispatcher.addEventListener( "objectSelected",  this.onObjectSelected.bind( this ) );
-    this.dispatcher.addEventListener( "objectDeselected", this.onObjectDeselected.bind( this ) );
+    //////////////////////////////////////////////////////////////////////////////
+    this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.onSceneObjectsSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectsDeselected", this.onSceneObjectsDeselected.bind( this ) );
+
+    //////////////////////////////////////////////////////////////////////////////
+    this.fnRequestRender = this.requestRender.bind( this );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,7 +20,12 @@ PropertyView.prototype = Object.assign( Object.create( Object.prototype ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     constructor: PropertyView,
 
-    onObjectSelected : function( selection )
+    //////////////////////////////////////////////////////////////////////////////
+    onResize: function()
+    {},
+
+    //////////////////////////////////////////////////////////////////////////////
+    onSceneObjectsSelected : function( selection )
     {
         if( selection === undefined )
         {
@@ -27,16 +37,22 @@ PropertyView.prototype = Object.assign( Object.create( Object.prototype ),
             this.setProperties( selection[0] )
         }
     },
-    onObjectDeselected : function( selection )
+
+    //////////////////////////////////////////////////////////////////////////////
+    onSceneObjectsDeselected : function( selection )
     {
         this.clearProperties();
     },
 
+    //////////////////////////////////////////////////////////////////////////////
     clearProperties: function()
     {
         if( this.gui !== undefined )
         {
-            this.element.removeChild( this.element.childNodes[0] );
+            for( var i = 0; i < this.element.childNodes.length; ++i )
+            {
+                this.element.removeChild( this.element.childNodes[1] );
+            }
 
             this.gui.destroy();
             this.gui = undefined;
@@ -64,6 +80,7 @@ PropertyView.prototype = Object.assign( Object.create( Object.prototype ),
         }
     },
 
+    //////////////////////////////////////////////////////////////////////////////
     setProperties: function( object )
     {
         var width = parseInt( this.element.style.width, 10 ) - 1;
@@ -77,25 +94,25 @@ PropertyView.prototype = Object.assign( Object.create( Object.prototype ),
         if( object.position !== undefined )
         {
             var positionGUI = gui.addFolder( "Position" );
-            positionGUI.add( object.position, "x" ).onChange( render );
-            positionGUI.add( object.position, "y" ).onChange( render );
-            positionGUI.add( object.position, "z" ).onChange( render );
+            positionGUI.add( object.position, "x" ).onChange( this.fnRequestRender );
+            positionGUI.add( object.position, "y" ).onChange( this.fnRequestRender );
+            positionGUI.add( object.position, "z" ).onChange( this.fnRequestRender );
         }
 
         if( object.rotation !== undefined  )
         {
             var rotationGUI = gui.addFolder( "Rotation" );
-            rotationGUI.add( object.rotation, "x" ).step( 0.100 ).onChange( render );
-            rotationGUI.add( object.rotation, "y" ).step( 0.100 ).onChange( render );
-            rotationGUI.add( object.rotation, "z" ).step( 0.100 ).onChange( render );
+            rotationGUI.add( object.rotation, "x" ).step( 0.100 ).onChange( this.fnRequestRender );
+            rotationGUI.add( object.rotation, "y" ).step( 0.100 ).onChange( this.fnRequestRender );
+            rotationGUI.add( object.rotation, "z" ).step( 0.100 ).onChange( this.fnRequestRender );
         }
 
         if( object.scale !== undefined  )
         {
             var scaleGUI = gui.addFolder( "Scale" );
-            scaleGUI.add( object.scale, "x" ).min( Epsilon ).onChange( render );
-            scaleGUI.add( object.scale, "y" ).min( Epsilon ).onChange( render );
-            scaleGUI.add( object.scale, "z" ).min( Epsilon ).onChange( render );
+            scaleGUI.add( object.scale, "x" ).min( Epsilon ).onChange( this.fnRequestRender );
+            scaleGUI.add( object.scale, "y" ).min( Epsilon ).onChange( this.fnRequestRender );
+            scaleGUI.add( object.scale, "z" ).min( Epsilon ).onChange( this.fnRequestRender );
         }
 
         if( object instanceof THREE.Mesh )
@@ -173,5 +190,11 @@ PropertyView.prototype = Object.assign( Object.create( Object.prototype ),
                 geometryGUI.add( object.geometry, "name" );
             }
         }
+    },
+
+    //////////////////////////////////////////////////////////////////////////////
+    requestRender : function()
+    {
+        this.eventDispatcher.dispatchEvent( "render" ); 
     }
 } )

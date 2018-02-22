@@ -6,7 +6,6 @@ var screen_height;
 var screen_aspect_ratio;
 
 var textureLoader;
-var TDSloader;
 var defaultTexture;
 
 var renderer;
@@ -69,6 +68,9 @@ function addObject( object, dontAddToScene  )
     var editorObject = { id: sceneObjectsId++ };
 
     object.updateMatrixWorld();
+
+    object.castShadow = true;
+    object.receiveShadow = true;
 
     if( !dontAddToScene )
     {
@@ -168,10 +170,12 @@ function loadTDS( path, normalMapPath )
         normalMap = textureLoader.load( normalMapPath );
     }
 
-    var basePath = path.substr(0, path.lastIndexOf( "/" ) );
+    var basePath = path.substr(0, path.lastIndexOf( "/" ) + 1 );
     var name = path.substr( path.lastIndexOf( "/" ) + 1 );
-    TDSloader.setPath( basePath );
-    TDSloader.load( path,   function ( object ) 
+
+    var TDSLoader = new THREE.TDSloader();
+    TDSLoader.setPath( basePath );
+    TDSLoader.load( path,   function ( object ) 
                             {
                                 if( normalMap !== undefined )
                                 {
@@ -192,6 +196,22 @@ function loadTDS( path, normalMapPath )
                   );
 }
 
+function loadDAE( path )
+{
+    var basePath = path.substr(0, path.lastIndexOf( "/" ) + 1 );
+    var name = path.substr( path.lastIndexOf( "/" ) + 1 );
+
+    var DAELoader = new THREE.ColladaLoader( );
+    DAELoader.setPath( basePath );
+    DAELoader.load( path,   function ( collada ) 
+                            {
+                                var object = collada.scene 
+                                object.name = object.name || name;
+
+                                addObject( object );
+                            } );
+}
+
 //////////////////////////////////////////////////////////////////////////////
 function setupEditor()
 {  
@@ -204,8 +224,6 @@ function setupEditor()
 
     textureLoader = new THREE.TextureLoader();
     defaultTexture = textureLoader.load( "textures/UV_Grid_Sm.jpg", render );
-
-    TDSloader = new THREE.TDSLoader( );
 
     scene = new THREE.Scene( { name: "Scene" } );
     uiPage.dispatchEvent( "sceneCreated", scene );
@@ -277,7 +295,8 @@ function initScene()
     spotLight.shadow.camera.far = 200;
     spotLight.castShadow = true;    
     addObject( spotLight );
-      
+    
+    /*
     var cubeGeometry = new THREE.BoxGeometry( 4, 4, 4 )
     var cubeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: defaultTexture } );
     var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
@@ -297,6 +316,7 @@ function initScene()
     sphere.position.z = 2;
     sphere.castShadow = true;
     addObject( sphere );
+    */
 
     var planeGeometry = new THREE.PlaneGeometry( 60, 20 );
     var planeMaterial = new THREE.MeshPhongMaterial( {  color:0xffffff } );
@@ -309,60 +329,9 @@ function initScene()
     plane.receiveShadow = true;
     addObject( plane );
 
-    /*
-    // collada
-    var test = LoaderUtils.extractUrlBase( "./test1/test2" ); 
-
-    var dae;
-    var loadingManager = new THREE.LoadingManager( function() 
-    { 
-        dae.scale.x = 10;
-        dae.scale.y = 10;
-        dae.scale.z = 10;
-
-        addObject( dae ); } );
-    var loader = new THREE.ColladaLoader( loadingManager );
-    loader.load( './data/g4jmqcp3hjwg-Sofa/sofa.dae', function ( collada ) { dae = collada.scene; } );
-    */
-
-   loadTDS( './data/portalgun/portalgun.3ds', './data/portalgun/normal.jpg' );
-   //loadTDS( './data/tree9/trees9.3ds' );
-    
-
-    /*
-    var onProgress = function ( xhr ) 
-    {
-        if ( xhr.lengthComputable ) 
-        {
-            var percentComplete = xhr.loaded / xhr.total * 100;
-            console.log( Math.round(percentComplete, 2) + '% downloaded' );
-        }
-    };
-
-    var onError = function ( xhr ) {};
-
-    THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
-
-    var mtlLoader = new THREE.MTLLoader();
-    mtlLoader.setPath( './data/g4jmqcp3hjwg-Sofa/' );
-    mtlLoader.load( 'sofa.mtl', 
-                    function( materials ) 
-                    {
-                        materials.preload();
-                        var objLoader = new THREE.OBJLoader();
-                        objLoader.setMaterials( materials );
-                        objLoader.setPath( './data/g4jmqcp3hjwg-Sofa/' );
-                        objLoader.load( 'sofa.obj', function ( object ) 
-                        {
-                            //object.scale.x = 0.1;
-                            //object.scale.y = 0.1;
-                            //object.scale.z = 0.1;
-
-                            //object.position.y = -9.5;
-                            addObject( object );
-                        }, onProgress, onError );
-                    });
-    */
+   //loadTDS( "./data/portalgun/portalgun.3ds", "./data/portalgun/normal.jpg" );
+   //loadTDS( './data/tree9/trees9.3ds' );   
+   loadDAE( "./data/sofa1.DAE" );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -816,5 +785,86 @@ function resize()
 {
     resizePage();
     resizeEditor();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function sceneOpen() 
+{
+    var fileSelector = document.createElement( "input" );
+    fileSelector.type = 'file';
+    fileSelector.addEventListener('change', function( event ) 
+                                            {
+                                                if( event.target.files.length > 0 )
+                                                {
+                                                    var file = event.target.files[0];
+                                                    if( file.name.match(/\.(json|js)$/) ) 
+                                                    {
+                                                        var tmpPath = URL.createObjectURL( file );
+                                                        var loader = new THREE.ObjectLoader();
+                                                        loader.load(  tmpPath, function ( obj ) { addObject( obj ); } );
+                                                    }
+                                                    else
+                                                    if( file.name.match(/\.dae$/) ) 
+                                                    {
+                                                        var loader = new THREE.ColladaLoader( loadingManager );
+                                                        loader.load( './models/collada/elf/elf.dae', function ( collada ) 
+                                                            {
+                                                                addObject( collada.scene );
+                                                            } );
+                                                    }
+
+                                                }
+                                            } );
+    fileSelector.click();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function sceneSave() 
+{
+    var fileSelector = document.createElement( "input" );
+    fileSelector.type = 'file';
+    fileSelector.click();
+
+    if( fileSelector.files.length > 0 )
+    {
+        var exporter = new THREE.FileLoader();
+        var sceneJson = JSON.stringify( scene.toJSON() );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function sceneNew() 
+{
+
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function sceneImport()
+{
+    var fileSelector = document.createElement( "input" );
+    fileSelector.type = 'file';
+    fileSelector.addEventListener('change', function( event ) 
+                                            {
+                                                if( event.target.files.length > 0 )
+                                                {
+                                                    var file = event.target.files[0];
+                                                    if( file.name.match(/\.(json|js)$/) ) 
+                                                    {
+                                                        var tmpPath = URL.createObjectURL( file );
+                                                        var loader = new THREE.ObjectLoader();
+                                                        loader.load(  tmpPath, function ( obj ) { addObject( obj ); } );
+                                                    }
+                                                    else
+                                                    if( file.name.match(/\.dae$/) ) 
+                                                    {
+                                                        var tmpPath = URL.createObjectURL( file );
+
+                                                        loadDAE( tmpPath );
+                                                       
+                                                    }
+
+                                                }
+                                            } );
+    fileSelector.click();
 }
 

@@ -4,6 +4,8 @@
     <!-- ----------------------------------------------------------------------------- -->
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="./libs/vanillatree.css" rel="stylesheet">        
         <style>
             html,
             body
@@ -60,7 +62,7 @@
                 border: 1px #a8a8a8;
                 margin: 0; 
                 padding: 0; 
-                pointer-events:none;                
+                pointer-events:none;
             }
             .page_element
             {
@@ -175,29 +177,57 @@
             }
         </style>
 
+        <script src="./libs/vanillatree.js"></script>
+        <script src="./libs/dat.gui.js"></script>
+
+        <script src="./libs/three.js/three.js"></script>
+        <script src="./libs/three.js/TransformControls.js"></script>
+        <script src="./libs/three.js/loaders/LoaderUtils.js"></script>
+        <script src="./libs/three.js/loaders/LoadingManager.js"></script>
+        <script src="./libs/three.js/loaders/DDSLoader.js"></script>
+		<script src="./libs/three.js/loaders/MTLLoader.js"></script>
+        <script src="./libs/three.js/loaders/OBJLoader.js"></script>
+        <script src="./libs/three.js/loaders/ColladaLoader.js"></script>
+        <script src="./libs/three.js/loaders/TDSLoader.js"></script>
+
         <script src="./libs/resizer.js"></script>
-        <script src="./Page/Page_Layout.js"></script>        
-        <script src="./Page/Layout.js"></script>        
+        <script src="./layout/EventDispatcher.js"></script>
+        <script src="./layout/PropertiesView.js"></script>
+        <script src="./layout/TreeView.js"></script>
+        <script src="./layout/Layout.js"></script>
+        <script src="./editor/editor_Basics.js"></script>
+        <script src="./editor/editor_Data.js"></script>
+        <script src="./editor/editor_Layout.js"></script>
+        <script src="./editor/editor_view.js"></script>
+        <script src="./editor/editor_ViewWebGL.js"></script>
+        <script src="./editor/editor.js"></script>
     </head>
     <!-- ----------------------------------------------------------------------------- -->
     
     <!-- ----------------------------------------------------------------------------- -->
-    <body onload="setupPage();" onresize="resizePage();">
+    <body onload="setup();" onresize="resize();">
         <div id="header" class="page_element" style="background-color:#757575;"></div>
         <div id="header-tabs" class="page_element" style="background-color:#757575;"></div>
-
-        <div id="left" class="page_element"></div>
+        <div id="left" class="page_element">
+            <div id="tree-view-menu" style="background-color:#757575; border: 1px solid #000;">
+                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneOpen();"><span class="glyphicon glyphicon-open"></span></button>
+                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneSave();"><span class="glyphicon glyphicon-save"></span></button>
+                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneNew();"><span class="glyphicon glyphicon-file"></span></button>
+                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneImport();"><span class="glyphicon glyphicon-folder-open"></span></button>
+            </div>
+            <div id="tree-view" style="overflow: auto; width:100%;" ></div>
+        </div>
         <div id="resizerLeft" class="resizerX"></div>
         <div id="editor" class="page_element" style="overflow:visible;">
             <!-- ----------------------------------------------------------------------------- -->
             <!-- First row                                                                     -->
             <!-- ----------------------------------------------------------------------------- -->
-            <div id="panelView1" class="page_element" style="background-color:#a8a8a8;">
-                <canvas id="view1" class="element noselect"></canvas>
+            <div id="panelViewTL" class="page_element" style="background-color:#a8a8a8;">
+                <canvas id="viewTL" class="element noselect"></canvas>
             </div>
-            <div id="resizerX1" class="resizerX"></div>
-            <div id="panelView2" class="page_element" style="background-color:#a8a8a8;">
-                <canvas id="view2" class="element noselect"></canvas>
+            <div id="resizerXTop" class="resizerX"></div>
+            <div id="panelViewTR" class="page_element" style="background-color:#a8a8a8;">
+                <canvas id="viewTR" class="element noselect"></canvas>
             </div>
 
             <!-- ----------------------------------------------------------------------------- -->
@@ -208,17 +238,19 @@
             <!-- ----------------------------------------------------------------------------- -->
             <!-- Second row                                                                    -->
             <!-- ----------------------------------------------------------------------------- -->
-            <div id="panelView3" class="page_element" style="background-color:#a8a8a8;">
-                <canvas id="view3" class="element noselect"></canvas>
+            <div id="panelViewBL" class="page_element" style="background-color:#a8a8a8;">
+                <canvas id="viewBL" class="element noselect"></canvas>
             </div>
-            <div id="resizerX2" class="resizerX"></div>
-            <div id="panelView4" class="page_element" style="background-color:#a8a8a8;">
-                <canvas id="view4" class="element noselect"></canvas>
+            <div id="resizerXBottom" class="resizerX"></div>
+            <div id="panelViewBR" class="page_element" style="background-color:#a8a8a8;">
+                <canvas id="viewBR" class="element noselect"></canvas>
             </div>
             <div id="viewSelect" class="selectionRectangle"></div>
         </div>
         <div id="resizerRight" class="resizerX"></div>
-        <div id="right" class="page_element"></div>
+        <div id="right" class="page_element">
+            
+        </div>
         <div id="resizerBottom" class="resizerY"></div>
         <div id="footer" class="page_element" style="background-color:#757575;"></div>
     </body>

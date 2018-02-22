@@ -5,52 +5,14 @@ var Control_PAN_pixel2world_ratio = 0.05;
 var Control_ZOOM_pixel2world_ratio= 0.05;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function ViewWebGL( canvas, width, height, viewId, scene, camera ) 
+function ViewWebGL( eventDispatcher, element, configuration ) 
 {
-    View.call( this, canvas, width, height, viewId );
+    View.call( this, eventDispatcher, element, configuration );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    canvas.width = width * window.devicePixelRatio;
-    canvas.height = height * window.devicePixelRatio;
+    this.camera = undefined;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.context = canvas.getContext( '2d' );
-    this.scene = scene;
-
-    if( camera === undefined )
-    {
-        this.camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 1000 );
-        this.camera.position.x = -30;
-        this.camera.position.y =   0 
-        this.camera.position.z =   0;
-        this.camera.lookAt( Zero );
-    }
-    else
-    {
-        this.camera = camera;
-    }
-
-    this.renderer = new THREE.WebGLRenderer( { antialias: true } );
-    this.renderer.setPixelRatio( window.devicePixelRatio );
-    this.renderer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.autoClear = false;
-    this.renderer.setClearColor( 0xaaaaaa );
-
-    this.fnRender = this.render.bind( this );
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
-    this.pickingRenderTarget = new THREE.WebGLRenderTarget( width, height );
-    this.pickingRenderTarget.texture.minFilter = THREE.LinearFilter;
-    this.pickingRenderTarget.texture.maxFilter = THREE.NearestFilter;
-
-    this.pickingTextureSelection = new THREE.DataTexture( this.pickingTextureSelectionData, width, height, THREE.RGBAFormat );
-    this.pickingTextureSelection.needsUpdate = true;
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
-    this.currentControlMode = EControlMode.NONE;    
-
     this.mousePrevX = null;
     this.mousePrevY = null;
     this.mouseX = null;
@@ -58,7 +20,27 @@ function ViewWebGL( canvas, width, height, viewId, scene, camera )
 
     this.selectionRectangle = { left: 0, top: 0, width: 0, height: 0 };
     this.selectionRectangleElement = document.getElementById( "viewSelect" );
+
+    this.currentControlMode = EControlMode.NONE;    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.sceneGizmos = new THREE.Scene();    
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.fnRender = this.render.bind( this );
+    this.fnRequestRender = this.requestRender.bind( this );
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.handleSceneObjectsSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectsDeselected", this.handleSceneObjectsDeselected.bind( this ) );
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.canvas.addEventListener( "mousedown",  this.handleMouseDown.bind( this ),  false );
+    this.canvas.addEventListener( "mousemove",  this.handleMouseMove.bind( this ),  false );    
+    this.canvas.addEventListener( "mouseup",    this.handleMouseUp.bind( this ),    false );
+    this.canvas.addEventListener( "mouseleave", this.handleMouseLeave.bind( this ), false );
+
+    this.eventDispatcher.dispatchEvent( "onViewCreated", this );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,11 +50,68 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
     constructor: ViewWebGL,
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    init : function( editor )
+    {
+        View.prototype.init.call( this, editor );
+
+        //console.log( "ViewWebGL.prototype.init, viewId = " + this.viewId );
+
+        var width  = parseInt( this.canvas.style.width,  10 ) || 0;
+        var height = parseInt( this.canvas.style.height, 10 ) || 0;
+ 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        this.canvas.width  = width * window.devicePixelRatio;
+        this.canvas.height = height * window.devicePixelRatio;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        this.camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 1000 );
+
+        if( this.configuration !== undefined )
+        {
+            if( this.configuration.cameraPosition !== undefined )
+            {
+                this.camera.position.x = this.configuration.cameraPosition.x;
+                this.camera.position.y = this.configuration.cameraPosition.y;
+                this.camera.position.z = this.configuration.cameraPosition.z;
+            }
+            if( this.configuration.cameraLookat !== undefined )
+            {
+                var lookAt = new THREE.Vector3( this.configuration.cameraLookat.x, this.configuration.cameraLookat.y, this.configuration.cameraLookat.z );
+                this.camera.lookAt( lookAt );        
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+        this.renderer.setPixelRatio( window.devicePixelRatio );
+        this.renderer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.autoClear = false;
+        this.renderer.setClearColor( 0xaaaaaa );
+        this.canvas.appendChild( this.renderer.domElement );
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+        this.pickingRenderTarget = new THREE.WebGLRenderTarget( width, height );
+        this.pickingRenderTarget.texture.minFilter = THREE.LinearFilter;
+        this.pickingRenderTarget.texture.maxFilter = THREE.NearestFilter;
+
+        this.pickingTextureSelection = new THREE.DataTexture( this.pickingTextureSelectionData, width, height, THREE.RGBAFormat );
+        this.pickingTextureSelection.needsUpdate = true;
+
+        this.transformControls = new THREE.TransformControls( this.camera, this.canvas );
+        this.transformControls.addEventListener( "change", this.handleObjectTransformChange.bind( this ) );
+        this.sceneGizmos.add( this.transformControls );
+    },
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     render : function()
     {
         View.prototype.render.call( this );
 
-        //console.log( "ViewWebGL2.prototype.render, viewId = " + this.viewId );
+        //console.log( "ViewWebGL2.prototype.render, viewId = " + this.viewId );         
+
+        this.transformControls.update();
 
         if( this.currentControlMode != EControlMode.NONE )
         {
@@ -149,13 +188,13 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
                         this.selectionRectangle.top     = Math.max( this.selectionRectangle.top, 0 );
     
                         var right   = Math.max( this.mouseX, this.mousePrevX );
-                        //right       = Math.min( right, screen_width );
+                        right       = Math.min( right, this.width );
                         var bottom  = Math.max( this.mouseY, this.mousePrevY );
-                        //bottom      = Math.min( bottom, screen_height );
+                        bottom      = Math.min( bottom, this.height );
     
                         this.selectionRectangle.width  = right  - this.selectionRectangle.left;
                         this.selectionRectangle.height = bottom - this.selectionRectangle.top; 
-    
+                        
                         this.selectionRectangleElement.style.left   = this.selectionRectangle.left   + 'px';
                         this.selectionRectangleElement.style.top    = this.selectionRectangle.top    + 'px';
                         this.selectionRectangleElement.style.width  = this.selectionRectangle.width  + 'px';
@@ -172,9 +211,22 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
     
         this.renderer.setClearColor( 0xaaaaaa );
         this.renderer.clear();
-        this.renderer.render( this.scene, this.camera );
+
+        this.renderer.render( this.editor.scene, this.camera );
+        this.renderer.render( this.editor.sceneHelpers, this.camera );
+        this.renderer.render( this.sceneGizmos, this.camera );
         
         this.context.drawImage( this.renderer.domElement, 0, 0 );
+    },
+
+    //////////////////////////////////////////////////////////////////////////////
+    requestRender : function()
+    {
+        View.prototype.requestRender.call( this );
+
+        //console.log( "ViewWebGL2.prototype.requestRender, viewId = " + this.viewId );
+
+        requestAnimationFrame( this.fnRender );
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,6 +235,9 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
         View.prototype.resize.call( this, width, height );
 
         //console.log( "ViewWebGL2.prototype.resize, viewId = " + this.viewId );
+
+        this.width  = width;
+        this.height = height;
 
         this.renderer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
 
@@ -204,6 +259,8 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
         }
 
         this.camera.updateProjectionMatrix();
+
+        this.pickingRenderTarget.setSize( width, height );
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -232,12 +289,6 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
         {
             case 0:  
             { 
-                this.currentControlMode = EControlMode.SELECT;
-            }
-            break;
-    
-            case 1:  
-            { 
                 if( event.shiftKey == true )
                 {
                     this.currentControlMode = EControlMode.TRACKBALL;
@@ -248,10 +299,16 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
                     this.currentControlMode = EControlMode.PAN;
                 }
                 else
-                {                
-                    this.currentControlMode = EControlMode.ZOOM;
+                {
+                    this.currentControlMode = EControlMode.SELECT;
                 }
             }
+            break;
+    
+            case 1:  
+            { 
+                this.currentControlMode = EControlMode.ZOOM;  
+            } 
             break;
     
             case 2:
@@ -260,15 +317,24 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
     
         if( this.currentControlMode != EControlMode.NONE )
         {
-            var rect = this.renderer.domElement.getBoundingClientRect();
-            this.mouseX = event.clientX - rect.left;
-            this.mouseY = event.clientY - rect.top;
+            var position = getRelativePosition( event );
+            this.mouseX = position.x;
+            this.mouseY = position.y;
     
             this.mousePrevX = this.mouseX;
             this.mousePrevY = this.mouseY;
     
-            requestAnimationFrame( this.fnRender );
+            if( this.currentControlMode == EControlMode.SELECT )
+            {
+                this.selectionRectangle.left = this.mouseX;
+                this.selectionRectangle.top  = this.mouseY;
+                this.selectionRectangle.width  = 0; 
+                this.selectionRectangle.height = 0; 
+            }
+    
+            this.requestRender();
         }
+            
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,11 +346,12 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
 
         if( this.currentControlMode != EControlMode.NONE )
         {
-            this.mouseX = event.pageX;
-            this.mouseY = event.pageY;
+            var position = getRelativePosition( event );
+            this.mouseX = position.x;
+            this.mouseY = position.y;
+        }
     
-            requestAnimationFrame( this.fnRender );
-        }        
+        this.requestRender();
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -294,23 +361,25 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
 
         //console.log( "ViewWebGL2.prototype.handleMouseUp, viewId = " + this.viewId );
 
-        if( this.currentControlMode != EControlMode.NONE )
+        if( this.currentControlMode == EControlMode.SELECT )
         {
-            this.currentControlMode = EControlMode.NONE;
-
-            this.selectionRectangleElement.style.left   = '0px';
-            this.selectionRectangleElement.style.top    = '0px';
-            this.selectionRectangleElement.style.width  = '0px';
-            this.selectionRectangleElement.style.height = '0px';
-        
-            this.mousePrevX = null;
-            this.mousePrevY = null;
-            
-            this.mouseX = null;
-            this.mouseY = null;
-        
-            requestAnimationFrame( this.fnRender );        
+            this.selectObjects();
         }
+    
+        this.currentControlMode = EControlMode.NONE;
+    
+        this.selectionRectangleElement.style.left   = '0px';
+        this.selectionRectangleElement.style.top    = '0px';
+        this.selectionRectangleElement.style.width  = '0px';
+        this.selectionRectangleElement.style.height = '0px';
+    
+        this.mousePrevX = null;
+        this.mousePrevY = null;
+        
+        this.mouseX = null;
+        this.mouseY = null;
+       
+        this.requestRender();
     },
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -322,7 +391,79 @@ ViewWebGL.prototype = Object.assign( Object.create( View.prototype ),
 
         ViewWebGL.prototype.handleMouseUp.call( this, event );
     },
+
+    //////////////////////////////////////////////////////////////////////////////
+    handleSceneObjectsSelected : function( objects )
+    {
+        if( objects.length == 1 )
+        {
+            var object = objects[0];
+            this.transformControls.attach( object );
+        }
     
+        this.requestRender();
+    },
+
+    //////////////////////////////////////////////////////////////////////////////
+    handleSceneObjectsDeselected : function( objects )
+    {
+        this.transformControls.detach();
+
+        this.requestRender();
+    },
+
+    //////////////////////////////////////////////////////////////////////////////
+    handleObjectTransformChange : function(  )
+    {
+        this.eventDispatcher.dispatchEvent( "render" );
+    },
+
+    //////////////////////////////////////////////////////////////////////////////
+    selectObjects : function()
+    {
+        if( this.selectionRectangle.width >= 0 && this.selectionRectangle.height >= 0 )
+        {
+            this.renderer.setClearColor( 0x000000 );
+            this.renderer.render( this.editor.scenePicking, this.camera, this.pickingRenderTarget, true );
+            
+            var x = this.selectionRectangle.left;
+            var y = this.selectionRectangle.top;
+            var w = this.selectionRectangle.width || 1;
+            var h = this.selectionRectangle.height || 1;
+
+            //create buffer for reading pixels
+            var pixelBuffer = new Uint8Array( w * h * 4 );
+            this.renderer.readRenderTargetPixels( this.pickingRenderTarget, 
+                                            x,
+                                            this.pickingRenderTarget.height - y - h, 
+                                            w,
+                                            h,
+                                            pixelBuffer );
+        
+            this.pickingTextureSelection.image.data = pixelBuffer;
+            this.pickingTextureSelection.image.width = w;
+            this.pickingTextureSelection.image.height = h;
+            this.pickingTextureSelection.needsUpdate = true;
+
+        
+            var ids = {};
+            var count = w * h * 4;
+            for( var i = 0; i < count; i += 4 )
+            {
+                var id = ( pixelBuffer[i + 0] << 16 ) | ( pixelBuffer[i + 1] << 8 ) | ( pixelBuffer[i + 2 ] );
+                ids[id] = id;
+            }
+
+            var editorObjectsIds = [];
+            for( var idText in ids ) 
+            { 
+                var id = ids[idText];
+                editorObjectsIds.push( id );
+            }
+
+            this.editor.selectObjectsFromEditorIds( editorObjectsIds );
+        }
+    }
 
 } )
 

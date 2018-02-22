@@ -176,18 +176,19 @@
 
         <script src="./libs/three.js"></script>
         <script src="./libs/resizer.js"></script>
+        <script src="./Page/Page_layout.js"></script>                
         <script src="./editor/editor_Basics.js"></script>
         <script src="./editor/editor_Data.js"></script>
         <script src="./editor/editor_View.js"></script>
         <script src="./editor/editor_ViewWebGL.js"></script>
         <script src="./editor/editor.js"></script>        
-        <script src="./Page/Page_layout.js"></script>        
     </head>
     <!-- ----------------------------------------------------------------------------- -->
     
     <!-- ----------------------------------------------------------------------------- -->
     <body onload="setupPageElements()" onresize="resizePageElements()">
         <nav id="header" class="navbar navbar-inverse noselect" style="border-radius:0px;">
+            <!--
             <div class="container-fluid">
               <div class="navbar-header">
                 <a class="navbar-brand" href="#">WebGL Editor</a>
@@ -206,15 +207,15 @@
                   </ul>
                 </li>
               </ul>
-              <!--
               <ul class="nav navbar-nav navbar-right">
                   <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
                   <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
               </ul>                  
-              -->
             </div>
+            -->
         </nav>
         <div id="header-tabs" class="container" style="position:absolute; margin-right:10px; background-color:#222;border:#000 solid 1px;">
+            <!--
             <ul class="nav nav-tabs" style="top:4px; border-bottom: 1px solid #000;">
                 <li class="active"><a data-toggle="tab" style="padding:4px 6px; background-color:#222; color:rgb(157, 157, 157);" href="#menu1">Menu 1</a></li>
                 <li ><a data-toggle="tab" style="padding:4px 6px; background-color:#222; color:rgb(157, 157, 157);" href="#menu2">Menu 2</a></li>
@@ -235,6 +236,7 @@
                     <p style="color:rgb(157, 157, 157);">Some content in menu 4.</p>
                 </div>
             </div>
+            -->
         </div>
         <div id="left" class="page_element" style="border:#000 solid 1px;"></div>
         <div id="editor" class="page_element" style="overflow:visible;">
