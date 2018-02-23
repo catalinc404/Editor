@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function TreeView( eventDispatcher, element ) 
 {
-    console.log( "TreeView" );
+    //console.log( "TreeView" );
 
     this.eventDispatcher = eventDispatcher;
     this.element = element;

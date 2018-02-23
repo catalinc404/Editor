@@ -362,18 +362,6 @@ Editor.prototype.loadDAE = function ( path )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function createDemoScene( editor )
 {
-    var helper = new THREE.GridHelper( 100, 40 );
-    helper.position.x = 0;
-    helper.position.y = -1;
-    helper.position.z = 0;
-    helper.material.opacity = 0.25;
-    helper.material.transparent = true;
-    editor.scene.add( helper );
-
-    var ambientLight = new THREE.AmbientLight( 0x222222 );
-    ambientLight.name = "ambientLight";
-    editor.addSceneObject( ambientLight );
-       
     var spotLight = new THREE.SpotLight( 0xffffff );
     spotLight.name = "spotlight1";
     spotLight.position.set( -10, 15, -5 );

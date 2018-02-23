@@ -22,7 +22,12 @@ PropertyView.prototype = Object.assign( Object.create( Object.prototype ),
 
     //////////////////////////////////////////////////////////////////////////////
     onResize: function()
-    {},
+    {
+        if( this.gui !== undefined )
+        {
+            this.gui.width = parseInt( this.element.style.width, 10 ) || 0; 
+        }
+    },
 
     //////////////////////////////////////////////////////////////////////////////
     onSceneObjectsSelected : function( selection )
