@@ -696,3 +696,17 @@ function getRelativePosition( event )
     return position;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function getRelativePositionForElement( parentElement, element,  position )
+{
+    var currentElement = element;
+    while( (currentElement !== undefined) && (currentElement != parentElement) && (!(currentElement instanceof HTMLBodyElement)) )
+    {
+        position.x += currentElement.offsetLeft;
+        position.y += currentElement.offsetTop;
+
+        currentElement = currentElement.parentElement;
+    }
+
+    return position;
+}
