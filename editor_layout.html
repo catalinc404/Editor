@@ -4,7 +4,6 @@
     <!-- ----------------------------------------------------------------------------- -->
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link href="./js/libs/vanillatree.css" rel="stylesheet">        
         <style>
             html,
@@ -207,14 +206,14 @@
     
     <!-- ----------------------------------------------------------------------------- -->
     <body onload="setup();" onresize="resize();">
-        <div id="header" class="page_element" style="background-color:#757575;"></div>
-        <div id="header-tabs" class="page_element" style="background-color:#757575;"></div>
+        <div id="header" class="page_element" style="background-color:#1a1a1a; border-bottom: 5px solid #575757;"></div>
+        <div id="header-tabs" class="page_element" style="background-color:#1a1a1a; border-bottom: 5px solid #575757;"></div>
         <div id="left" class="page_element">
-            <div id="tree-view-menu" style="background-color:#757575; border: 1px solid #000;">
-                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneOpen();"><span class="glyphicon glyphicon-open"></span></button>
-                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneSave();"><span class="glyphicon glyphicon-save"></span></button>
-                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneNew();"><span class="glyphicon glyphicon-file"></span></button>
-                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneImport();"><span class="glyphicon glyphicon-folder-open"></span></button>
+            <div id="tree-view-menu" style="background-color:#1a1a1a; border-bottom: 5px solid #575757; padding-top: 4px; padding-left: 4px;">
+                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneOpen();"><span class="glyphicon glyphicon-open"></span>Open</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneSave();"><span class="glyphicon glyphicon-save"></span>Save</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneNew();"><span class="glyphicon glyphicon-file"></span>New</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneImport();"><span class="glyphicon glyphicon-folder-open">Import</span></button>
             </div>
             <div id="tree-view" style="overflow: auto; width:100%;" ></div>
         </div>
@@ -249,10 +248,9 @@
             <div id="viewSelect" class="selectionRectangle"></div>
         </div>
         <div id="resizerRight" class="resizerX"></div>
-        <div id="right" class="page_element">
-            
-        </div>
+        <div id="right" class="page_element"  style="overflow:auto"></div>
         <div id="resizerBottom" class="resizerY"></div>
+
         <div id="footer" class="page_element" style="background-color:#757575;"></div>
     </body>
     <!-- ----------------------------------------------------------------------------- -->

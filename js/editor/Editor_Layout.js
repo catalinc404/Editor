@@ -196,14 +196,14 @@ var editorPageLayout =
                 { 
                     name: "header_menu",
                     id: "header",
-                    height: 52,
-                    size_min: 52
+                    height: 30,
+                    size_min: 30
                 },
                 { 
                     name: "header_toolbar",
                     id: "header-tabs",
-                    height: 70,
-                    size_min: 70
+                    height: 30,
+                    size_min: 30
                 }
             ]
         },
@@ -214,10 +214,8 @@ var editorPageLayout =
                 {
                     name: "body_left",
                     id: "left",
-                    width: 200,
-                    size_min: 200,
-                    width: 200,
-                    size_min: 200,
+                    width: 220,
+                    size_min: 220,
                     rows:
                     [
                         {
@@ -236,9 +234,15 @@ var editorPageLayout =
                             class:
                             {
                                 type: "treeView",
-                                onresize : genericResizeableElementWidth( "tree-view" )
+                                //onresize : genericResizeableElementWidth( "tree-view" )
                             }
-                        }
+                        },
+                        {
+                            name: "tree_view_padding",
+                            id: "tree-view-padding",
+                            height: 9,
+                            size_min: 9,
+                        },
                     ]
                 },
                 {
@@ -283,6 +287,7 @@ var editorPageLayout =
                     class:
                     {
                         type: "propertyView",
+                        //onresize : genericResizeableElementWidth( "right" )
                     },                    
                 }
             ]

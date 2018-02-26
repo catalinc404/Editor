@@ -367,13 +367,13 @@ UI.prototype.setupElementClass = function( element, uiClass )
             case "propertyView":
             {
                 element.ui = new PropertyView( eventDispatcher, element );
-                element.onresize = element.ui.onResize.bind( element.ui );
+                element.onresize = element.ui.onresize.bind( element.ui );
             }
             break;
             case "treeView":
             {
                 element.ui = new TreeView( eventDispatcher, element );
-                element.onresize = element.ui.onResize.bind( element.ui );
+                element.onresize = element.ui.onresize.bind( element.ui );
             }
             break;
             case "viewWebGL":
@@ -591,7 +591,6 @@ function genericResizeableElementWidth( elementId )
     return resizeWidth;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function genericResizeableElementHeight( elementId )
 {
@@ -615,6 +614,31 @@ function genericResizeableElementHeight( elementId )
     };
 
     return resizeHeight;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function genericResizeableElement( elementId )
+{
+    function resizeWidth()
+    {
+        var element = document.getElementById( elementId );
+        if( element != null )
+        {
+            var width  = parseInt( element.style.width,  10 ) || 0;
+            var height = parseInt( element.style.height, 10 ) || 0;
+            if( element.parentElement != null )
+            {
+                width  = parseInt( element.parentElement.style.width,  10 ) || width;
+            }
+            
+            var left   = parseInt( element.style.left,   10 ) || 0;
+            var top    = parseInt( element.style.top,    10 ) || 0;
+
+            setElementSize( element, left, top, width, height);
+        }
+    };
+
+    return resizeWidth;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

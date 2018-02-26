@@ -73,7 +73,7 @@ Editor.prototype.initDefaultScene = function()
     helper.position.z = 0;
     helper.material.opacity = 0.25;
     helper.material.transparent = true;
-    this.scene.add( helper );
+    this.sceneHelpers.add( helper );
 
     var ambientLight = new THREE.AmbientLight( 0x222222 );
     ambientLight.name = "ambientLight";
@@ -213,7 +213,7 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
   
     for( var i = 0; i < object.children.length; ++i )
     {
-        this.addObject( object.children[i], true );
+        this.addSceneObject( object.children[i], true );
     }
 }
 
@@ -386,15 +386,21 @@ function createDemoScene( editor )
     cube.castShadow = true;
     editor.addSceneObject( cube );
 
-    var sphereGeometry = new THREE.SphereGeometry( 4, 20, 20 );
+    var groupSpeheres = new THREE.Group();
+    groupSpeheres.name = "spheres";
+    var sphereGeometry = new THREE.SphereGeometry( 1, 20, 20 );
     var sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: editor.defaultTexture } );
-    var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    sphere.name = "sphere1";
-    sphere.position.x = 20;
-    sphere.position.y = 4;
-    sphere.position.z = 2;
-    sphere.castShadow = true;
-    editor.addSceneObject( sphere );
+    for( var i = 1; i < 100; ++i )
+    {
+        var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        sphere.name = "sphere" + i;
+        sphere.position.x = (Math.random() * 40);
+        sphere.position.y = (Math.random() * 40) - 20;
+        sphere.position.z = (Math.random() * 40) - 20;
+        sphere.castShadow = true;
+        groupSpeheres.add( sphere );
+    }
+    editor.addSceneObject( groupSpeheres );    
 
     var planeGeometry = new THREE.PlaneGeometry( 60, 20 );
     var planeMaterial = new THREE.MeshPhongMaterial( {  color:0xffffff } );
@@ -426,4 +432,82 @@ function resize()
     var area = { left: 0, top: 0, width: width, height: height };
     
     ui.setupLayout( area, ui.UIData );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function sceneOpen() 
+{
+    var fileSelector = document.createElement( "input" );
+    fileSelector.type = 'file';
+    fileSelector.addEventListener('change', function( event ) 
+                                            {
+                                                if( event.target.files.length > 0 )
+                                                {
+                                                    var file = event.target.files[0];
+                                                    if( file.name.match(/\.(json|js)$/) ) 
+                                                    {
+                                                        var tmpPath = URL.createObjectURL( file );
+                                                        var loader = new THREE.ObjectLoader();
+                                                        loader.load(  tmpPath, function ( obj ) { editor.addSceneObject( obj ); } );
+                                                    }
+                                                    else
+                                                    if( file.name.match(/\.dae$/) ) 
+                                                    {
+                                                        var loader = new THREE.ColladaLoader( );
+                                                        loader.load( './models/collada/elf/elf.dae', function ( collada ) 
+                                                            {
+                                                                editor.addSceneObject( collada.scene );
+                                                            } );
+                                                    }
+                                                }
+                                            } );
+    fileSelector.click();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function sceneSave() 
+{
+    var fileSelector = document.createElement( "input" );
+    fileSelector.type = 'file';
+    fileSelector.click();
+
+    if( fileSelector.files.length > 0 )
+    {
+        var exporter = new THREE.FileLoader();
+        var sceneJson = JSON.stringify( scene.toJSON() );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function sceneNew() 
+{
+
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function sceneImport()
+{
+    var fileSelector = document.createElement( "input" );
+    fileSelector.type = 'file';
+    fileSelector.addEventListener('change', function( event ) 
+                                            {
+                                                if( event.target.files.length > 0 )
+                                                {
+                                                    var file = event.target.files[0];
+                                                    if( file.name.match(/\.(json|js)$/) ) 
+                                                    {
+                                                        var tmpPath = URL.createObjectURL( file );
+                                                        var loader = new THREE.ObjectLoader();
+                                                        loader.load(  tmpPath, function ( obj ) { editor.addSceneObject( obj ); } );
+                                                    }
+                                                    else
+                                                    if( file.name.match(/\.dae$/) ) 
+                                                    {
+                                                        var tmpPath = URL.createObjectURL( file );
+
+                                                        editor.loadDAE( tmpPath );
+                                                    }
+                                                }
+                                            } );
+    fileSelector.click();
 }

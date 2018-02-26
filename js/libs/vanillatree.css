@@ -3,31 +3,42 @@
 	padding: 0;
 	list-style-type: none;
 	position: relative;
-	font: 12px 'Lucida Grande', sans-serif;
+	
+	/*font: 12px 'Lucida Grande', sans-serif;*/
+
+	color: #eee;
+	font: 11px 'Lucida Grande', sans-serif;
+	text-shadow: 0 -1px 0 #111;
+	background-color: #1a1a1a;
 }
 
 ul.vtree {
-	margin: 0;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
 	padding: 0;
 	list-style-type: none;
 	position: relative;
+	/*
 	padding-top: 6px;
 	padding-left: 8px;
+	*/
 }
 
 .vtree li.vtree-leaf {
 	background-position: -90px 0;
 	background-repeat: repeat-y;
 	min-height: 18px;
-	line-height: 18px;
+	line-height: 24px;
 }
 
 .vtree li.vtree-leaf::before {
 	content: '';
 	width: 18px;
-	height: 18px;
-	position: absolute;
+	height: 24px;
+	position: relative;
 	background-position: -36px 0;
+	border-top: 6px;
 }
 
 .vtree li.vtree-leaf li.vtree-leaf {
@@ -45,35 +56,39 @@ ul.vtree {
 .vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle {
 	display: block;
 	width: 18px;
-	height: 18px;
-	background-position: -72px 0;
+	height: 24px;
+	background-position: -72px 3px;
 	position: absolute;
 	left: 0;
 	top: 0;
 }
 
 .vtree li.vtree-leaf.vtree-has-children.closed > span.vtree-toggle {
-	background-position: -54px 0;
+	background-position: -54px 3px;
+	background-repeat: no-repeat;
 }
 
 .vtree a.vtree-leaf-label {
-	line-height: 18px;
+	line-height: 22px;
 	display: inline-block;
 	vertical-align: top;
 	cursor: pointer;
-	max-width: 100%;
+	/*max-width: 100%;*/
+	width: 100%;
 	margin-left: 18px;
-	padding: 0 2px;
+	margin-bottom: 2px;
+	/*padding: 0 2px;*/
+	border-bottom: 1px solid #575757;
 }
 
 .vtree li.vtree-leaf a.vtree-leaf-label:hover {
-	background-color: #f3f3f3;
+	background-color: #b1b1b1;
 	/*outline: 1px dotted #777777;*/
 }
 
 .vtree li.vtree-leaf.vtree-selected > a.vtree-leaf-label {
-	background-color: #fdfdfd81;
-	outline: 1px dotted #00000081;
+	background-color: #4b4b4b;
+	/*outline: 1px dotted #00000081;*/
 }
 
 .vtree-contextmenu {
@@ -102,6 +117,6 @@ ul.vtree {
 }
 
 .vtree li.vtree-leaf, .vtree li.vtree-leaf::before, .vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle {
-	background-image: url('./../../textures/vanillatree_images.png');
+	background-image: url('./../../textures/vanillatree_images3.png');
 	color: #fff;
 }

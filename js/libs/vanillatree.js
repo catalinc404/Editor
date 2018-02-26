@@ -228,6 +228,10 @@
 			}
 
 			return this;
+		},
+		setWidth: function( width )
+		{
+			this.tree.style.width = width + "px"; 
 		}
 	};
 

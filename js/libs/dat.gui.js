@@ -3017,7 +3017,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	    }
-	
+
+			/*
 	    this.__closeButton = document.createElement('div');
 	    this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
 	    _dom2.default.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
@@ -3031,7 +3032,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _dom2.default.bind(this.__closeButton, 'click', function () {
 	      _this.closed = !_this.closed;
-	    });
+			});
+			*/
+			
 	    // Oh, you're a nested GUI!
 	  } else {
 	    if (params.closed === undefined) {
