@@ -82,7 +82,7 @@ ul.vtree {
 }
 
 .vtree li.vtree-leaf a.vtree-leaf-label:hover {
-	background-color: #b1b1b1;
+	background-color: #979797;
 	/*outline: 1px dotted #777777;*/
 }
 

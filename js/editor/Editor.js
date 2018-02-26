@@ -338,12 +338,12 @@ Editor.prototype.loadTDS = function ( path, normalMapPath )
 
                                 object.name = object.name || name;
 
-                                this.addSceneObject( object );
+                                editor.addSceneObject( object );
                             }
                   );
 }
 
-Editor.prototype.loadDAE = function ( path )
+Editor.prototype.loadDAE = function ( path, objectName )
 {
     var basePath = path.substr(0, path.lastIndexOf( "/" ) + 1 );
     var name = path.substr( path.lastIndexOf( "/" ) + 1 );
@@ -353,9 +353,8 @@ Editor.prototype.loadDAE = function ( path )
     DAELoader.load( path,   function ( collada ) 
                             {
                                 var object = collada.scene 
-                                object.name = object.name || name;
-
-                                this.addSceneObject( object );
+                                object.name = object.name || objectName;
+                                editor.addSceneObject( object );
                             } );
 }
 
@@ -448,16 +447,13 @@ function sceneOpen()
                                                     {
                                                         var tmpPath = URL.createObjectURL( file );
                                                         var loader = new THREE.ObjectLoader();
-                                                        loader.load(  tmpPath, function ( obj ) { editor.addSceneObject( obj ); } );
+                                                        loader.load( tmpPath, function ( obj ) { editor.addSceneObject( obj ); } );
                                                     }
                                                     else
                                                     if( file.name.match(/\.dae$/) ) 
                                                     {
-                                                        var loader = new THREE.ColladaLoader( );
-                                                        loader.load( './models/collada/elf/elf.dae', function ( collada ) 
-                                                            {
-                                                                editor.addSceneObject( collada.scene );
-                                                            } );
+                                                        var tmpPath = URL.createObjectURL( file );
+                                                        editor.loadDAE( tmpPath, file.name );
                                                     }
                                                 }
                                             } );
@@ -504,8 +500,7 @@ function sceneImport()
                                                     if( file.name.match(/\.dae$/) ) 
                                                     {
                                                         var tmpPath = URL.createObjectURL( file );
-
-                                                        editor.loadDAE( tmpPath );
+                                                        editor.loadDAE( tmpPath, file.name );
                                                     }
                                                 }
                                             } );

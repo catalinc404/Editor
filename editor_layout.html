@@ -82,7 +82,31 @@
               -ms-user-select: none; /* Internet Explorer/Edge */
               user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
-            }        
+            }
+            .text11
+            {
+                font: 11px 'Lucida Grande', sans-serif;
+                text-shadow: 0 -1px 0 #111;
+                color: #eee;
+            }       
+            .text13
+            {
+                font: 13px 'Lucida Grande', sans-serif;
+                text-shadow: 0 -1px 0 #111;
+                color: #eee;
+            }
+            .background-color-dark
+            {
+                background-color:#1a1a1a;
+            }
+            .background-color-border
+            {
+                background-color:#575757;
+            }
+            .border-bottom
+            {
+                border-bottom: 3px solid #575757;
+            }
             .glyphicon-pad-right-7px:before 
             {
               margin-right: 7px;
@@ -92,14 +116,9 @@
               content: "\2122";
               color: transparent !important;
             }
-            .horizontalmenu
-            {
-              z-index: 100;
-            }
-
             #primary_nav_wrap
             {
-                z-index: 100;
+                z-index: 1000;
                 position:relative;
                 overflow:visible;
             }
@@ -117,17 +136,17 @@
                 float:left;
                 padding:0;
                 border: 1px solid #1313126b;
-                border-radius: 4px;
+                /*border-radius: 4px;*/
                 margin:0px;
             }
             #primary_nav_wrap ul a
             {
                 display:block;
-                color:#222;
-                text-decoration:none;
-                font-size:12px;
                 padding:3px 7px;
-                font-family:Arial;
+
+                font: 13px 'Lucida Grande', sans-serif;
+                text-shadow: 0 -1px 0 #111;
+                color: #eee;
             }
             #primary_nav_wrap ul li
             {
@@ -143,8 +162,7 @@
             }
             #primary_nav_wrap ul li:hover
             {
-                background:#dddddd;
-                border-radius: 4px;
+                background:#979797;
             }
             #primary_nav_wrap ul ul
             {
@@ -206,15 +224,28 @@
     
     <!-- ----------------------------------------------------------------------------- -->
     <body onload="setup();" onresize="resize();">
-        <div id="header" class="page_element" style="background-color:#1a1a1a; border-bottom: 5px solid #575757;"></div>
-        <div id="header-tabs" class="page_element" style="background-color:#1a1a1a; border-bottom: 5px solid #575757;"></div>
-        <div id="left" class="page_element">
-            <div id="tree-view-menu" style="background-color:#1a1a1a; border-bottom: 5px solid #575757; padding-top: 4px; padding-left: 4px;">
-                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneOpen();"><span class="glyphicon glyphicon-open"></span>Open</button>
-                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneSave();"><span class="glyphicon glyphicon-save"></span>Save</button>
-                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneNew();"><span class="glyphicon glyphicon-file"></span>New</button>
-                <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneImport();"><span class="glyphicon glyphicon-folder-open">Import</span></button>
-            </div>
+        <div id="header" class="page_element background-color-dark" style="overflow:visible">
+            <nav id="primary_nav_wrap" style="left:4px; top:4px;height: 22px;">
+                <ul>
+                  <li><a href="#" class="text13">File</a>
+                    <ul>
+                        <li><a href="#">Open scene</a></li>
+                        <li><a href="#">Save scene</a></li>
+                        <li><a href="#">Save scene as...</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Export selected</a></li>
+                    </ul>
+                  </li>
+                  <li><a href="#" class="text13">Edit</a></li>
+                  <li><a href="#" class="text13">View</a></li>
+                  <li><a href="#" class="text13">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div id="header-tabs" class="page_element background-color-dark border-bottom"></div>
+        <div id="header-toolbar" class="page_element background-color-dark border-bottom"></div>
+        <div id="left" class="page_element" style="">
+            <div id="tree-view-header" class="noselect text13 background-color-dark border-bottom" style="padding-top: 8px; padding-left: 6px;">Scene Explorer</div>
             <div id="tree-view" style="overflow: auto; width:100%;" ></div>
         </div>
         <div id="resizerLeft" class="resizerX"></div>
@@ -222,11 +253,11 @@
             <!-- ----------------------------------------------------------------------------- -->
             <!-- First row                                                                     -->
             <!-- ----------------------------------------------------------------------------- -->
-            <div id="panelViewTL" class="page_element" style="background-color:#a8a8a8;">
+            <div id="panelViewTL" class="page_element">
                 <canvas id="viewTL" class="element noselect"></canvas>
             </div>
             <div id="resizerXTop" class="resizerX"></div>
-            <div id="panelViewTR" class="page_element" style="background-color:#a8a8a8;">
+            <div id="panelViewTR" class="page_element">
                 <canvas id="viewTR" class="element noselect"></canvas>
             </div>
 
@@ -238,20 +269,23 @@
             <!-- ----------------------------------------------------------------------------- -->
             <!-- Second row                                                                    -->
             <!-- ----------------------------------------------------------------------------- -->
-            <div id="panelViewBL" class="page_element" style="background-color:#a8a8a8;">
+            <div id="panelViewBL" class="page_element">
                 <canvas id="viewBL" class="element noselect"></canvas>
             </div>
             <div id="resizerXBottom" class="resizerX"></div>
-            <div id="panelViewBR" class="page_element" style="background-color:#a8a8a8;">
+            <div id="panelViewBR" class="page_element">
                 <canvas id="viewBR" class="element noselect"></canvas>
             </div>
             <div id="viewSelect" class="selectionRectangle"></div>
         </div>
         <div id="resizerRight" class="resizerX"></div>
-        <div id="right" class="page_element"  style="overflow:auto"></div>
+        <div id="right" class="page_element">
+            <div id="properties-view-header" class="noselect text13 background-color-dark border-bottom" style="padding-top: 8px; padding-left: 6px;">Properties View</div>
+            <div id="properties-view" style="overflow: auto; width:100%;" ></div>
+        </div>
         <div id="resizerBottom" class="resizerY"></div>
 
-        <div id="footer" class="page_element" style="background-color:#757575;"></div>
+        <div id="footer" class="page_element background-color-border"></div>
     </body>
     <!-- ----------------------------------------------------------------------------- -->
 </html>

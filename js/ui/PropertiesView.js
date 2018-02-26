@@ -24,9 +24,22 @@ PropertyView.prototype = Object.assign( Object.create( Object.prototype ),
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.onresize = function()
 {
+    var rectangle = {};
+
+    rectangle.left    = parseInt( this.element.style.left,   10 ) || 0;
+    rectangle.top     = parseInt( this.element.style.top,    10 ) || 0;
+    rectangle.width   = parseInt( this.element.style.width,  10 ) || 0;
+    rectangle.height  = parseInt( this.element.style.height, 10 ) || 0;
+    if( this.element.parentElement != null )
+    {
+        rectangle.width = parseInt( this.element.parentElement.style.width,  10 ) || rectangle.width;
+    }
+
+    setElementSize(  this.element, rectangle.left, rectangle.top, rectangle.width, rectangle.height );
+
     if( this.gui !== undefined )
     {
-        this.gui.width = parseInt( this.element.style.width, 10 ) || 0; 
+        this.gui.width =  rectangle.width; 
     }
 }
 

@@ -200,11 +200,17 @@ var editorPageLayout =
                     size_min: 30
                 },
                 { 
-                    name: "header_toolbar",
+                    name: "header_tabs",
                     id: "header-tabs",
                     height: 30,
                     size_min: 30
-                }
+                },
+                { 
+                    name: "header_toolbar",
+                    id: "header-toolbar",
+                    height: 30,
+                    size_min: 30
+                }                
             ]
         },
         {
@@ -219,13 +225,13 @@ var editorPageLayout =
                     rows:
                     [
                         {
-                            name: "tree_view_menu",
-                            id: "tree-view-menu",
-                            height: 30,
-                            size_min: 30,
+                            name: "tree_view_header",
+                            id: "tree-view-header",
+                            height: 22,
+                            size_min: 22,
                             class:
                             {
-                                onresize : genericResizeableElementWidth( "tree-view-menu" )
+                                onresize : genericResizeableElementWidth( "tree-view-header" )
                             }
                         },
                         {
@@ -240,8 +246,8 @@ var editorPageLayout =
                         {
                             name: "tree_view_padding",
                             id: "tree-view-padding",
-                            height: 9,
-                            size_min: 9,
+                            height: 11,
+                            size_min: 11,
                         },
                     ]
                 },
@@ -284,11 +290,34 @@ var editorPageLayout =
                     id: "right",
                     width: 260,
                     size_min: 260,
-                    class:
-                    {
-                        type: "propertyView",
-                        //onresize : genericResizeableElementWidth( "right" )
-                    },                    
+                    rows:
+                    [
+                        {
+                            name: "properties-view_header",
+                            id: "properties-view-header",
+                            height: 22,
+                            size_min: 22,
+                            class:
+                            {
+                                onresize : genericResizeableElementWidth( "properties-view-header" )
+                            }
+                        },
+                        {
+                            name: "properties_view",
+                            id: "properties-view",
+                            class:
+                            {
+                                type: "propertyView",
+                                //onresize : genericResizeableElementWidth( "propertyView" )
+                            }
+                        },
+                        {
+                            name: "tree_view_padding",
+                            id: "tree-view-padding",
+                            height: 11,
+                            size_min: 11,
+                        },
+                    ]
                 }
             ]
         },
