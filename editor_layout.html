@@ -4,195 +4,12 @@
     <!-- ----------------------------------------------------------------------------- -->
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="./js/libs/vanillatree.css" rel="stylesheet">        
-        <style>
-            html,
-            body
-            {
-                /* set margin to 0 and overflow to hidden, to use the complete page */
-                overflow: hidden;
-                margin: 0;
-                padding: 0;
-                height:100%;
-                width: 100%;
-                min-width: 900;
-                min-height: 600;                
-            }
-            .element
-	        {
-                overflow:hidden; 
-		        width: 0px; 
-                height: 0px;
-                visibility: hidden;
-                position: absolute;
-	        }
-            .resizerX
-	        {
-                overflow: hidden; 
-                cursor: e-resize;
-                width: 0px; 
-                height: 0px;
-                visibility: hidden;
-                position: absolute;
-                background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAARCAYAAAAYNhYvAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAGElEQVQYV2P4++c/CIBpBhADhoe8zP//AJT5qfyyqEgyAAAAAElFTkSuQmCC')  no-repeat center center;
-                background-color: rgba(51, 51, 51, 1);
-	        }
-            .resizerY
-	        {
-                overflow:hidden; 
-		        background-color: #333;
-                cursor: n-resize;
-                width: 0px; 
-                height:0px;
-                visibility: hidden;
-                position: absolute;
-                background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAADCAYAAAB1c+RqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAG0lEQVQYV2P4++c/CFBEM4AYlGKibMJP//8PAO7Dqfz5wz1UAAAAAElFTkSuQmCC')  no-repeat center center;
-                background-color: rgba(51, 51, 51, 1);
-	        }
-            .selectionRectangle
-            {
-                position:absolute;
-                top: 0px;
-                left: 0px;
-                height: 0px;
-                width: 0px;
-                z-index: 50;
-                background-color: rgba(235, 235, 235, 0.5);
-                border: 1px #a8a8a8;
-                margin: 0; 
-                padding: 0; 
-                pointer-events:none;
-            }
-            .page_element
-            {
-                position: absolute;
-                overflow: hidden;
-                background-color: #a8a8a8;
-                
-                -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-                -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-                box-sizing: border-box;         /* Opera/IE 8+ */
-            }
-            .noselect 
-            {
-              -webkit-touch-callout: none; /* iOS Safari */
-              -webkit-user-select: none; /* Safari */
-              -khtml-user-select: none; /* Konqueror HTML */
-              -moz-user-select: none; /* Firefox */
-              -ms-user-select: none; /* Internet Explorer/Edge */
-              user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
-            }
-            .text11
-            {
-                font: 11px 'Lucida Grande', sans-serif;
-                text-shadow: 0 -1px 0 #111;
-                color: #eee;
-            }       
-            .text13
-            {
-                font: 13px 'Lucida Grande', sans-serif;
-                text-shadow: 0 -1px 0 #111;
-                color: #eee;
-            }
-            .background-color-dark
-            {
-                background-color:#1a1a1a;
-            }
-            .background-color-border
-            {
-                background-color:#575757;
-            }
-            .border-bottom
-            {
-                border-bottom: 3px solid #575757;
-            }
-            .glyphicon-pad-right-7px:before 
-            {
-              margin-right: 7px;
-            }             
-            .glyphicon-none:before 
-            {
-              content: "\2122";
-              color: transparent !important;
-            }
-            #primary_nav_wrap
-            {
-                z-index: 1000;
-                position:relative;
-                overflow:visible;
-            }
-            #primary_nav_wrap .divider
-            {
-              height: 1px;
-              margin: 3px 0;
-              overflow: hidden;
-              background-color: #e5e5e5;
-            }
-            #primary_nav_wrap ul
-            {
-                list-style:none;
-                position:relative;
-                float:left;
-                padding:0;
-                border: 1px solid #1313126b;
-                /*border-radius: 4px;*/
-                margin:0px;
-            }
-            #primary_nav_wrap ul a
-            {
-                display:block;
-                padding:3px 7px;
-
-                font: 13px 'Lucida Grande', sans-serif;
-                text-shadow: 0 -1px 0 #111;
-                color: #eee;
-            }
-            #primary_nav_wrap ul li
-            {
-                position:relative;
-                float:left;
-                margin:0;
-                padding:0
-            }
-            #primary_nav_wrap ul li.current-menu-item
-            {
-                z-index: 1000;
-                background:rgb(175, 175, 175);
-            }
-            #primary_nav_wrap ul li:hover
-            {
-                background:#979797;
-            }
-            #primary_nav_wrap ul ul
-            {
-                display:none;
-                position:absolute;
-                top:100%;
-                left:0;
-                background:#fff;
-                padding:0
-            }
-            #primary_nav_wrap ul ul li
-            {
-                float:none;
-                width:200px;
-            }
-            #primary_nav_wrap ul ul a
-            {
-                padding:5px 10px;
-            }
-            #primary_nav_wrap ul ul ul
-            {
-                top:0;
-                left:100%;
-                position:absolute;
-            }
-            #primary_nav_wrap ul li:hover > ul
-            {
-                display:block;
-            }
-        </style>
+        <!-- ----------------------------------------------------------------------------- -->
+        <link rel="stylesheet/less" type="text/css" href="./css/styles.less"/>
+        <script>less = { env: 'development' };</script>
+        <script src="./js/libs/less.js" data-env="development"></script>
+        <script>less.watch();</script>
+        <!-- ----------------------------------------------------------------------------- -->
 
         <script src="./js/libs/vanillatree.js"></script>
         <script src="./js/libs/dat.gui.js"></script>
@@ -224,28 +41,32 @@
     
     <!-- ----------------------------------------------------------------------------- -->
     <body onload="setup();" onresize="resize();">
-        <div id="header" class="page_element background-color-dark" style="overflow:visible">
-            <nav id="primary_nav_wrap" style="left:4px; top:4px;height: 22px;">
-                <ul>
-                  <li><a href="#" class="text13">File</a>
-                    <ul>
-                        <li><a href="#">Open scene</a></li>
-                        <li><a href="#">Save scene</a></li>
-                        <li><a href="#">Save scene as...</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">Export selected</a></li>
-                    </ul>
-                  </li>
-                  <li><a href="#" class="text13">Edit</a></li>
-                  <li><a href="#" class="text13">View</a></li>
-                  <li><a href="#" class="text13">Help</a></li>
+        <div id="header" class="page_element background-color-dark border-bottom-page-element" style="overflow:visible">
+            <nav id="menu" style="left:4px; top:4px;height: 22px;">
+                <ul style="border:none;">
+                    <li><a href="#" class="text13">File</a>
+                        <ul>
+                            <li><a href="#">Open scene</a></li>
+                            <li><a href="#">Save scene</a></li>
+                            <li><a href="#">Save scene as...</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">Export selected</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#" class="text13">Edit</a></li>
+                    <li><a href="#" class="text13">View</a></li>
+                    <li><a href="#" class="text13">Help</a>
+                        <ul>
+                            <li><a href="#">About</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </nav>
         </div>
-        <div id="header-tabs" class="page_element background-color-dark border-bottom"></div>
-        <div id="header-toolbar" class="page_element background-color-dark border-bottom"></div>
-        <div id="left" class="page_element" style="">
-            <div id="tree-view-header" class="noselect text13 background-color-dark border-bottom" style="padding-top: 8px; padding-left: 6px;">Scene Explorer</div>
+        <div id="header-tabs" class="page_element background-color-dark border-bottom-page-element"></div>
+        <div id="header-toolbar" class="page_element background-color-dark border-bottom-page-element"></div>
+        <div id="left" class="page_element">
+            <div id="tree-view-header" class="noselect text13 background-color-dark border-bottom-page-element" style="padding-top: 8px; padding-left: 6px;">Scene Explorer</div>
             <div id="tree-view" style="overflow: auto; width:100%;" ></div>
         </div>
         <div id="resizerLeft" class="resizerX"></div>
@@ -280,12 +101,12 @@
         </div>
         <div id="resizerRight" class="resizerX"></div>
         <div id="right" class="page_element">
-            <div id="properties-view-header" class="noselect text13 background-color-dark border-bottom" style="padding-top: 8px; padding-left: 6px;">Properties View</div>
+            <div id="properties-view-header" class="noselect text13 background-color-dark border-bottom-page-element" style="padding-top: 8px; padding-left: 6px;">Properties View</div>
             <div id="properties-view" style="overflow: auto; width:100%;" ></div>
         </div>
         <div id="resizerBottom" class="resizerY"></div>
 
-        <div id="footer" class="page_element background-color-border"></div>
+        <div id="footer" class="page_element background-color-lighter"></div>
     </body>
     <!-- ----------------------------------------------------------------------------- -->
 </html>

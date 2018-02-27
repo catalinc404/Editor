@@ -1,0 +1,670 @@
+//@import (reference) "base.less";
+
+//@tint: #c3e0f8;
+@tint: #ffffff;
+
+@color1:  multiply( #111111, @tint);
+@color2:  multiply( #1a1a1a, @tint);
+@color3:  multiply( #333333, @tint);
+@color4:  multiply( #575757, @tint);
+@color5:  multiply( #979797, @tint);
+@color6:  multiply( #a8a8a8, @tint);
+@color7:  multiply( #e5e5e5, @tint);
+@color8:  multiply( #eeeeee, @tint);
+
+@font-color-shadow:        @color1;
+@color-dark:               @color2;
+@color-resizer-background: @color3;
+@color-lighter:            @color4;
+@hover-color:              @color5;
+@color-light:              @color6;
+@nav-color:                @color7;
+@font-color:               @color8;
+
+html,
+body 
+{
+    /* set margin to 0 and overflow to hidden, to use the complete page */
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    min-width: 900;
+    min-height: 600;
+}
+
+.nosize
+{
+    width: 0px;
+    height: 0px;    
+}
+
+.borderinside
+{
+    -webkit-box-sizing: border-box;
+    /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;
+    /* Firefox, other Gecko */
+    box-sizing: border-box;
+    /* Opera/IE 8+ */
+}
+
+.base-elemennt
+{
+    position: absolute;    
+    overflow: hidden;
+}
+
+.element 
+{
+    visibility: hidden;
+
+    .base-elemennt;
+    .nosize;
+}
+
+.page_element 
+{
+    .base-elemennt;
+    .background-color(@color: @color-light);
+    .borderinside;
+}
+
+.resizerX 
+{
+    cursor: e-resize;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAARCAYAAAAYNhYvAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAGElEQVQYV2P4++c/CIBpBhADhoe8zP//AJT5qfyyqEgyAAAAAElFTkSuQmCC') no-repeat center center;
+    
+    .background-color(@color: @color-resizer-background);
+    .element;    
+}
+
+.resizerY 
+{
+    cursor: n-resize;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAADCAYAAAB1c+RqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAG0lEQVQYV2P4++c/CFBEM4AYlGKibMJP//8PAO7Dqfz5wz1UAAAAAElFTkSuQmCC') no-repeat center center;
+
+    .background-color(@color: @color-resizer-background);
+    .element;
+}
+
+.selectionRectangle 
+{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    .nosize;
+    z-index: 50;
+    background-color: rgba(235, 235, 235, 0.5);
+    border: 1px @color-lighter;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+}
+
+.noselect 
+{
+    -webkit-touch-callout: none;    /* iOS Safari */
+    -webkit-user-select: none;      /* Safari */
+    -khtml-user-select: none;       /* Konqueror HTML */
+    -moz-user-select: none;         /* Firefox */
+    -ms-user-select: none;          /* Internet Explorer/Edge */
+    user-select: none;              /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+.text(@size: 11; @color: @font-color; @color-shadow: @font-color-shadow)
+{
+    font-size: @size;
+    font-family: 'Lucida Grande', sans-serif;
+    text-shadow: 0 -1px 0 @color-shadow;
+    color: @color;
+}
+
+.text11
+{
+    .text(12px);
+}
+
+.text13
+{
+    .text(13px);
+}
+
+.border-bottom(@size: 3px; @color: @color-lighter) 
+{
+    border-bottom: @size solid @color;
+}
+
+.border-bottom-page-element
+{
+    .border-bottom;
+}
+
+.background-color(@color: @color-dark)
+{
+    background-color: @color;
+}
+
+.background-color-dark
+{
+    .background-color;
+}
+
+//------------------------------------------------------------------------------
+// Menu 
+//------------------------------------------------------------------------------
+#menu
+{
+    z-index: 1000;
+    position: relative;
+    overflow: visible;
+}
+
+#menu .divider
+{
+    height: 1px;
+    margin: 3px 0;
+    overflow: hidden;
+    background-color: @color-light;
+}
+
+#menu ul
+{
+    list-style: none;
+    position: relative;
+    float: left;
+    padding: 0;
+    margin: 0px;
+    border: 1px solid @color-light;
+}
+
+#menu ul a 
+{
+    display: block;
+    padding: 3px 7px;
+    .text13;
+    text-decoration: none;
+}
+
+#menu ul li 
+{
+    position: relative;
+    float: left;
+    margin: 0;
+    padding: 0
+}
+
+#menu ul li.current-menu-item 
+{
+    z-index: 1000;
+    background: @color-light;
+}
+
+#menu ul li:hover 
+{
+    background: @hover-color;
+}
+
+#menu ul ul 
+{
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 0;
+    .background-color;
+}
+
+#menu ul ul li 
+{
+    float: none;
+    width: 200px;
+}
+
+#menu ul ul a
+{
+    padding: 5px 10px;
+}
+
+#menu ul ul ul
+{
+    top: 0;
+    left: 100%;
+    position: absolute;
+}
+
+#menu ul li:hover>ul
+{
+    display: block;
+}
+
+
+//------------------------------------------------------------------------------
+// Vanilla Tree 
+//------------------------------------------------------------------------------
+.vtree ul.vtree-subtree, .vtree li.vtree-leaf 
+{
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+    position: relative;
+    
+    .text11;
+	.background-color;
+}
+
+ul.vtree {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	padding: 0;
+	list-style-type: none;
+	position: relative;
+}
+
+.vtree li.vtree-leaf 
+{
+	background-position: -90px 0;
+	background-repeat: repeat-y;
+	min-height: 18px;
+	line-height: 24px;
+}
+
+.vtree li.vtree-leaf::before {
+	content: '';
+	width: 18px;
+	height: 24px;
+	position: relative;
+	background-position: -36px 0;
+	border-top: 6px;
+}
+
+.vtree li.vtree-leaf li.vtree-leaf {
+	margin-left: 18px;
+}
+
+.vtree li.vtree-leaf:last-child {
+	background-image: none;
+}
+
+.vtree li.vtree-leaf.closed ul.vtree-subtree {	
+	display: none;
+}
+
+.vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle {
+	display: block;
+	width: 18px;
+	height: 24px;
+	background-position: -72px 3px;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+.vtree li.vtree-leaf.vtree-has-children.closed > span.vtree-toggle {
+	background-position: -54px 3px;
+	background-repeat: no-repeat;
+}
+
+.vtree a.vtree-leaf-label 
+{
+	line-height: 22px;
+	display: inline-block;
+	vertical-align: top;
+	cursor: pointer;
+	width: calc(100% - 18px);
+	margin-left: 18px;
+    margin-bottom: 2px;
+
+    .border-bottom(1px);
+}
+
+.vtree li.vtree-leaf a.vtree-leaf-label:hover 
+{
+	background-color: @hover-color;
+}
+
+.vtree li.vtree-leaf.vtree-selected > a.vtree-leaf-label 
+{
+	.background-color(@color: @color-lighter);
+}
+
+.vtree-contextmenu {
+	position: absolute;
+	z-index: 9999999;
+	border: solid 1px #ccc;
+	background: #eee;
+	padding: 0px;
+	margin: 0px;
+	display: none;
+}
+
+.vtree-contextmenu li {
+	list-style: none;
+	padding: 1px 5px;
+	margin: 0px;
+	color: #fff;
+	line-height: 20px;
+	height: 20px;
+	cursor: default;
+}
+
+.vtree-contextmenu li:hover {
+	color: #fff;
+	background-color: #868686;
+}
+
+.vtree li.vtree-leaf, .vtree li.vtree-leaf::before, .vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle {
+	background-image: url('./../textures/vanillatree_images3.png');
+	color: @font-color;
+}
+
+
+//------------------------------------------------------------------------------
+// Dat.GUI 
+//------------------------------------------------------------------------------
+
+.dg {
+    /** Clear list styles */
+    /* Auto-place container */
+    /* Auto-placed GUI's */
+    /* Line items that don't contain folders. */
+    /** Folder names */
+    /** Hides closed items */
+    /** Controller row */
+    /** Name-half (left) */
+    /** Controller-half (right) */
+    /** Controller placement */
+    /** Shorter number boxes when slider is present. */
+    /** Ensure the entire boolean and function row shows a hand */
+    /** allow overflow for color selector */ }
+    .dg ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      clear: both; }
+    .dg.ac {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 0;
+      z-index: 0; }
+    .dg:not(.ac) .main {
+      /** Exclude mains in ac so that we don't hide close button */
+      overflow: hidden; }
+    .dg.main {
+      -webkit-transition: opacity 0.1s linear;
+      -o-transition: opacity 0.1s linear;
+      -moz-transition: opacity 0.1s linear;
+      transition: opacity 0.1s linear; }
+      .dg.main.taller-than-window {
+        overflow-y: auto; }
+        .dg.main.taller-than-window .close-button {
+          opacity: 1;
+          /* TODO, these are style notes */
+          margin-top: -1px;
+          border-top: 1px solid #2c2c2c; }
+      .dg.main ul.closed .close-button {
+        opacity: 1 !important; }
+      .dg.main:hover .close-button,
+      .dg.main .close-button.drag {
+        opacity: 1; }
+      .dg.main .close-button 
+      {
+        /*opacity: 0;*/
+        -webkit-transition: opacity 0.1s linear;
+        -o-transition: opacity 0.1s linear;
+        -moz-transition: opacity 0.1s linear;
+        transition: opacity 0.1s linear;
+        border: 0;
+        line-height: 19px;
+        height: 20px;
+        /* TODO, these are style notes */
+        cursor: pointer;
+        text-align: center;
+        background-color: #000; }
+        .dg.main .close-button.close-top {
+          position: relative; }
+        .dg.main .close-button.close-bottom {
+          position: absolute; }
+        .dg.main .close-button:hover 
+        {
+          background-color: @color1;
+        }
+    .dg.a {
+      float: right;
+      margin-right: 15px;
+      overflow-y: visible; }
+      .dg.a.has-save > ul.close-top {
+        margin-top: 0; }
+      .dg.a.has-save > ul.close-bottom {
+        margin-top: 27px; }
+      .dg.a.has-save > ul.closed {
+        margin-top: 0; }
+      .dg.a .save-row {
+        top: 0;
+        z-index: 1002; }
+        .dg.a .save-row.close-top {
+          position: relative; }
+        .dg.a .save-row.close-bottom {
+          position: fixed; }
+    .dg li {
+      -webkit-transition: height 0.1s ease-out;
+      -o-transition: height 0.1s ease-out;
+      -moz-transition: height 0.1s ease-out;
+      transition: height 0.1s ease-out;
+      -webkit-transition: overflow 0.1s linear;
+      -o-transition: overflow 0.1s linear;
+      -moz-transition: overflow 0.1s linear;
+      transition: overflow 0.1s linear; }
+    .dg li:not(.folder) {
+      cursor: auto;
+      height: 27px;
+      line-height: 27px;
+      padding: 0 4px 0 5px; }
+    .dg li.folder {
+      padding: 0;
+      border-left: 4px solid transparent; }
+    .dg li.title {
+      cursor: pointer;
+      margin-left: -4px; }
+    .dg .closed li:not(.title),
+    .dg .closed ul li,
+    .dg .closed ul li > * {
+      height: 0;
+      overflow: hidden;
+      border: 0; }
+    .dg .cr {
+      clear: both;
+      padding-left: 3px;
+      height: 27px;
+      overflow: hidden; }
+    .dg .property-name {
+      cursor: default;
+      float: left;
+      clear: left;
+      width: 40%;
+      overflow: hidden;
+      text-overflow: ellipsis; }
+    .dg .c {
+      float: left;
+      width: 60%;
+      position: relative; }
+    .dg .c input[type=text] {
+      border: 0;
+      margin-top: 4px;
+      padding: 3px;
+      width: 100%;
+      float: right; }
+    .dg .has-slider input[type=text] {
+      width: 30%;
+      /*display: none;*/
+      margin-left: 0; }
+    .dg .slider {
+      float: left;
+      width: 66%;
+      margin-left: -5px;
+      margin-right: 0;
+      height: 19px;
+      margin-top: 4px; }
+    .dg .slider-fg {
+      height: 100%; }
+    .dg .c input[type=checkbox] {
+      margin-top: 7px; }
+    .dg .c select {
+      margin-top: 5px; }
+    .dg .cr.function,
+    .dg .cr.function .property-name,
+    .dg .cr.function *,
+    .dg .cr.boolean,
+    .dg .cr.boolean * {
+      cursor: pointer; }
+    .dg .cr.color {
+      overflow: visible; }
+    .dg .selector {
+      display: none;
+      position: absolute;
+      margin-left: -9px;
+      margin-top: 23px;
+      z-index: 10; }
+    .dg .c:hover .selector,
+    .dg .selector.drag {
+      display: block; }
+    .dg li.save-row {
+      padding: 0; }
+      .dg li.save-row .button {
+        display: inline-block;
+        padding: 0px 6px; }
+    .dg.dialogue {
+      background-color: #222;
+      width: 460px;
+      padding: 15px;
+      font-size: 13px;
+      line-height: 15px; }
+  
+  /* TODO Separate style and structure */
+  #dg-new-constructor {
+    padding: 10px;
+    color: #222;
+    font-family: Monaco, monospace;
+    font-size: 10px;
+    border: 0;
+    resize: none;
+    box-shadow: inset 1px 1px 1px #888;
+    word-wrap: break-word;
+    margin: 12px 0;
+    display: block;
+    width: 440px;
+    overflow-y: scroll;
+    height: 100px;
+    position: relative; }
+  
+  #dg-local-explain {
+    display: none;
+    font-size: 11px;
+    line-height: 17px;
+    border-radius: 3px;
+    background-color: #333;
+    padding: 8px;
+    margin-top: 10px; }
+    #dg-local-explain code {
+      font-size: 10px; }
+  
+  #dat-gui-save-locally {
+    display: none; }
+  
+  /** Main type */
+  .dg {
+    color: @color8;
+    .text11;
+
+    /** Auto place */
+    /* Controller row, <li> */
+    /** Controllers */ }
+    .dg.main {
+      /** Scrollbar */ }
+      .dg.main::-webkit-scrollbar {
+        width: 5px;
+        background: #1a1a1a; }
+      .dg.main::-webkit-scrollbar-corner {
+        height: 0;
+        display: none; }
+      .dg.main::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background: #676767; }
+    .dg li:not(.folder) {
+      background: @color2;
+      border-bottom: 1px solid #2c2c2c; }
+    .dg li.save-row {
+      line-height: 25px;
+      background: #dad5cb;
+      border: 0; }
+      .dg li.save-row select {
+        margin-left: 5px;
+        width: 108px; }
+      .dg li.save-row .button {
+        margin-left: 5px;
+        margin-top: 1px;
+        border-radius: 2px;
+        font-size: 9px;
+        line-height: 7px;
+        padding: 4px 4px 5px 4px;
+        background: #c5bdad;
+        color: #fff;
+        text-shadow: 0 1px 0 #b0a58f;
+        box-shadow: 0 -1px 0 #b0a58f;
+        cursor: pointer; }
+        .dg li.save-row .button.gears {
+          background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;
+          height: 7px;
+          width: 8px; }
+        .dg li.save-row .button:hover {
+          background-color: #bab19e;
+          box-shadow: 0 -1px 0 #b0a58f; }
+    .dg li.folder {
+      border-bottom: 0; }
+    .dg li.title {
+      padding-left: 16px;
+      background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+    .dg .closed li.title {
+      background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }
+    .dg .cr.boolean {
+      border-left: 3px solid #806787; }
+    .dg .cr.color {
+      border-left: 3px solid; }
+    .dg .cr.function {
+      border-left: 3px solid #e61d5f; }
+    .dg .cr.number {
+      border-left: 3px solid #2FA1D6; }
+      .dg .cr.number input[type=text] {
+        color: #2FA1D6; }
+    .dg .cr.string {
+      border-left: 3px solid #1ed36f; }
+      .dg .cr.string input[type=text] {
+        color: #1ed36f; }
+    .dg .cr.function:hover, .dg .cr.boolean:hover {
+      background: #111; }
+    .dg .c input[type=text] {
+      background: #303030;
+      outline: none; }
+      .dg .c input[type=text]:hover {
+        background: #3c3c3c; }
+      .dg .c input[type=text]:focus {
+        background: #494949;
+        color: #fff; }
+    .dg .c .slider {
+      background: #303030;
+      cursor: ew-resize; }
+    .dg .c .slider-fg {
+      background: #2FA1D6;
+      max-width: 100%; }
+    .dg .c .slider:hover {
+      background: #3c3c3c; }
+      .dg .c .slider:hover .slider-fg {
+        background: #44abda; }
+  

@@ -4,8 +4,6 @@
 	list-style-type: none;
 	position: relative;
 	
-	/*font: 12px 'Lucida Grande', sans-serif;*/
-
 	color: #eee;
 	font: 11px 'Lucida Grande', sans-serif;
 	text-shadow: 0 -1px 0 #111;
@@ -74,7 +72,7 @@ ul.vtree {
 	vertical-align: top;
 	cursor: pointer;
 	/*max-width: 100%;*/
-	width: 100%;
+	width: calc(100% - 18px);
 	margin-left: 18px;
 	margin-bottom: 2px;
 	/*padding: 0 2px;*/
@@ -117,6 +115,6 @@ ul.vtree {
 }
 
 .vtree li.vtree-leaf, .vtree li.vtree-leaf::before, .vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle {
-	background-image: url('./../../textures/vanillatree_images3.png');
+	background-image: url('./../textures/vanillatree_images3.png');
 	color: #fff;
 }
