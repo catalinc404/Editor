@@ -4,16 +4,13 @@
     <!-- ----------------------------------------------------------------------------- -->
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!-- ----------------------------------------------------------------------------- -->
+
+        <!-- LESS ------------------------------------------------------------------------ -->
         <link rel="stylesheet/less" type="text/css" href="./css/styles.less"/>
         <script>less = { env: 'development' };</script>
         <script src="./js/libs/less.js" data-env="development"></script>
-        <script>less.watch();</script>
-        <!-- ----------------------------------------------------------------------------- -->
-
-        <script src="./js/libs/vanillatree.js"></script>
-        <script src="./js/libs/dat.gui.js"></script>
-
+        
+        <!-- THREE.js--------------------------------------------------------------------- -->
         <script src="./js/libs/three.js/three.js"></script>
         <script src="./js/libs/three.js/TransformControls.js"></script>
         <script src="./js/libs/three.js/loaders/LoaderUtils.js"></script>
@@ -24,17 +21,24 @@
         <script src="./js/libs/three.js/loaders/ColladaLoader.js"></script>
         <script src="./js/libs/three.js/loaders/TDSLoader.js"></script>
 
+        <!-- UI -------------------------------------------------------------------------- -->
+        <script src="./js/libs/vanillatree.js"></script>
+        <script src="./js/libs/dat.gui.js"></script>
         <script src="./js/ui/EventDispatcher.js"></script>
         <script src="./js/ui/Resizer.js"></script>        
         <script src="./js/ui/PropertiesView.js"></script>
         <script src="./js/ui/TreeView.js"></script>
         <script src="./js/ui/Layout.js"></script>
 
+        <!-- EDITOR ---------------------------------------------------------------------- -->
         <script src="./js/editor/Editor_Basics.js"></script>
         <script src="./js/editor/Editor_Layout.js"></script>
         <script src="./js/editor/Editor_view.js"></script>
         <script src="./js/editor/Editor_ViewWebGL.js"></script>
         <script src="./js/editor/Editor.js"></script>
+
+        <!-- MAIN ------------------------------------------------------------------------ -->
+        <script src="./js/main.js"></script>
 
     </head>
     <!-- ----------------------------------------------------------------------------- -->
@@ -55,9 +59,22 @@
                     </li>
                     <li><a href="#" class="text13">Edit</a></li>
                     <li><a href="#" class="text13">View</a></li>
+                    <li><a href="#" class="text13">Settings</a>
+                        <ul>
+                            <li><a href="#">Theme</a>
+                                <ul>
+                                    <li><a href="#" onclick="changeTheme('default');">Default</a></li>
+                                    <li><a href="#" onclick="changeTheme('blue');">Blue</a></li>
+                                    <li><a href="#" onclick="changeTheme('green');">Green</a></li>
+                                    <li><a href="#" onclick="changeTheme('red');">Red</a></li>
+                                    <li><a href="#" onclick="changeTheme('light');">Light</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
                     <li><a href="#" class="text13">Help</a>
                         <ul>
-                            <li><a href="#">About</a></li>
+                            <li><a href="#" onclick="about();">About</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -107,6 +124,20 @@
         <div id="resizerBottom" class="resizerY"></div>
 
         <div id="footer" class="page_element background-color-lighter"></div>
+
+        <div id="messageboxcontainer" class="page_element noselect" style="visibility:hidden; float:left; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1000000;">
+            <div id="messagebox" class="page_element border-solid-1px" style="left:calc(50% - 200px); top:40%; width:400px;">
+                <div id="messageboxtitle" class="text13 background-color-dark border-bottom-page-element" style="height:26px; padding-top: 8px; padding-left: 6px;">Title</div>
+                <div id="messageboxcontents" class="text13 background-color-dark border-bottom-page-element" style="padding-top: 8px; padding-left: 6px;">Contents</div>
+                <div id="messageboxbuttons" class="background-color-dark" style="height:30px; padding-top: 8px">
+                    <div id="messageboxbuttonscontainer" style="text-align:center;">
+                        <button id="messageboxbuttonok" type="button" style="visibility:hidden;">OK</button>
+                        <div id="messageboxbuttonspacer" style="visibility:hidden;">&nbsp;&nbsp;&nbsp;</div>
+                        <button id="messageboxbuttoncancel" type="button" style="visibility:hidden;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
     <!-- ----------------------------------------------------------------------------- -->
 </html>

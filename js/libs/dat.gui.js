@@ -2703,7 +2703,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// CSS to embed in build
 	
-	_css2.default.inject(_style2.default);
+	//_css2.default.inject(_style2.default);
 	
 	/** Outer-most className for GUI's */
 	var CSS_NAMESPACE = 'dg';

@@ -23,6 +23,8 @@ function ViewWebGL( eventDispatcher, element, configuration )
 
     this.currentControlMode = EControlMode.NONE;    
 
+    this.clearColor = 0xaaaaaa;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.sceneGizmos = new THREE.Scene();    
 
@@ -33,6 +35,7 @@ function ViewWebGL( eventDispatcher, element, configuration )
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.handleSceneObjectsSelected.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectsDeselected", this.handleSceneObjectsDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "themeChanged",             this.handleThemeChanged.bind( this ) );
 
     this.eventDispatcher.dispatchEvent( "onViewCreated", this );
 }
@@ -213,7 +216,7 @@ ViewWebGL.prototype.render = function()
         }
     }
 
-    this.renderer.setClearColor( 0xaaaaaa );
+    this.renderer.setClearColor( this.clearColor );
     this.renderer.clear();
 
     this.renderer.render( this.editor.scene, this.camera );
@@ -425,6 +428,13 @@ ViewWebGL.prototype.handleSceneObjectsDeselected = function( objects )
 ViewWebGL.prototype.handleObjectTransformChange = function(  )
 {
     this.eventDispatcher.dispatchEvent( "render" );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.handleThemeChanged = function( colors )
+{
+    this.clearColor = colors[5];
+    this.requestRender();
 }
 
 //////////////////////////////////////////////////////////////////////////////
