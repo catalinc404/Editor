@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" ></html>
+<html>
+    <!-- ----------------------------------------------------------------------------- -->
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="./libs/vanillatree.css" rel="stylesheet">        
+        <style>
+            html,
+            body
+            {
+                /* set margin to 0 and overflow to hidden, to use the complete page */
+                overflow: hidden;
+                margin: 0;
+                padding: 0;
+                height:100%;
+                width: 100%;
+                min-width: 900;
+                min-height: 600;                
+            }
+            .element
+	        {
+                overflow:hidden; 
+		        width: 0px; 
+                height: 0px;
+                visibility: hidden;
+                position: absolute;
+	        }
+            .resizerX
+	        {
+                overflow: hidden; 
+                cursor: e-resize;
+                width: 0px; 
+                height: 0px;
+                visibility: hidden;
+                position: absolute;
+                background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAARCAYAAAAYNhYvAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAGElEQVQYV2P4++c/CIBpBhADhoe8zP//AJT5qfyyqEgyAAAAAElFTkSuQmCC')  no-repeat center center;
+                background-color: rgba(51, 51, 51, 1);
+	        }
+            .resizerY
+	        {
+                overflow:hidden; 
+		        background-color: #333;
+                cursor: n-resize;
+                width: 0px; 
+                height:0px;
+                visibility: hidden;
+                position: absolute;
+                background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAADCAYAAAB1c+RqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAG0lEQVQYV2P4++c/CFBEM4AYlGKibMJP//8PAO7Dqfz5wz1UAAAAAElFTkSuQmCC')  no-repeat center center;
+                background-color: rgba(51, 51, 51, 1);
+	        }
+            .selectionRectangle
+            {
+                position:absolute;
+                top: 0px;
+                left: 0px;
+                height: 0px;
+                width: 0px;
+                z-index: 50;
+                background-color: rgba(235, 235, 235, 0.5);
+                border: 1px #a8a8a8;
+                margin: 0; 
+                padding: 0; 
+                pointer-events:none;                
+            }
+            .page_element
+            {
+                position: absolute;
+                overflow: hidden;
+                background-color: #a8a8a8;
+                
+                -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+                -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+                box-sizing: border-box;         /* Opera/IE 8+ */
+                -webkit-padding-start: 0px;
+            }
+            .noselect 
+            {
+              -webkit-touch-callout: none; /* iOS Safari */
+              -webkit-user-select: none; /* Safari */
+              -khtml-user-select: none; /* Konqueror HTML */
+              -moz-user-select: none; /* Firefox */
+              -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+            }        
+            .glyphicon-pad-right-7px:before 
+            {
+              margin-right: 7px;
+            }             
+            .glyphicon-none:before 
+            {
+              content: "\2122";
+              color: transparent !important;
+            }
+            .horizontalmenu
+            {
+              z-index: 100;
+            }
+        </style>
+
+        <script src="./libs/vanillatree.js"></script>
+        <script src="./libs/dat.gui.js"></script>
+        
+        <script src="./libs/three.js/three.js"></script>
+        <script src="./libs/three.js/TransformControls.js"></script>
+        <script src="./libs/three.js/loaders/LoaderUtils.js"></script>
+        <script src="./libs/three.js/loaders/LoadingManager.js"></script>
+        <script src="./libs/three.js/loaders/DDSLoader.js"></script>
+		<script src="./libs/three.js/loaders/MTLLoader.js"></script>
+        <script src="./libs/three.js/loaders/OBJLoader.js"></script>
+        <script src="./libs/three.js/loaders/ColladaLoader.js"></script>
+        <script src="./libs/three.js/loaders/TDSLoader.js"></script>
+
+
+        <script src="./libs/resizer.js"></script>
+        <script src="./layout/EventDispatcher.js"></script>
+        <script src="./layout/PropertiesView.js"></script>
+        <script src="./layout/TreeView.js"></script>
+        <script src="./layout/Layout.js"></script>
+        <script src="./editor/editor_Layout_simple.js"></script>
+        <script src="./editor/editor_simple.js"></script>
+    </head>
+    <!-- ----------------------------------------------------------------------------- -->
+    
+    <!-- ----------------------------------------------------------------------------- -->
+    <body onload="init();" onresize="resize();">        
+        <div id="header" class="page_element" style="background-color:#757575;"></div>
+        <div id="header-tabs" class="page_element" style="background-color:#757575;"></div>
+        <div id="left" class="page_element">
+            <div id="tree-view-menu" style="background-color:#757575; border: 1px solid #000;">
+                <!--<div id="tree-view-menu-container" style="left: 4px; top: 2px; width:100%; position:relative">-->
+                    <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneOpen();"><span class="glyphicon glyphicon-open"></span></button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneSave();"><span class="glyphicon glyphicon-save"></span></button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneNew();"><span class="glyphicon glyphicon-file"></span></button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" style="padding-top: 4px; padding-left: 6px; padding-bottom: 2px; padding-right:6px;" onclick="sceneImport();"><span class="glyphicon glyphicon-folder-open"></span></button>
+                <!--</div>-->
+            </div>
+            <div id="tree-view" style="overflow: auto; width:100%;" ></div>
+        </div>
+        <div id="resizerLeft" class="resizerX"></div>
+        <div id="editor" class="page_element" style="overflow:visible;">
+            
+        </div>
+        <div id="Select-rectangle" style="position:absolute;top: 0px;left: 0px;z-index: 50;height: 0px; width: 0px;background-color: rgba(235, 235, 235, 0.5);border: 1px #a8a8a8; margin: 0; padding: 0; pointer-events:none;"></div>
+        <div id="resizerRight" class="resizerX"></div>
+        <div id="right" class="page_element" style="overflow:auto"></div>
+    </body>
+    <!-- ----------------------------------------------------------------------------- -->
+</html>

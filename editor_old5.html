@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <!-- ----------------------------------------------------------------------------- -->
+    <head>
+        <script src="./libs/dat.gui.js"></script>
+        <script src="./libs/stats.min.js"></script>
+
+        <script src="./libs/three.js/three.js"></script>
+        <script src="./libs/three.js/TransformControls.js"></script>
+        <script src="./libs/three.js/loaders/LoaderUtils.js"></script>
+
+        <script src="./libs/three.js/loaders/LoadingManager.js"></script>
+
+        <script src="./libs/three.js/loaders/DDSLoader.js"></script>
+		<script src="./libs/three.js/loaders/MTLLoader.js"></script>
+        <script src="./libs/three.js/loaders/OBJLoader.js"></script>
+        <script src="./libs/three.js/loaders/ColladaLoader.js"></script>
+        <script src="./libs/three.js/loaders/TDSLoader.js"></script>
+        
+        
+        <!--
+        <script type="text/javascript" src="http://benvanik.github.io/WebGL-Inspector/core/lib/gli.all.js"></script>
+        <script type="text/javascript" src="../../core/embed.js"></script>
+        <link rel="stylesheet" href="http://benvanik.github.io/WebGL-Inspector/core/lib/gli.all.css">
+        <script type="text/javascript" src="http://benvanik.github.io/WebGL-Inspector/core/embed.js"></script>
+        -->
+
+        <script src="./editor/scene1.js"></script>
+        <style>
+            body
+            {
+                /* set margin to 0 and overflow to hidden, to use the complete page */
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <!-- ----------------------------------------------------------------------------- -->
+    
+    <!-- ----------------------------------------------------------------------------- -->
+    <body onload="init();" onresize="resize();">
+        <!-- Div which will hold the Output -->
+        <div id="WebGL-output" onmousedown="handleMouseDown"></div>
+        <div id="Stats-output"></div>
+        <div id="Select-rectangle" style="position:absolute;top: 0px;left: 0px;z-index: 50;height: 0px;
+            width: 0px;background-color: rgba(235, 235, 235, 0.5);border: 1px #a8a8a8;
+            margin: 0; padding: 0; pointer-events:none;"></div>
+        </div>
+    </body>
+    <!-- ----------------------------------------------------------------------------- -->
+</html>

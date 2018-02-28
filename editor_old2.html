@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" ></html>
+<html>
+    <!-- ----------------------------------------------------------------------------- -->
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- ----------------------------------------------------------------------------- -->
+        <link rel="stylesheet/less" type="text/css" href="./css/styles.less"/>
+        <script>less = { env: 'development' };</script>
+        <script src="./js/libs/less.js" data-env="development"></script>
+        <script>less.watch();</script>
+        <!-- ----------------------------------------------------------------------------- -->
+
+        <script src="./js/libs/vanillatree.js"></script>
+        <script src="./js/libs/dat.gui.js"></script>
+
+        <script src="./js/libs/three.js/three.js"></script>
+        <script src="./js/libs/three.js/TransformControls.js"></script>
+        <script src="./js/libs/three.js/loaders/LoaderUtils.js"></script>
+        <script src="./js/libs/three.js/loaders/LoadingManager.js"></script>
+        <script src="./js/libs/three.js/loaders/DDSLoader.js"></script>
+		<script src="./js/libs/three.js/loaders/MTLLoader.js"></script>
+        <script src="./js/libs/three.js/loaders/OBJLoader.js"></script>
+        <script src="./js/libs/three.js/loaders/ColladaLoader.js"></script>
+        <script src="./js/libs/three.js/loaders/TDSLoader.js"></script>
+
+        <script src="./js/ui/EventDispatcher.js"></script>
+        <script src="./js/ui/Resizer.js"></script>        
+        <script src="./js/ui/PropertiesView.js"></script>
+        <script src="./js/ui/TreeView.js"></script>
+        <script src="./js/ui/Layout.js"></script>
+
+        <script src="./js/editor/Editor_Basics.js"></script>
+        <script src="./js/editor/Editor_Layout.js"></script>
+        <script src="./js/editor/Editor_view.js"></script>
+        <script src="./js/editor/Editor_ViewWebGL.js"></script>
+        <script src="./js/editor/Editor.js"></script>
+
+    </head>
+    <!-- ----------------------------------------------------------------------------- -->
+    
+    <!-- ----------------------------------------------------------------------------- -->
+    <body onload="setup();" onresize="resize();">
+        <div id="header" class="page_element background-color-dark border-bottom-page-element" style="overflow:visible">
+            <nav id="menu" style="left:4px; top:4px;height: 22px;">
+                <ul style="border:none;">
+                    <li><a href="#" class="text13">File</a>
+                        <ul>
+                            <li><a href="#">Open scene</a></li>
+                            <li><a href="#">Save scene</a></li>
+                            <li><a href="#">Save scene as...</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">Export selected</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#" class="text13">Edit</a></li>
+                    <li><a href="#" class="text13">View</a></li>
+                    <li><a href="#" class="text13">Help</a>
+                        <ul>
+                            <li><a href="#">About</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div id="header-tabs" class="page_element background-color-dark border-bottom-page-element"></div>
+        <div id="header-toolbar" class="page_element background-color-dark border-bottom-page-element"></div>
+        <div id="left" class="page_element">
+            <div id="tree-view-header" class="noselect text13 background-color-dark border-bottom-page-element" style="padding-top: 8px; padding-left: 6px;">Scene Explorer</div>
+            <div id="tree-view" style="overflow: auto; width:100%;" ></div>
+        </div>
+        <div id="resizerLeft" class="resizerX"></div>
+        <div id="editor" class="page_element" style="overflow:visible;">
+            <!-- ----------------------------------------------------------------------------- -->
+            <!-- First row                                                                     -->
+            <!-- ----------------------------------------------------------------------------- -->
+            <div id="panelViewTL" class="page_element">
+                <canvas id="viewTL" class="element noselect"></canvas>
+            </div>
+            <div id="resizerXTop" class="resizerX"></div>
+            <div id="panelViewTR" class="page_element">
+                <canvas id="viewTR" class="element noselect"></canvas>
+            </div>
+
+            <!-- ----------------------------------------------------------------------------- -->
+            <!-- Horizontal resizer                                                            -->
+            <!-- ----------------------------------------------------------------------------- -->
+            <div id="resizerY" class="resizerY"></div>
+
+            <!-- ----------------------------------------------------------------------------- -->
+            <!-- Second row                                                                    -->
+            <!-- ----------------------------------------------------------------------------- -->
+            <div id="panelViewBL" class="page_element">
+                <canvas id="viewBL" class="element noselect"></canvas>
+            </div>
+            <div id="resizerXBottom" class="resizerX"></div>
+            <div id="panelViewBR" class="page_element">
+                <canvas id="viewBR" class="element noselect"></canvas>
+            </div>
+            <div id="viewSelect" class="selectionRectangle"></div>
+        </div>
+        <div id="resizerRight" class="resizerX"></div>
+        <div id="right" class="page_element">
+            <div id="properties-view-header" class="noselect text13 background-color-dark border-bottom-page-element" style="padding-top: 8px; padding-left: 6px;">Properties View</div>
+            <div id="properties-view" style="overflow: auto; width:100%;" ></div>
+        </div>
+        <div id="resizerBottom" class="resizerY"></div>
+
+        <div id="footer" class="page_element background-color-lighter"></div>
+    </body>
+    <!-- ----------------------------------------------------------------------------- -->
+</html>

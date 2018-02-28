@@ -1,7 +1,8 @@
 //@import (reference) "base.less";
 
-//@tint: #c3e0f8;
-@tint: #ffffff;
+//@tint: #07fd72;
+//@tint: #ff7575;
+@tint: #00ffff;
 
 @color1:  multiply( #111111, @tint);
 @color2:  multiply( #1a1a1a, @tint);
@@ -50,6 +51,44 @@ body
     /* Opera/IE 8+ */
 }
 
+.background-color(@color: @color-dark)
+{
+    background-color: @color;
+}
+
+.border-solid-top(@size: 3px; @color: @color-lighter) 
+{
+    border-top: @size solid @color;
+}
+
+.border-solid-bottom(@size: 3px; @color: @color-lighter) 
+{
+    border-bottom: @size solid @color;
+}
+
+.border-solid-left(@size: 3px; @color: @color-lighter) 
+{
+    border-left: @size solid @color;
+}
+
+.border-solid-right(@size: 3px; @color: @color-lighter) 
+{
+    border-right: @size solid @color;
+}
+
+.border-solid(@size: 3px; @color: @color-lighter)
+{
+    border: @size solid @color;
+}
+
+.text(@size: 11; @color: @font-color; @color-shadow: @font-color-shadow)
+{
+    font-size: @size;
+    font-family: 'Lucida Grande', sans-serif;
+    text-shadow: 0 -1px 0 @color-shadow;
+    color: @color;
+}
+
 .base-elemennt
 {
     position: absolute;    
@@ -94,13 +133,14 @@ body
     position: absolute;
     top: 0px;
     left: 0px;
-    .nosize;
     z-index: 50;
-    background-color: rgba(235, 235, 235, 0.5);
-    border: 1px @color-lighter;
     margin: 0;
     padding: 0;
     pointer-events: none;
+
+    .nosize;
+    .background-color(@color: rgba(235, 235, 235, 0.5));
+    .border-solid( @size: 1px; @color: @color-lighter);
 }
 
 .noselect 
@@ -113,14 +153,6 @@ body
     user-select: none;              /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 
-.text(@size: 11; @color: @font-color; @color-shadow: @font-color-shadow)
-{
-    font-size: @size;
-    font-family: 'Lucida Grande', sans-serif;
-    text-shadow: 0 -1px 0 @color-shadow;
-    color: @color;
-}
-
 .text11
 {
     .text(12px);
@@ -131,19 +163,9 @@ body
     .text(13px);
 }
 
-.border-bottom(@size: 3px; @color: @color-lighter) 
-{
-    border-bottom: @size solid @color;
-}
-
 .border-bottom-page-element
 {
-    .border-bottom;
-}
-
-.background-color(@color: @color-dark)
-{
-    background-color: @color;
+    .border-solid-bottom;
 }
 
 .background-color-dark
@@ -166,7 +188,8 @@ body
     height: 1px;
     margin: 3px 0;
     overflow: hidden;
-    background-color: @color-light;
+
+    .background-color(@color: @color-light);
 }
 
 #menu ul
@@ -176,15 +199,17 @@ body
     float: left;
     padding: 0;
     margin: 0px;
-    border: 1px solid @color-light;
+
+    .border-solid(@size: 1px; @color: @color-light);
 }
 
 #menu ul a 
 {
     display: block;
     padding: 3px 7px;
-    .text13;
     text-decoration: none;
+
+    .text13;
 }
 
 #menu ul li 
@@ -198,12 +223,13 @@ body
 #menu ul li.current-menu-item 
 {
     z-index: 1000;
-    background: @color-light;
+
+    .background-color(@color: @color-light);
 }
 
 #menu ul li:hover 
 {
-    background: @hover-color;
+    .background-color(@color: @hover-color);
 }
 
 #menu ul ul 
@@ -213,6 +239,7 @@ body
     top: 100%;
     left: 0;
     padding: 0;
+
     .background-color;
 }
 
@@ -238,7 +265,6 @@ body
 {
     display: block;
 }
-
 
 //------------------------------------------------------------------------------
 // Vanilla Tree 
@@ -317,12 +343,12 @@ ul.vtree {
 	margin-left: 18px;
     margin-bottom: 2px;
 
-    .border-bottom(1px);
+    .border-solid-bottom(1px);
 }
 
 .vtree li.vtree-leaf a.vtree-leaf-label:hover 
 {
-	background-color: @hover-color;
+	.background-color(@color: @hover-color);
 }
 
 .vtree li.vtree-leaf.vtree-selected > a.vtree-leaf-label 
@@ -333,26 +359,31 @@ ul.vtree {
 .vtree-contextmenu {
 	position: absolute;
 	z-index: 9999999;
-	border: solid 1px #ccc;
-	background: #eee;
 	padding: 0px;
 	margin: 0px;
-	display: none;
+    display: none;
+    
+    .border-solid(@size: 1px; @color: @color-light);
+	.background-color;
+
 }
 
 .vtree-contextmenu li {
 	list-style: none;
 	padding: 1px 5px;
 	margin: 0px;
-	color: #fff;
+	
 	line-height: 20px;
 	height: 20px;
-	cursor: default;
+    cursor: default;
+    
+    color: @font-color;
 }
 
-.vtree-contextmenu li:hover {
-	color: #fff;
-	background-color: #868686;
+.vtree-contextmenu li:hover 
+{
+	color: @font-color;
+	.background-color(@color: #868686);
 }
 
 .vtree li.vtree-leaf, .vtree li.vtree-leaf::before, .vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle {
@@ -597,7 +628,7 @@ ul.vtree {
         background: #676767; }
     .dg li:not(.folder) {
       background: @color2;
-      border-bottom: 1px solid #2c2c2c; }
+      .border-solid-bottom(@size: 1px; @color: #2c2c2c); }
     .dg li.save-row {
       line-height: 25px;
       background: #dad5cb;
