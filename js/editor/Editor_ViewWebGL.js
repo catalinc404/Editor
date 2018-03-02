@@ -433,7 +433,7 @@ ViewWebGL.prototype.handleObjectTransformChange = function(  )
 //////////////////////////////////////////////////////////////////////////////
 ViewWebGL.prototype.handleThemeChanged = function( colors )
 {
-    this.clearColor = colors[5];
+    this.clearColor = colors.editor_view_background;
     this.requestRender();
 }
 

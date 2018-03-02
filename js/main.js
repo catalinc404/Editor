@@ -4,6 +4,8 @@ var ui = new UI( editorPageLayout );
 function setup()
 {
     ui.setupLayoutClasses( ui.UIData );
+    eventDispatcher.dispatchEvent( "onUISetup" );
+
     resize();
 
     //createDemoScene( editor );
@@ -16,10 +18,9 @@ function resize()
     var area = { left: 0, top: 0, width: width, height: height };
     
     ui.setupLayout( area, ui.UIData );
+
+    eventDispatcher.dispatchEvent( "onUIResize" );
 }
-
-//less.watch();
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,136 +78,10 @@ function createDemoScene( editor )
     editor.addSceneObject( plane );
 }
 
-
 //////////////////////////////////////////////////////////////////////////////
-function sceneOpen() 
-{
-    var fileSelector = document.createElement( "input" );
-    fileSelector.type = 'file';
-    fileSelector.addEventListener('change', function( event ) 
-                                            {
-                                                if( event.target.files.length > 0 )
-                                                {
-                                                    var file = event.target.files[0];
-                                                    if( file.name.match(/\.(json|js)$/) ) 
-                                                    {
-                                                        var tmpPath = URL.createObjectURL( file );
-                                                        var loader = new THREE.ObjectLoader();
-                                                        loader.load( tmpPath, function ( obj ) { editor.addSceneObject( obj ); } );
-                                                    }
-                                                    else
-                                                    if( file.name.match(/\.dae$/) ) 
-                                                    {
-                                                        var tmpPath = URL.createObjectURL( file );
-                                                        editor.loadDAE( tmpPath, file.name );
-                                                    }
-                                                }
-                                            } );
-    fileSelector.click();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-function sceneSave() 
-{
-    var fileSelector = document.createElement( "input" );
-    fileSelector.type = 'file';
-    fileSelector.click();
-
-    if( fileSelector.files.length > 0 )
-    {
-        var exporter = new THREE.FileLoader();
-        var sceneJson = JSON.stringify( scene.toJSON() );
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-function sceneNew() 
-{
-
-}
-
-//////////////////////////////////////////////////////////////////////////////
-function sceneImport()
-{
-    var fileSelector = document.createElement( "input" );
-    fileSelector.type = 'file';
-    fileSelector.addEventListener('change', function( event ) 
-                                            {
-                                                if( event.target.files.length > 0 )
-                                                {
-                                                    var file = event.target.files[0];
-                                                    if( file.name.match(/\.(json|js)$/) ) 
-                                                    {
-                                                        var tmpPath = URL.createObjectURL( file );
-                                                        var loader = new THREE.ObjectLoader();
-                                                        loader.load(  tmpPath, function ( obj ) { editor.addSceneObject( obj ); } );
-                                                    }
-                                                    else
-                                                    if( file.name.match(/\.dae$/) ) 
-                                                    {
-                                                        var tmpPath = URL.createObjectURL( file );
-                                                        editor.loadDAE( tmpPath, file.name );
-                                                    }
-                                                }
-                                            } );
-    fileSelector.click();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-var currentTheme = "default";
-
-function parseRGBColor( color )
-{
-    var rgbArray = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
-    return (rgbArray[1] << 16 | rgbArray[2] << 8 | rgbArray[3] << 0);
-}
-
 function changeTheme( theme )
 {
-    if( theme === undefined || theme === currentTheme )
-    {
-        return;
-    }
-
-    currentTheme = theme;
-
-    var newColor = "#111111";
-    switch( theme )
-    {
-        case "blue":    newColor = "@basecolor-blue";  break;
-        case "red":     newColor = "@basecolor-red";   break;
-        case "green":   newColor = "@basecolor-green"; break;
-        case "light":   newColor = "@basecolor-light"; break;
-        default:
-        break;
-    }
-
-    less.refresh( false, { "@basecolor" : newColor } ).then(
-        function()
-        {
-            var colors = [];
-
-            var styleSheetList = document.styleSheets;
-            for(var i = 0; i < styleSheetList.length; i++)
-            {
-                var sheet = styleSheetList[i];
-                for( var i = 0; i < sheet.rules.length; ++i )
-                {
-                    var rule = sheet.rules[i];
-                    if( rule.selectorText == ".color1" ) colors[0] = parseRGBColor( rule.style.color );
-                    if( rule.selectorText == ".color2" ) colors[1] = parseRGBColor( rule.style.color );
-                    if( rule.selectorText == ".color3" ) colors[2] = parseRGBColor( rule.style.color );
-                    if( rule.selectorText == ".color4" ) colors[3] = parseRGBColor( rule.style.color );
-                    if( rule.selectorText == ".color5" ) colors[4] = parseRGBColor( rule.style.color );
-                    if( rule.selectorText == ".color6" ) colors[5] = parseRGBColor( rule.style.color );
-                    if( rule.selectorText == ".color7" ) colors[6] = parseRGBColor( rule.style.color );
-                    if( rule.selectorText == ".color8" ) colors[7] = parseRGBColor( rule.style.color );
-                }
-            }
-        
-            eventDispatcher.dispatchEvent( "themeChanged", colors );
-        }
-      );
+    eventDispatcher.dispatchEvent( "themeChange", theme );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -214,4 +89,3 @@ function about()
 {
     messageBox( { title: "About", contents: "<br>WebGL Editor<br>version 0.0.1<br><br>", type: EMessageBox.OK });
 }
-

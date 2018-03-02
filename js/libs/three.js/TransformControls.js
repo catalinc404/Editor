@@ -876,8 +876,11 @@
 						oldRotationMatrix.extractRotation( scope.object.matrix );
 						worldRotationMatrix.extractRotation( scope.object.matrixWorld );
 
-						parentRotationMatrix.extractRotation( scope.object.parent.matrixWorld );
-						parentScale.setFromMatrixScale( tempMatrix.getInverse( scope.object.parent.matrixWorld ) );
+						if( scope.object.parent )
+						{
+							parentRotationMatrix.extractRotation( scope.object.parent.matrixWorld );
+							parentScale.setFromMatrixScale( tempMatrix.getInverse( scope.object.parent.matrixWorld ) );
+						}
 
 						offset.copy( planeIntersect.point );
 
