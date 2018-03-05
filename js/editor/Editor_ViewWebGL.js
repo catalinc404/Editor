@@ -38,6 +38,26 @@ function ViewWebGL( eventDispatcher, element, configuration )
     this.eventDispatcher.addEventListener( "themeChanged",             this.handleThemeChanged.bind( this ) );
 
     this.eventDispatcher.dispatchEvent( "onViewCreated", this );
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.depthMaterial;
+    this.saoMaterial;
+    this.saoModulateMaterial;
+    this.normalMaterial;
+    this.vBlurMaterial;
+    this.hBlurMaterial;
+    this.copyMaterial;
+    
+    this.depthRenderTarget;
+    this.normalRenderTarget;
+    this.saoRenderTarget;
+    this.beautyRenderTarget;
+    this.blurIntermediateRenderTarget;
+    
+    this.composer;
+    this.renderPass;
+    this.saoPass;
+    this.copyPass;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,6 +126,14 @@ ViewWebGL.prototype.init = function( editor )
     this.canvas.addEventListener( "mousemove",  this.handleMouseMove.bind( this ),  false );    
     this.canvas.addEventListener( "mouseup",    this.handleMouseUp.bind( this ),    false );
     this.canvas.addEventListener( "mouseleave", this.handleMouseLeave.bind( this ), false );
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.composer = new THREE.EffectComposer( this.renderer );
+	this.renderPass = new THREE.RenderPass( this.scene, this.camera );
+	this.composer.addPass( this.renderPass );
+	this.saoPass = new THREE.SAOPass( this.editor.scene, this.camera, false, true );
+	this.saoPass.renderToScreen = true;
+	this.composer.addPass( this.saoPass );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +247,12 @@ ViewWebGL.prototype.render = function()
     this.renderer.setClearColor( this.clearColor );
     this.renderer.clear();
 
+    //this.renderPass.scene = this.editor.scene;
+    //this.saoPass.scene = this.editor.scene;
+    //this.composer.render();
+    
     this.renderer.render( this.editor.scene, this.camera );
+
     this.renderer.render( this.editor.sceneHelpers, this.camera );
     this.renderer.render( this.sceneGizmos, this.camera );
     
@@ -268,6 +301,8 @@ ViewWebGL.prototype.resize = function( width, height )
     this.camera.updateProjectionMatrix();
 
     this.pickingRenderTarget.setSize( width, height );
+
+    this.composer.setSize( width, height );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

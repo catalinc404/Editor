@@ -213,6 +213,12 @@ PropertyView.prototype.setProperties = function( object )
             geometryGUI.add( object.geometry, "name" );
         }
     }
+    else
+    if( object instanceof THREE.AmbientLight )
+    {
+        gui.addColor( object, "color" ).onChange( this.fnRequestRender );
+        gui.add( object, "intensity" ).onChange( this.fnRequestRender );
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

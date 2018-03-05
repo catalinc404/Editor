@@ -359,3 +359,27 @@ Editor.prototype.loadDAE = function ( path, objectName )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.loadOBJ = function ( path, objectName )
+{
+    var basePath = path.substr(0, path.lastIndexOf( "/" ) + 1 );
+    var name = path.substr( path.lastIndexOf( "/" ) + 1 )
+    name = name.substr(0, name.lastIndexOf( "." ));
+
+    var mtlLoader = new THREE.MTLLoader();
+    mtlLoader.setPath( basePath );
+    mtlLoader.load( name + ".mtl", function( materials ) 
+    {
+		materials.preload();
+
+        var objLoader = new THREE.OBJLoader();
+		objLoader.setMaterials( materials );
+		objLoader.setPath( basePath );
+        objLoader.load( name + ".obj", function ( object ) 
+        {
+            object.name = name;
+            editor.addSceneObject( object );
+        } );
+	} );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

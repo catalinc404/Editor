@@ -8,7 +8,7 @@ function setup()
 
     resize();
 
-    //createDemoScene( editor );
+    createDemoScene( editor );
 }
 
 function resize()
@@ -40,6 +40,7 @@ function createDemoScene( editor )
     spotLight.castShadow = true;    
     editor.addSceneObject( spotLight );
 
+    /*
     var cubeGeometry = new THREE.BoxGeometry( 4, 4, 4 )
     var cubeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: editor.defaultTexture } );
     var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
@@ -76,6 +77,9 @@ function createDemoScene( editor )
     plane.position.z = 0;
     plane.receiveShadow = true;
     editor.addSceneObject( plane );
+    */
+
+    //editor.loadOBJ( "data/Room.obj" );
 }
 
 //////////////////////////////////////////////////////////////////////////////

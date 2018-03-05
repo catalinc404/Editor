@@ -13,6 +13,7 @@
         <!-- THREE.js--------------------------------------------------------------------- -->
         <script src="./js/libs/three.js/three.js"></script>
         <script src="./js/libs/three.js/TransformControls.js"></script>
+
         <script src="./js/libs/three.js/loaders/LoaderUtils.js"></script>
         <script src="./js/libs/three.js/loaders/LoadingManager.js"></script>
         <script src="./js/libs/three.js/loaders/DDSLoader.js"></script>
@@ -20,6 +21,16 @@
         <script src="./js/libs/three.js/loaders/OBJLoader.js"></script>
         <script src="./js/libs/three.js/loaders/ColladaLoader.js"></script>
         <script src="./js/libs/three.js/loaders/TDSLoader.js"></script>
+
+        <script src="./js/libs/three.js/postprocessing/EffectComposer.js"></script>
+		<script src="./js/libs/three.js/postprocessing/RenderPass.js"></script>
+		<script src="./js/libs/three.js/postprocessing/ShaderPass.js"></script>
+		<script src="./js/libs/three.js/postprocessing/SAOPass.js"></script>
+
+		<script src="./js/libs/three.js/shaders/CopyShader.js"></script>
+		<script src="./js/libs/three.js/shaders/SAOShader.js"></script>
+		<script src="./js/libs/three.js/shaders/DepthLimitedBlurShader.js"></script>
+		<script src="./js/libs/three.js/shaders/UnpackDepthRGBAShader.js"></script>
 
         <!-- UI -------------------------------------------------------------------------- -->
         <script src="./js/libs/vanillatree.js"></script>
@@ -50,7 +61,7 @@
     <!-- ----------------------------------------------------------------------------- -->
     <body onload="setup();" onresize="resize();">
         <div id="header" class="page_element background-color-dark border-bottom-page-element" style="overflow:visible">
-            <nav id="menu" style="left:4px; top:4px;height: 22px;">
+            <nav id="menu" class="menu" style="left:4px; top:4px;height: 22px;">
                 <ul style="border:none;">
                     <li><a href="#" class="text13">File</a>
                         <ul>
@@ -65,7 +76,7 @@
                     <li><a href="#" class="text13">View</a></li>
                     <li><a href="#" class="text13">Settings</a>
                         <ul>
-                            <li><a href="#">Theme</a>
+                            <li><a href="#">Theme<span class="icon-triangle-right" style="float:right; padding-top: 3px;"></span></a>
                                 <ul>
                                     <li><a href="#" onclick="changeTheme('default');">Default</a></li>
                                     <li><a href="#" onclick="changeTheme('blue');">Blue</a></li>

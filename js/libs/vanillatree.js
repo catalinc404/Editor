@@ -130,7 +130,8 @@
 			leaf.setAttribute( 'data-vtree-id', id = options.id || Math.random() );
 
 			leaf.appendChild( create( 'span', {
-				className: 'vtree-toggle'
+				className: 'vtree-toggle',
+				innerHTML: ''
 			}) );
 
 			leaf.appendChild( create( 'a', {
@@ -179,11 +180,13 @@
 			return this._placeholder()._dispatch( 'remove', id );
 		},
 		open: function( id ) {
-			this.getLeaf( id ).classList.remove( 'closed' );
+			var leaf  = this.getLeaf( id );
+			leaf.classList.remove( 'closed' );
 			return this._dispatch( 'open', id );
 		},
 		close: function( id ) {
-			this.getLeaf( id ).classList.add( 'closed' );
+			var leaf  = this.getLeaf( id );
+			leaf.classList.add( 'closed' );
 			return this._dispatch( 'close', id );
 		},
 		toggle: function( id ) {

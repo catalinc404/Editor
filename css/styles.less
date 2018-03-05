@@ -14,7 +14,6 @@
 @element-color-selected:        @default-color-selected;
 
 @icon-color:                    @default-color-icon;
-@icon-contrast:                 @default-contrast-icon;
 
 @resizer-color:                 @default-color-resizer-color;
 @resizer-color-background:      @default-color-resizer-color-background;
@@ -35,7 +34,47 @@
 .resizer-color-background       { color: @resizer-color-background;   }
 .editor-view-background         { color: @editor-view-background;     }
 
+//------------------------------------------------------------------------------
+// ICONS 
+//------------------------------------------------------------------------------
+@font-face 
+{
+  font-family: "icons-font";
+  src: url("../fonts/icons-font.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
 
+.icon(@content: ""; @size: 13px; @color: @icon-color)
+{
+    font-family: "icons-font" !important;
+    font-style: normal !important;
+    line-height: 1;
+    font-size: @size;
+    color: @color;
+
+    content: @content;    
+}
+
+.icon-triangle-left:before
+{
+    .icon(@content: "\61"; @size: 13px; @color: @icon-color);
+}
+.icon-triangle-right:before
+{
+    .icon(@content: "\62"; @size: 13px; @color: @icon-color);
+}
+.icon-triangle-up:before
+{
+    .icon(@content: "\63"; @size: 13px; @color: @icon-color);
+}
+.icon-triangle-down:before
+{
+    .icon(@content: "\64"; @size: 13px; @color: @icon-color);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Main
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 html,
 body 
@@ -232,14 +271,14 @@ body
 //------------------------------------------------------------------------------
 // Menu 
 //------------------------------------------------------------------------------
-#menu
+.menu
 {
     z-index: 1000;
     position: relative;
     overflow: visible;
 }
 
-#menu .divider
+.menu .divider
 {
     height: 1px;
     margin: 3px 0;
@@ -248,7 +287,7 @@ body
     .background-color(@color: @element-color-border);
 }
 
-#menu ul
+.menu ul
 {
     list-style: none;
     position: relative;
@@ -259,7 +298,7 @@ body
     .border-solid(@size: 1px; @color: @element-color-border);
 }
 
-#menu ul a 
+.menu ul a 
 {
     display: block;
     padding: 3px 7px;
@@ -268,7 +307,7 @@ body
     .text13;
 }
 
-#menu ul li 
+.menu ul li 
 {
     position: relative;
     float: left;
@@ -276,19 +315,19 @@ body
     padding: 0
 }
 
-#menu ul li.current-menu-item 
+.menu ul li.current-menu-item 
 {
     z-index: 1000;
 
     .background-color(@color: @element-color-background);
 }
 
-#menu ul li:hover 
+.menu ul li:hover 
 {
     .background-color(@color: @element-color-highlight);
 }
 
-#menu ul ul 
+.menu ul ul 
 {
     display: none;
     position: absolute;
@@ -299,25 +338,25 @@ body
     .background-color;
 }
 
-#menu ul ul li 
+.menu ul ul li 
 {
     float: none;
     width: 200px;
 }
 
-#menu ul ul a
+.menu ul ul a
 {
     padding: 5px 10px;
 }
 
-#menu ul ul ul
+.menu ul ul ul
 {
     top: 0;
     left: 100%;
     position: absolute;
 }
 
-#menu ul li:hover>ul
+.menu ul li:hover>ul
 {
     display: block;
 }
@@ -348,20 +387,17 @@ ul.vtree
 
 .vtree li.vtree-leaf 
 {
-	background-position: -90px 0;
-	background-repeat: repeat-y;
 	min-height: 18px;
-	line-height: 24px;
+    line-height: 24px;
 }
 
 .vtree li.vtree-leaf::before 
 {
-	content: '';
+	//content: '';
 	width: 18px;
 	height: 24px;
 	position: relative;
-	background-position: -36px 0;
-	border-top: 6px;
+    border-top: 6px;
 }
 
 .vtree li.vtree-leaf li.vtree-leaf 
@@ -382,21 +418,50 @@ ul.vtree
 .vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle 
 {
 	display: block;
-	width: 18px;
-	height: 24px;
-    background-position: -72px 3px;
-    filter: contrast(@icon-contrast);
+	width: 14px;
+	height: 18px;
 	position: absolute;
 	left: 0;
-	top: 0;
+    top: 0;
+
+    /*
+    font-family: "icons-font";
+    font-style: normal;
+    line-height: 1;
+    font-size: 13px;
+
+    content: "\62";
+    color: @icon-color;
+
+    .noselect;
+
+    padding-left: 4px;
+    padding-top: 6px;
+    */
+}
+
+.vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle:before 
+{
+    padding-left: 4px;
+    padding-top: 6px;
+
+    .icon(@content: "\64"; @size: "13px");
+    .noselect;
 }
 
 .vtree li.vtree-leaf.vtree-has-children.closed > span.vtree-toggle 
 {
-	background-position: -54px 3px;
-    background-repeat: no-repeat;
-    filter: contrast(@icon-contrast);
 }
+
+.vtree li.vtree-leaf.vtree-has-children.closed > span.vtree-toggle:before 
+{
+    padding-left: 4px;
+    padding-top: 6px;
+
+    .icon(@content: "\62"; @size: "13px");
+    .noselect;
+}
+
 
 .vtree a.vtree-leaf-label 
 {
@@ -453,13 +518,6 @@ ul.vtree
   
 	.background-color(@color: @element-color-highlight);
 }
-
-.vtree li.vtree-leaf, .vtree li.vtree-leaf::before, .vtree li.vtree-leaf.vtree-has-children > span.vtree-toggle 
-{
-    background-image: url('./../textures/vanillatree_images3.png');
-    color: @font-color;
-}
-
 
 //------------------------------------------------------------------------------
 // Dat.GUI 
@@ -660,15 +718,31 @@ ul.vtree
 }
 .dg li.title
 {
-    padding-left: 16px;
+    //padding-left: 16px;
     cursor: pointer;
-    background: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat transparent;
     .border-solid(@size: 1px; @color: @element-color-border);
+
+    //background: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat transparent;
 }
+
+.dg li.title::before
+{
+    .icon(@content: "\64"; @size: "13px");
+    .noselect;
+}
+
 .dg .closed li.title 
 {
-    background: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==) 6px 10px no-repeat transparent;
+   //background: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==) 6px 10px no-repeat transparent;
 }
+
+.dg .closed li.title:before
+{
+    .icon(@content: "\62"; @size: "13px");
+    .noselect;
+}
+
+
 .dg .cr.boolean
 {
     border-left: 3px solid #806787;
