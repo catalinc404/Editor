@@ -48,7 +48,6 @@ ThemeManager.prototype.handleThemeChange = function( theme )
         "@element-color-selected":        "@" + this.currentTheme + "-color-selected",
 
         "@icon-color":                     "@" + this.currentTheme + "-color-icon",
-        "@icon-contrast":                  "@" + this.currentTheme + "-contrast-icon",
         
         "@resizer-color":                 "@" + this.currentTheme + "-color-resizer-color",
         "@resizer-color-background":      "@" + this.currentTheme + "-color-resizer-color-background",

@@ -12,6 +12,8 @@ function PropertyView( eventDispatcher, element )
 
     //////////////////////////////////////////////////////////////////////////////
     this.fnRequestRender = this.requestRender.bind( this );
+    this.fnColorChange   = this.handleColorChange.bind( this );
+   
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +88,7 @@ PropertyView.prototype.createMapGUI = function( gui, map )
         gui.add( map, "name" );
         if( map.image !== undefined )
         {
-            gui.add( map.image, "src" );
+            gui.add( map.image, "src" ).onChange( this.fnRequestRender );
         }
         else
         {
@@ -147,10 +149,10 @@ PropertyView.prototype.setProperties = function( object )
                 var materialGUI = gui.addFolder( "Phong Material" );
                 
                 materialGUI.add( object.material, "name" );
-                materialGUI.addColor( object.material, "color" );
+                materialGUI.addColor( object.material, "color" ).onChange( this.fnColorChange );;
                 
-                materialGUI.addColor( object.material, "specular" );
-                materialGUI.add( object.material, "shininess" );
+                materialGUI.addColor( object.material, "specular" ).onChange( this.fnColorChange );;
+                materialGUI.add( object.material, "shininess" ).onChange( this.fnRequestRender );;
 
                 var mapGUI = materialGUI.addFolder( "map" );
                 this.createMapGUI( mapGUI, object.material.map );
@@ -216,9 +218,19 @@ PropertyView.prototype.setProperties = function( object )
     else
     if( object instanceof THREE.AmbientLight )
     {
-        gui.addColor( object, "color" ).onChange( this.fnRequestRender );
+        gui.addColor( object, "color" ).onChange( this.fnColorChange );
         gui.add( object, "intensity" ).onChange( this.fnRequestRender );
     }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.handleColorChange = function( color )
+{
+    //color.r /= 255.0;
+    //color.g /= 255.0;
+    //color.b /= 255.0;
+
+    this.requestRender();
 }
 
 //////////////////////////////////////////////////////////////////////////////

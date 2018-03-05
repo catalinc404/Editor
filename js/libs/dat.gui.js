@@ -508,14 +508,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return {
 	          space: 'RGB',
-	          r: original[0],
-	          g: original[1],
-	          b: original[2]
+	          r: original[0] * 255.0,
+	          g: original[1] * 255.0,
+	          b: original[2] * 255.0
 	        };
 	      },
 	
 	      write: function write(color) {
-	        return [color.r, color.g, color.b];
+	        return [color.r / 255.0, color.g / 255.0, color.b / 255.0];
 	      }
 	    },
 	
@@ -572,9 +572,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (_common2.default.isNumber(original.r) && _common2.default.isNumber(original.g) && _common2.default.isNumber(original.b)) {
 	          return {
 	            space: 'RGB',
-	            r: original.r,
-	            g: original.g,
-	            b: original.b
+	            r: original.r * 255.0,
+							g: original.g * 255.0,
+							b: original.b * 255.0
 	          };
 	        }
 	        return false;
@@ -582,9 +582,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      write: function write(color) {
 	        return {
-	          r: color.r,
-	          g: color.g,
-	          b: color.b
+	          r: color.r / 255.0,
+	          g: color.g / 255.0,
+	          b: color.b / 255.0
 	        };
 	      }
 	    },
@@ -2379,7 +2379,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      width: '122px',
 	      height: '102px',
 	      padding: '3px',
-	      backgroundColor: '#222',
+	      //backgroundColor: '#222',
 	      boxShadow: '0px 1px 3px rgba(0,0,0,0.3)'
 	    });
 	
@@ -2438,7 +2438,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      //      marginBottom: '6px',
 	      color: '#fff',
 	      border: 0,
-	      fontWeight: 'bold',
+	      //fontWeight: 'bold',
 	      textShadow: _this2.__input_textShadow + 'rgba(0,0,0,0.7)'
 	    });
 	
