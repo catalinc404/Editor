@@ -701,19 +701,7 @@ function notifyChildrensResize( element )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function getRelativePosition( event )
 {
-    var position = { x : event.clientX, y : event.clientY };
-    for( var i = 0; i < event.path.length; ++i )
-    {
-        var element = event.path[i];
-        if( element instanceof HTMLBodyElement )
-        {
-            break;
-        }
-
-        position.x -= element.offsetLeft;
-        position.y -= element.offsetTop;
-    }
-
+    var position = { x : event.offsetX, y : event.offsetY };
     return position;
 }
 

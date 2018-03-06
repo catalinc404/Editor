@@ -68,7 +68,7 @@ function createDemoScene( editor )
     editor.addSceneObject( groupSpeheres );    
     */
     var planeGeometry = new THREE.PlaneGeometry( 60, 20 );
-    var planeMaterial = new THREE.MeshPhongMaterial( {  color:0xffffff } );
+    var planeMaterial = new THREE.MeshPhongMaterial( {  color:0xffffff, map: editor.loadTexture( "textures/grid.png") } );
     plane = new THREE.Mesh( planeGeometry, planeMaterial );
     plane.name = "plane1";
     plane.rotation.x = -0.5 * Math.PI;

@@ -1727,7 +1727,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    _this2.__input = document.createElement('input');
-	    _this2.__input.setAttribute('type', 'text');
+			_this2.__input.setAttribute('type', 'text');
+
+			
+			
 	
 	    _dom2.default.bind(_this2.__input, 'keyup', onChange);
 	    _dom2.default.bind(_this2.__input, 'change', onChange);

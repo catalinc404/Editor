@@ -51,7 +51,7 @@ Editor.prototype = Object.assign( Object.create( UI.prototype ),
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.init = function() 
 {
-    this.defaultTexture = this.textureLoader.load( "textures/UV_Grid_Sm.jpg", this.render.bind( this ) );
+    this.defaultTexture = this.loadTexture( "textures/UV_Grid_Sm.jpg" );
 
     this.scene = new THREE.Scene( { name: "Scene" } );
     this.sceneHelpers = new THREE.Scene();
@@ -214,6 +214,12 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
     {
         this.addSceneObject( object.children[i], true );
     }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.loadTexture = function ( path )
+{
+    return this.textureLoader.load( path, this.render.bind( this ) );
 }
 
 //////////////////////////////////////////////////////////////////////////////

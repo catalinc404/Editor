@@ -47,7 +47,7 @@ ThemeManager.prototype.handleThemeChange = function( theme )
         "@element-color-highlight":       "@" + this.currentTheme + "-color-highlight",
         "@element-color-selected":        "@" + this.currentTheme + "-color-selected",
 
-        "@icon-color":                     "@" + this.currentTheme + "-color-icon",
+        "@icon-color":                    "@" + this.currentTheme + "-color-icon",
         
         "@resizer-color":                 "@" + this.currentTheme + "-color-resizer-color",
         "@resizer-color-background":      "@" + this.currentTheme + "-color-resizer-color-background",
@@ -67,9 +67,9 @@ ThemeManager.prototype.handleThemeUpdated = function()
     for(var i = 0; i < styleSheetList.length; i++)
     {
         var sheet = styleSheetList[i];
-        for( var i = 0; i < sheet.rules.length; ++i )
+        for( var i = 0; i < sheet.cssRules.length; ++i )
         {
-            var rule = sheet.rules[i];
+            var rule = sheet.cssRules[i];
 
             if( rule.selectorText == ".font-color" )                 colors.font_color                 = this.parseRGBColor( rule.style.color );
             if( rule.selectorText == ".font-color-shadow" )          colors.font_color_shadow          = this.parseRGBColor( rule.style.color );
