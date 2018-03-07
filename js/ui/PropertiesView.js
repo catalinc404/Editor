@@ -79,14 +79,14 @@ PropertyView.prototype.clearProperties = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.createMapGUI = function( gui, map )
+PropertyView.prototype.createMapGUI = function( gui, map, callback )
 {
     if( map !== undefined && map != null )
     {
         gui.add( map, "name" );
         if( map.image !== undefined )
         {
-            gui.add( map.image, "src" ).onChange( this.fnRequestRender );
+            gui.add( map.image, "src" ).onChange( callback );
         }
         else
         {
@@ -96,6 +96,99 @@ PropertyView.prototype.createMapGUI = function( gui, map )
     else
     {
         gui.add( { map: "none" }, "map" );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createMaterialGUI = function( gui, material )
+{
+    if( material !== undefined )
+    {
+        var renderFunction = this.fnRequestRender;
+        var requestMateriaUpdate = function()
+        {
+            material.needsUpdate = true;
+            renderFunction();
+        }
+
+        if( material instanceof THREE.MeshPhongMaterial )
+        {
+            var materialGUI = gui.addFolder( "Phong Material" );
+            
+            materialGUI.add( material, "name" );
+            materialGUI.addColor( material, "color" ).onChange( requestMateriaUpdate );
+            
+            materialGUI.addColor( material, "specular" ).onChange( requestMateriaUpdate );
+            materialGUI.add( material, "shininess" ).onChange( requestMateriaUpdate );
+
+            var mapGUI = materialGUI.addFolder( "map" );
+            this.createMapGUI( mapGUI, material.map, requestMateriaUpdate );
+
+            var lightMapGUI = materialGUI.addFolder( "lightMap" );
+            lightMapGUI.add( material, "lightMapIntensity" ).onChange( requestMateriaUpdate );
+            this.createMapGUI( lightMapGUI, material.lightMap, requestMateriaUpdate );
+
+            var aoMapGUI = materialGUI.addFolder( "aoMap" );
+            aoMapGUI.add( material, "lightMapIntensity" ).onChange( requestMateriaUpdate );
+            this.createMapGUI( aoMapGUI, material.lightMap, requestMateriaUpdate );
+        
+            var emmisiveMapGUI = materialGUI.addFolder( "emmissiveMap" );
+            emmisiveMapGUI.addColor( material, "emissive" ).onChange( requestMateriaUpdate );
+            emmisiveMapGUI.add( material, "emissiveIntensity" ).onChange( requestMateriaUpdate );
+            this.createMapGUI( emmisiveMapGUI, material.emissiveMap, requestMateriaUpdate );
+
+            var bumpMapGUI = materialGUI.addFolder( "bumpMap" );
+            bumpMapGUI.add( material, "bumpScale" ).onChange( requestMateriaUpdate );;
+            this.createMapGUI( bumpMapGUI, material.bumpMap, requestMateriaUpdate );
+
+            var normalMapGUI = materialGUI.addFolder( "normalMap" );
+            var normalMapScaleGUI = normalMapGUI.addFolder( "scale" );
+            normalMapScaleGUI.add( material.normalScale, "x" ).onChange( requestMateriaUpdate );
+            normalMapScaleGUI.add( material.normalScale, "y" ).onChange( requestMateriaUpdate );
+            this.createMapGUI( normalMapGUI, material.normalMap, requestMateriaUpdate );
+
+            var displacementMapGUI = materialGUI.addFolder( "displacementMap" );
+            displacementMapGUI.add( material, "displacementScale" ).onChange( requestMateriaUpdate );
+            displacementMapGUI.add( material, "displacementBias" ).onChange( requestMateriaUpdate );
+            this.createMapGUI( displacementMapGUI, material.displacementMap, requestMateriaUpdate );
+
+            var specularMapGUI = materialGUI.addFolder( "specularMap" );
+            this.createMapGUI( specularMapGUI, material.specularMap, requestMateriaUpdate );
+
+            var alphaMapGUI = materialGUI.addFolder( "alphaMap" )
+            this.createMapGUI( alphaMapGUI, material.alphaMap, requestMateriaUpdate );
+
+            var envMapGUI = materialGUI.addFolder( "envMap" )
+            this.createMapGUI( envMapGUI, material.envMap, requestMateriaUpdate );
+
+            materialGUI.add( material, "combine", { MultiplyOperation: 0, MixOperation: 1, AddOperation: 2 } ).onChange( requestMateriaUpdate );
+
+            materialGUI.add( material, "reflectivity" ).onChange( requestMateriaUpdate );
+            materialGUI.add( material, "refractionRatio" ).onChange( requestMateriaUpdate );
+
+            materialGUI.add( material, "wireframe" ).onChange( requestMateriaUpdate );
+            materialGUI.add( material, "wireframeLinewidth" ).onChange( requestMateriaUpdate );
+            materialGUI.add( material, "wireframeLinecap" ).onChange( requestMateriaUpdate );
+            materialGUI.add( material, "wireframeLinejoin" ).onChange( requestMateriaUpdate );
+            
+            materialGUI.add( material, "skinning" ).onChange( requestMateriaUpdate );
+            materialGUI.add( material, "morphTargets" ).onChange( requestMateriaUpdate );
+            materialGUI.add( material, "morphNormals" ).onChange( requestMateriaUpdate );
+        }
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createGeometryGUI = function( gui, geometry )
+{
+    if( geometry !== undefined )
+    {
+        var geometryGUI = gui.addFolder( "Geometry" );
+        geometryGUI.add( geometry, "name" );
+
+        if( geometry instanceof THREE.Mesh )
+        {
+        }
     }
 }
 
@@ -112,7 +205,8 @@ PropertyView.prototype.setProperties = function( object )
     controllerType.__input.readOnly = true;
 
     if( object instanceof THREE.Scene )
-    {}
+    {
+    }
     else
     {
         if( object.visible !== undefined ) gui.add( object, "visible" ).onChange( this.fnRequestRender );
@@ -130,9 +224,9 @@ PropertyView.prototype.setProperties = function( object )
         if( object.rotation !== undefined  )
         {
             var rotationGUI = gui.addFolder( "Rotation" );
-            rotationGUI.add( object.rotation, "x" ).step( 0.100 ).onChange( this.fnRequestRender );
-            rotationGUI.add( object.rotation, "y" ).step( 0.100 ).onChange( this.fnRequestRender );
-            rotationGUI.add( object.rotation, "z" ).step( 0.100 ).onChange( this.fnRequestRender );
+            rotationGUI.add( object.rotation, "x" ).step( 0.010 ).onChange( this.fnRequestRender );
+            rotationGUI.add( object.rotation, "y" ).step( 0.010 ).onChange( this.fnRequestRender );
+            rotationGUI.add( object.rotation, "z" ).step( 0.010 ).onChange( this.fnRequestRender );
         }
 
         if( object.scale !== undefined  )
@@ -145,78 +239,8 @@ PropertyView.prototype.setProperties = function( object )
 
         if( object instanceof THREE.Mesh )
         {
-            if( object.material !== undefined )
-            {
-                if( object.material instanceof THREE.MeshPhongMaterial )
-                {
-                    var materialGUI = gui.addFolder( "Phong Material" );
-                    
-                    materialGUI.add( object.material, "name" );
-                    materialGUI.addColor( object.material, "color" ).onChange( this.fnRequestRender );
-                    
-                    materialGUI.addColor( object.material, "specular" ).onChange( this.fnRequestRender );
-                    materialGUI.add( object.material, "shininess" ).onChange( this.fnRequestRender );
-
-                    var mapGUI = materialGUI.addFolder( "map" );
-                    this.createMapGUI( mapGUI, object.material.map );
-
-                    var lightMapGUI = materialGUI.addFolder( "lightMap" );
-                    lightMapGUI.add( object.material, "lightMapIntensity" );
-                    this.createMapGUI( lightMapGUI, object.material.lightMap );
-
-                    var aoMapGUI = materialGUI.addFolder( "aoMap" );
-                    aoMapGUI.add( object.material, "lightMapIntensity" );
-                    this.createMapGUI( aoMapGUI, object.material.lightMap );
-                
-                    var emmisiveMapGUI = materialGUI.addFolder( "emmissiveMap" );
-                    emmisiveMapGUI.addColor( object.material, "emissive" );
-                    emmisiveMapGUI.add( object.material, "emissiveIntensity" );
-                    this.createMapGUI( emmisiveMapGUI, object.material.emissiveMap );
-
-                    var bumpMapGUI = materialGUI.addFolder( "bumpMap" );
-                    bumpMapGUI.add( object.material, "bumpScale" );
-                    this.createMapGUI( bumpMapGUI, object.material.bumpMap );
-
-                    var normalMapGUI = materialGUI.addFolder( "normalMap" );
-                    var normalMapScaleGUI = normalMapGUI.addFolder( "scale" );
-                    normalMapScaleGUI.add( object.material.normalScale, "x" );
-                    normalMapScaleGUI.add( object.material.normalScale, "y" );
-                    this.createMapGUI( normalMapGUI, object.material.normalMap );
-
-                    var displacementMapGUI = materialGUI.addFolder( "displacementMap" );
-                    displacementMapGUI.add( object.material, "displacementScale" );
-                    displacementMapGUI.add( object.material, "displacementBias" );
-                    this.createMapGUI( displacementMapGUI, object.material.displacementMap );
-
-                    var specularMapGUI = materialGUI.addFolder( "specularMap" );
-                    this.createMapGUI( specularMapGUI, object.material.specularMap );
-
-                    var alphaMapGUI = materialGUI.addFolder( "alphaMap" );
-                    this.createMapGUI( alphaMapGUI, object.material.alphaMap );
-
-                    var envMapGUI = materialGUI.addFolder( "envMap" );
-                    this.createMapGUI( envMapGUI, object.material.envMap );
-
-                    materialGUI.add( object.material, "combine", { MultiplyOperation: 0, MixOperation: 1, AddOperation: 2 } );
-
-                    materialGUI.add( object.material, "reflectivity" );
-                    materialGUI.add( object.material, "refractionRatio" );
-
-                    materialGUI.add( object.material, "wireframe" );
-                    materialGUI.add( object.material, "wireframeLinewidth" );
-                    materialGUI.add( object.material, "wireframeLinecap" );
-                    materialGUI.add( object.material, "wireframeLinejoin" );
-                    
-                    materialGUI.add( object.material, "skinning" );
-                    materialGUI.add( object.material, "morphTargets" );
-                    materialGUI.add( object.material, "morphNormals" );
-                }
-            }
-            if( object.geometry !== undefined )
-            {
-                var geometryGUI = gui.addFolder( "Geometry" );
-                geometryGUI.add( object.geometry, "name" );
-            }
+            this.createMaterialGUI( gui, object.material );
+            this.createGeometryGUI( gui, object.geometry );
         }
         else
         if( object instanceof THREE.Light )
@@ -239,6 +263,12 @@ PropertyView.prototype.setProperties = function( object )
 
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.requestRender = function()
+{
+    this.eventDispatcher.dispatchEvent( "render" ); 
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.requestMaterialUpdate = function()
 {
     this.eventDispatcher.dispatchEvent( "render" ); 
 }

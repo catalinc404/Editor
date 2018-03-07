@@ -259,7 +259,16 @@ Editor.prototype.selectObjects = function ( editorObjects )
 Editor.prototype.selectObjectsFromEditorIds = function ( editorObjectsIds )
 {
     var editorObjects = this.getEditorObjectsfromEditorIds( editorObjectsIds )
-    this.selectObjects( (editorObjects.length > 0) ? editorObjects : [] );
+    var filteredEditorObjects = [];
+
+    for( var i = 0; i < editorObjects.length; ++i )
+    {
+        if( editorObjects[i].object.visible !== false )
+        {
+            filteredEditorObjects.push( editorObjects[i] )
+        }
+    }
+    this.selectObjects( (filteredEditorObjects.length > 0) ? filteredEditorObjects : [] );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -365,7 +374,7 @@ Editor.prototype.loadDAE = function ( path, objectName )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Editor.prototype.loadOBJ = function ( path, objectName )
+Editor.prototype.loadOBJ = function ( path, objectName, callback )
 {
     var basePath = path.substr(0, path.lastIndexOf( "/" ) + 1 );
     var name = path.substr( path.lastIndexOf( "/" ) + 1 )
@@ -383,6 +392,12 @@ Editor.prototype.loadOBJ = function ( path, objectName )
         objLoader.load( name + ".obj", function ( object ) 
         {
             object.name = name;
+
+            if( callback !== undefined )
+            {
+                callback( object );
+            }
+
             editor.addSceneObject( object );
         } );
 	} );

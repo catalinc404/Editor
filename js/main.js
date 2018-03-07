@@ -66,7 +66,7 @@ function createDemoScene( editor )
         groupSpeheres.add( sphere );
     }
     editor.addSceneObject( groupSpeheres );    
-    */
+
     var planeGeometry = new THREE.PlaneGeometry( 60, 20 );
     var planeMaterial = new THREE.MeshPhongMaterial( {  color:0xffffff, map: editor.loadTexture( "textures/grid.png") } );
     plane = new THREE.Mesh( planeGeometry, planeMaterial );
@@ -77,8 +77,10 @@ function createDemoScene( editor )
     plane.position.z = 0;
     plane.receiveShadow = true;
     editor.addSceneObject( plane );
+    */
 
-    //editor.loadOBJ( "data/Room.obj" );
+    //editor.loadOBJ( "../../Room/Room.obj", undefined, function( object ) { object.scale.x = 0.01; object.scale.y = 0.01; object.scale.z = 0.01; } );
+    editor.loadOBJ( "../../Room/Room.obj" );
 }
 
 //////////////////////////////////////////////////////////////////////////////
