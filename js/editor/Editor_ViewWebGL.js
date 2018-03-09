@@ -103,10 +103,16 @@ ViewWebGL.prototype.init = function( editor )
     this.renderer = new THREE.WebGLRenderer( { antialias: true } );
     this.renderer.setPixelRatio( window.devicePixelRatio );
     this.renderer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
+
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.autoClear = false;
     this.renderer.setClearColor( 0xaaaaaa );
+
+    this.renderer.physicallyCorrectLights = true;
+    this.renderer.gammaInput = true;
+    this.renderer.gammaOutput = true;
+
     this.canvas.appendChild( this.renderer.domElement );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    

@@ -125,9 +125,6 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
     
     if( object instanceof THREE.Mesh )
     {
-        object.castShadow = true;
-        object.receiveShadow = true;
-
         var selectionHelper = new THREE.BoxHelper( object );
         selectionHelper.visible = false;
         editorObject.helpers.push( selectionHelper );
@@ -147,22 +144,16 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
     else
     if( object instanceof THREE.PointLight )
     {
-        object.castShadow = true;
-
         editorObject.helpers.push( new THREE.PointLightHelper( object ) );
     }
     else
     if( object instanceof THREE.DirectionalLight )
     {
-        object.castShadow = true;
-        
         editorObject.helpers.push( new THREE.DirectionalLightHelper( object ) );
     }
     else
     if( object instanceof THREE.SpotLight )
     {
-        object.castShadow = true;
-
         var objectPickingMaterial = new THREE.MeshBasicMaterial( { color: editorObject.id } );
         var objectPicking = new THREE.Mesh( new THREE.TetrahedronGeometry( 0.6, 0 ), objectPickingMaterial );
         objectPicking.matrix = object.matrixWorld;
@@ -185,16 +176,11 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
     else
     if( object instanceof THREE.HemisphereLight )
     {
-        object.castShadow = true;
-
-        editorObject.helpers.push( THREE.HemisphereLightHelper( object ) );
+        editorObject.helpers.push( new THREE.HemisphereLightHelper( object ) );
     }
     else
     if( object instanceof THREE.SkinnedMesh )
     {
-        object.castShadow = true;
-        object.receiveShadow = true;
-
         editorObject.helpers.push( new THREE.SkeletonHelper( object ) );
     }
 
@@ -217,9 +203,14 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.loadTexture = function ( path )
+Editor.prototype.loadTexture = function ( path, callback )
 {
-    return this.textureLoader.load( path, this.render.bind( this ) );
+    var _callback = callback;
+    if( callback === undefined )
+    {
+        callback = this.render.bind( this );
+    }
+    return this.textureLoader.load( path, callback );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -401,6 +392,13 @@ Editor.prototype.loadOBJ = function ( path, objectName, callback )
             editor.addSceneObject( object );
         } );
 	} );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.loadPLYMesh = function ( path, objectName, callback )
+{
+    var plyLoader = new THREE.PLYLoader();
+    plyLoader.load( path, callback );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

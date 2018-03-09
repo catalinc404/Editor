@@ -42,4 +42,6 @@ var LoaderUtils = {
 
 };
 
+THREE.LoaderUtils = LoaderUtils;
+
 //export { LoaderUtils };

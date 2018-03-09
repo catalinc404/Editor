@@ -26,6 +26,7 @@ function resize()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function createDemoScene( editor )
 {
+    /*
     var spotLight = new THREE.SpotLight( 0xffffff );
     spotLight.name = "spotlight1";
     spotLight.position.set( -10, 15, -5 );
@@ -39,6 +40,7 @@ function createDemoScene( editor )
     spotLight.shadow.camera.far = 200;
     spotLight.castShadow = true;    
     editor.addSceneObject( spotLight );
+    */
 
     /*
     var cubeGeometry = new THREE.BoxGeometry( 4, 4, 4 )
@@ -80,8 +82,132 @@ function createDemoScene( editor )
     */
 
     //editor.loadOBJ( "../../Room/Room.obj", undefined, function( object ) { object.scale.x = 0.01; object.scale.y = 0.01; object.scale.z = 0.01; } );
-    editor.loadOBJ( "../../Room/Room.obj" );
+    //editor.loadOBJ( "../../Room/Room.obj" );
+
+    createPBRTScene();
 }
+
+function createPBRTScene()
+{
+    var lightGeometry = new THREE.SphereGeometry(0);
+    var lightMaterial = new THREE.MeshStandardMaterial(
+        {
+            emissive: 0xffffee,
+            emissiveIntensity: 1,
+            color: 0x000000
+        });
+
+    var light = new THREE.PointLight(0xffffff, 1, 20, 2);
+    light.power = 1700;
+    light.castShadow = true;
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.heigth = 1024;
+    light.shadow.radius = 1.5;
+    light.position.set(0, 5, 3);
+
+    light.add(new THREE.Mesh(lightGeometry, lightMaterial));
+    light.name = "light";
+    editor.addSceneObject( light );
+
+    var hemisphereLight = new THREE.HemisphereLight(0x303F9F, 0x000000, 1);
+    hemisphereLight.name = "hemisphereLight";
+    editor.addSceneObject( hemisphereLight );
+
+    editor.loadPLYMesh( "data/lucy.ply", undefined, function( geometry )
+    {
+        var material = new THREE.MeshPhysicalMaterial( 
+            {
+                color: 0x3F51B5,
+                roughness: 0.5,
+                metalness: 0.7,
+                clearCoat: 0.5,
+                clearCoatRoughness: 0.5,
+                reflectivity: 0.7
+            } );
+
+        var mesh = new THREE.Mesh( geometry, material );
+        mesh.name = "lucy";
+        mesh.position.set( 3, 0, 0 );
+        mesh.rotation.set( 0, -Math.PI / 3.0, 0 );
+        mesh.castShadow = true;
+        mesh.matrixAutoUpdate = false;
+        mesh.updateMatrix();
+
+        editor.addSceneObject( mesh );
+    });
+
+    editor.loadPLYMesh( "data/dragon.ply", undefined, function( geometry )
+    {
+        var material = new THREE.MeshPhysicalMaterial( 
+            {
+                color: 0x448AFF,
+                roughness: 0.1,
+                metalness: 0.9,
+                clearCoat: 0.0,
+                clearCoatRoughness: 0.2,
+                reflectivity: 1
+            } );
+
+        var mesh = new THREE.Mesh( geometry, material );
+        mesh.name = "dragon";
+        mesh.position.set( -3, 0, 0 );
+        mesh.rotation.set( 0, -Math.PI, 0 );
+        mesh.castShadow = true;
+        mesh.matrixAutoUpdate = false;
+        mesh.updateMatrix();
+
+        editor.addSceneObject( mesh );
+    });
+
+    editor.loadPLYMesh( "data/bunny.ply", undefined, function( geometry )
+    {
+        var material = new THREE.MeshPhysicalMaterial( 
+            {
+                color: 0xCCFFFF,
+                roughness: 0.9,
+                metalness: 0.1,
+                clearCoat: 0.0,
+                clearCoatRoughness: 0.5,
+                reflectivity: 0.1
+            } );
+
+        var mesh = new THREE.Mesh( geometry, material );
+        mesh.name = "bunny";
+        mesh.position.set( 0, 0, -1.5 );
+        mesh.rotation.set( 0, -Math.PI, 0 );
+        mesh.castShadow = true;
+        mesh.matrixAutoUpdate = false;
+        mesh.updateMatrix();
+
+        editor.addSceneObject( mesh );
+    });
+
+    editor.loadTexture( "textures/marble.jpg", function( texture )
+    {
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set( 100, 100 );
+        
+        var material = new THREE.MeshStandardMaterial(
+            {
+                roughness: 0.7,
+                metalness: 0.1,
+                map: texture
+            });
+
+        var geometry = new THREE.PlaneGeometry( 1000, 1000 );
+        var mesh = new THREE.Mesh( geometry, material );
+        mesh.name = "floor";
+        mesh.receiveShadow = true;
+        mesh.rotation.x = -Math.PI / 2.0;
+        mesh.position.y = 0;
+        mesh.matrixAutoUpdate = false;
+        mesh.updateMatrix();
+
+        editor.addSceneObject( mesh );
+    });
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 function changeTheme( theme )
