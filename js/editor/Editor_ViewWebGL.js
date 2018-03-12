@@ -1,8 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var EControlMode = { NONE : 0, ORBIT: 1, TRACKBALL :2, PAN : 3, ZOOM : 4, SELECT : 5 };
+var EControlMode = { NONE : 0, ORBIT: 1, TRACKBALL :  2, PAN : 3, ZOOM : 4, SELECT : 5 };
 var Control_ORBIT_pixel2world_ratio = 0.005;
 var Control_PAN_pixel2world_ratio = 0.05;
 var Control_ZOOM_pixel2world_ratio= 0.05;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var ERenderMode = { COLOR : 0, DEPTH: 1, PICKING : 2 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function ViewWebGL( eventDispatcher, element, configuration ) 
@@ -23,6 +26,7 @@ function ViewWebGL( eventDispatcher, element, configuration )
 
     this.currentControlMode = EControlMode.NONE;    
 
+    this.renderMode = ERenderMode.COLOR;
     this.clearColor = 0xaaaaaa;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,26 +42,6 @@ function ViewWebGL( eventDispatcher, element, configuration )
     this.eventDispatcher.addEventListener( "themeChanged",             this.handleThemeChanged.bind( this ) );
 
     this.eventDispatcher.dispatchEvent( "onViewCreated", this );
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.depthMaterial;
-    this.saoMaterial;
-    this.saoModulateMaterial;
-    this.normalMaterial;
-    this.vBlurMaterial;
-    this.hBlurMaterial;
-    this.copyMaterial;
-    
-    this.depthRenderTarget;
-    this.normalRenderTarget;
-    this.saoRenderTarget;
-    this.beautyRenderTarget;
-    this.blurIntermediateRenderTarget;
-    
-    this.composer;
-    this.renderPass;
-    this.saoPass;
-    this.copyPass;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,16 +58,13 @@ ViewWebGL.prototype.init = function( editor )
 
     //console.log( "ViewWebGL.prototype.init, viewId = " + this.viewId );
 
-    var width  = parseInt( this.canvas.style.width,  10 ) || 0;
-    var height = parseInt( this.canvas.style.height, 10 ) || 0;
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.setDimensions( parseInt( this.canvas.style.width,  10 ), parseInt( this.canvas.style.height, 10 ) );
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 0.1, 1000 );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.canvas.width  = width * window.devicePixelRatio;
-    this.canvas.height = height * window.devicePixelRatio;
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 1000 );
-
     if( this.configuration !== undefined )
     {
         if( this.configuration.cameraPosition !== undefined )
@@ -100,28 +81,22 @@ ViewWebGL.prototype.init = function( editor )
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.renderer = new THREE.WebGLRenderer( { antialias: true } );
-    this.renderer.setPixelRatio( window.devicePixelRatio );
-    this.renderer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
+    this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true, devicePixelRatio: window.devicePixelRatio } );
+    this.renderer.setSize( this.width, this.height, false );
 
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.autoClear = false;
-    this.renderer.setClearColor( 0xaaaaaa );
+    this.renderer.setClearColor( this.clearColor );
 
     this.renderer.physicallyCorrectLights = true;
     this.renderer.gammaInput = true;
     this.renderer.gammaOutput = true;
 
-    this.canvas.appendChild( this.renderer.domElement );
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
-    this.pickingRenderTarget = new THREE.WebGLRenderTarget( width, height );
+    this.pickingRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height );
     this.pickingRenderTarget.texture.minFilter = THREE.LinearFilter;
     this.pickingRenderTarget.texture.maxFilter = THREE.NearestFilter;
-
-    this.pickingTextureSelection = new THREE.DataTexture( this.pickingTextureSelectionData, width, height, THREE.RGBAFormat );
-    this.pickingTextureSelection.needsUpdate = true;
 
     this.transformControls = new THREE.TransformControls( this.camera, this.canvas );
     this.transformControls.addEventListener( "change", this.handleObjectTransformChange.bind( this ) );
@@ -132,14 +107,6 @@ ViewWebGL.prototype.init = function( editor )
     this.canvas.addEventListener( "mousemove",  this.handleMouseMove.bind( this ),  false );    
     this.canvas.addEventListener( "mouseup",    this.handleMouseUp.bind( this ),    false );
     this.canvas.addEventListener( "mouseleave", this.handleMouseLeave.bind( this ), false );
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.composer = new THREE.EffectComposer( this.renderer );
-	this.renderPass = new THREE.RenderPass( this.scene, this.camera );
-	this.composer.addPass( this.renderPass );
-	this.saoPass = new THREE.SAOPass( this.editor.scene, this.camera, false, true );
-	this.saoPass.renderToScreen = true;
-	this.composer.addPass( this.saoPass );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,15 +198,20 @@ ViewWebGL.prototype.render = function()
                     bottom      = Math.min( bottom, this.height );
 
                     this.selectionRectangle.width  = right  - this.selectionRectangle.left;
-                    this.selectionRectangle.height = bottom - this.selectionRectangle.top; 
-                    
-                    var position = { x: this.selectionRectangle.left, y: this.selectionRectangle.top };
+                    this.selectionRectangle.height = bottom - this.selectionRectangle.top;
+
+                    var invDevicePixelRatio = 1.0 / ( window.devicePixelRatio || 1 );
+                    var position = 
+                    { 
+                        x: this.selectionRectangle.left * invDevicePixelRatio, 
+                        y: this.selectionRectangle.top  * invDevicePixelRatio
+                    };
                     position = getRelativePositionForElement( document.getElementById( "editor" ), this.canvas, position )
 
                     this.selectionRectangleElement.style.left   = position.x + 'px';
                     this.selectionRectangleElement.style.top    = position.y + 'px';
-                    this.selectionRectangleElement.style.width  = this.selectionRectangle.width  + 'px';
-                    this.selectionRectangleElement.style.height = this.selectionRectangle.height + 'px';
+                    this.selectionRectangleElement.style.width  = this.selectionRectangle.width  * invDevicePixelRatio + 'px';
+                    this.selectionRectangleElement.style.height = this.selectionRectangle.height * invDevicePixelRatio + 'px';
                 }
                 break;                    
         
@@ -252,17 +224,10 @@ ViewWebGL.prototype.render = function()
 
     this.renderer.setClearColor( this.clearColor );
     this.renderer.clear();
-
-    //this.renderPass.scene = this.editor.scene;
-    //this.saoPass.scene = this.editor.scene;
-    //this.composer.render();
-    
+   
     this.renderer.render( this.editor.scene, this.camera );
-
     this.renderer.render( this.editor.sceneHelpers, this.camera );
     this.renderer.render( this.sceneGizmos, this.camera );
-    
-    this.context.drawImage( this.renderer.domElement, 0, 0 );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -280,19 +245,14 @@ ViewWebGL.prototype.resize = function( width, height )
 {
     View.prototype.resize.call( this, width, height );
 
-    //console.log( "ViewWebGL2.prototype.resize, viewId = " + this.viewId );
+    console.log( "ViewWebGL2.prototype.resize, viewId = " + this.viewId );
 
-    this.width  = width;
-    this.height = height;
-
-    this.renderer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
-
-    this.canvas.width = width * window.devicePixelRatio;
-    this.canvas.height = height * window.devicePixelRatio;
-
+    this.setDimensions( width, height );
+    this.renderer.setSize( this.width, this.height, false );
+    
     if( this.camera.isPerspectiveCamera )
     {
-        this.camera.aspect = width / height;
+        this.camera.aspect = this.width / this.height;
     }
     else
     if( this.camera.isOrthographicCamera )
@@ -306,9 +266,9 @@ ViewWebGL.prototype.resize = function( width, height )
 
     this.camera.updateProjectionMatrix();
 
-    this.pickingRenderTarget.setSize( width, height );
+    this.pickingRenderTarget.setSize( this.width, this.height );
 
-    this.composer.setSize( width, height );
+    //this.composer.setSize( this.width, this.height );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -324,6 +284,18 @@ ViewWebGL.prototype.setView = function( position, lookAt )
     this.camera.lookAt( lookAt );
 
     this.camera.updateProjectionMatrix();
+},
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.setDimensions = function( width, height )
+{
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.width  = ( width  || 1 ) * ( window.devicePixelRatio || 1 );
+    this.height = ( height || 1 ) * ( window.devicePixelRatio || 1 );
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.canvas.width  = this.width;
+    this.canvas.height = this.height;
 },
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -371,8 +343,9 @@ ViewWebGL.prototype.handleMouseDown = function( event )
     if( this.currentControlMode != EControlMode.NONE )
     {
         var position = getRelativePosition( event );
-        this.mouseX = position.x;
-        this.mouseY = position.y;
+        var devicePixelRatio = window.devicePixelRatio || 1;
+        this.mouseX = position.x * devicePixelRatio;
+        this.mouseY = position.y * devicePixelRatio;
 
         this.mousePrevX = this.mouseX;
         this.mousePrevY = this.mouseY;
@@ -483,7 +456,11 @@ ViewWebGL.prototype.selectObjects = function()
 {
     if( this.selectionRectangle.width >= 0 && this.selectionRectangle.height >= 0 )
     {
-        this.renderer.setClearColor( 0x000000 );
+        this.renderer.physicallyCorrectLights = false;
+        this.renderer.gammaInput = false;
+        this.renderer.gammaOutput = false;
+
+        this.renderer.setClearColor( 0x000000, 0 );
         this.renderer.render( this.editor.scenePicking, this.camera, this.pickingRenderTarget, true );
         
         var x = this.selectionRectangle.left;
@@ -493,24 +470,18 @@ ViewWebGL.prototype.selectObjects = function()
 
         //create buffer for reading pixels
         var pixelBuffer = new Uint8Array( w * h * 4 );
-        this.renderer.readRenderTargetPixels( this.pickingRenderTarget, 
-                                        x,
-                                        this.pickingRenderTarget.height - y - h, 
-                                        w,
-                                        h,
-                                        pixelBuffer );
-    
-        this.pickingTextureSelection.image.data = pixelBuffer;
-        this.pickingTextureSelection.image.width = w;
-        this.pickingTextureSelection.image.height = h;
-        this.pickingTextureSelection.needsUpdate = true;
-
+        this.renderer.readRenderTargetPixels(   this.pickingRenderTarget, 
+                                                x,
+                                                this.pickingRenderTarget.height - y - h, 
+                                                w,
+                                                h,
+                                                pixelBuffer );
     
         var ids = {};
         var count = w * h * 4;
         for( var i = 0; i < count; i += 4 )
         {
-            var id = ( pixelBuffer[i + 0] << 16 ) | ( pixelBuffer[i + 1] << 8 ) | ( pixelBuffer[i + 2 ] );
+            var id = ( pixelBuffer[i + 0] << 16 ) | ( pixelBuffer[i + 1] << 8 ) | ( pixelBuffer[i + 2 ]  << 0 );
             ids[id] = id;
         }
 
@@ -522,6 +493,12 @@ ViewWebGL.prototype.selectObjects = function()
         }
 
         this.editor.selectObjectsFromEditorIds( editorObjectsIds );
+
+        this.renderer.physicallyCorrectLights = false;
+        this.renderer.gammaInput = false;
+        this.renderer.gammaOutput = false;
+
+        this.requestRender();
     }
 }
 

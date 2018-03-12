@@ -8,7 +8,7 @@ function setup()
 
     resize();
 
-    createDemoScene( editor );
+    createInitialScene( editor );
 }
 
 function resize()
@@ -24,9 +24,16 @@ function resize()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function createInitialScene( editor )
+{
+    //createDemoScene( editor );
+    createPBRTScene( editor );
+    //createUnrealArchDemoScene( editor );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function createDemoScene( editor )
 {
-    /*
     var spotLight = new THREE.SpotLight( 0xffffff );
     spotLight.name = "spotlight1";
     spotLight.position.set( -10, 15, -5 );
@@ -34,15 +41,14 @@ function createDemoScene( editor )
     spotLight.penumbra = 0.1;
     spotLight.decay = 2;
     spotLight.distance = 200;
+    spotLight.power = 1700;
     spotLight.shadow.mapSize.width = 1024;
     spotLight.shadow.mapSize.height = 1024;
     spotLight.shadow.camera.near = 1;
     spotLight.shadow.camera.far = 200;
     spotLight.castShadow = true;    
     editor.addSceneObject( spotLight );
-    */
 
-    /*
     var cubeGeometry = new THREE.BoxGeometry( 4, 4, 4 )
     var cubeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: editor.defaultTexture } );
     var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
@@ -51,6 +57,7 @@ function createDemoScene( editor )
     cube.position.y = 3;
     cube.position.z = 0;
     cube.castShadow = true;
+    cube.receiveShadow = true;
     editor.addSceneObject( cube );
 
     var groupSpeheres = new THREE.Group();
@@ -65,8 +72,11 @@ function createDemoScene( editor )
         sphere.position.y = (Math.random() * 40) - 20;
         sphere.position.z = (Math.random() * 40) - 20;
         sphere.castShadow = true;
+        sphere.receiveShadow = true;
         groupSpeheres.add( sphere );
     }
+    groupSpeheres.castShadow = true;
+    groupSpeheres.receiveShadow = true;
     editor.addSceneObject( groupSpeheres );    
 
     var planeGeometry = new THREE.PlaneGeometry( 60, 20 );
@@ -77,19 +87,14 @@ function createDemoScene( editor )
     plane.position.x = 15;
     plane.position.y = 0;
     plane.position.z = 0;
+    plane.castShadow = true;
     plane.receiveShadow = true;
     editor.addSceneObject( plane );
-    */
-
-    //editor.loadOBJ( "../../Room/Room.obj", undefined, function( object ) { object.scale.x = 0.01; object.scale.y = 0.01; object.scale.z = 0.01; } );
-    //editor.loadOBJ( "../../Room/Room.obj" );
-
-    createPBRTScene();
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function createPBRTScene()
 {
-    var lightGeometry = new THREE.SphereGeometry(0);
     var lightMaterial = new THREE.MeshStandardMaterial(
         {
             emissive: 0xffffee,
@@ -105,7 +110,10 @@ function createPBRTScene()
     light.shadow.radius = 1.5;
     light.position.set(0, 5, 3);
 
-    light.add(new THREE.Mesh(lightGeometry, lightMaterial));
+    var lightGeometry = new THREE.SphereGeometry(0);
+    var lightMesh = new THREE.Mesh(lightGeometry, lightMaterial);
+    lightMesh.name = "light geometry";
+    light.add( lightMesh );
     light.name = "light";
     editor.addSceneObject( light );
 
@@ -130,7 +138,6 @@ function createPBRTScene()
         mesh.position.set( 3, 0, 0 );
         mesh.rotation.set( 0, -Math.PI / 3.0, 0 );
         mesh.castShadow = true;
-        mesh.matrixAutoUpdate = false;
         mesh.updateMatrix();
 
         editor.addSceneObject( mesh );
@@ -153,7 +160,6 @@ function createPBRTScene()
         mesh.position.set( -3, 0, 0 );
         mesh.rotation.set( 0, -Math.PI, 0 );
         mesh.castShadow = true;
-        mesh.matrixAutoUpdate = false;
         mesh.updateMatrix();
 
         editor.addSceneObject( mesh );
@@ -176,7 +182,6 @@ function createPBRTScene()
         mesh.position.set( 0, 0, -1.5 );
         mesh.rotation.set( 0, -Math.PI, 0 );
         mesh.castShadow = true;
-        mesh.matrixAutoUpdate = false;
         mesh.updateMatrix();
 
         editor.addSceneObject( mesh );
@@ -201,22 +206,32 @@ function createPBRTScene()
         mesh.receiveShadow = true;
         mesh.rotation.x = -Math.PI / 2.0;
         mesh.position.y = 0;
-        mesh.matrixAutoUpdate = false;
         mesh.updateMatrix();
 
         editor.addSceneObject( mesh );
     });
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function createUnrealArchDemoScene()
+{
+    editor.loadOBJ( "../../Room/Room.obj", undefined, function( object ) { object.scale.x = 0.01; object.scale.y = 0.01; object.scale.z = 0.01; } );
+    editor.loadOBJ( "../../Room/Room.obj" );
+}
 
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function changeTheme( theme )
 {
     eventDispatcher.dispatchEvent( "themeChange", theme );
 }
 
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function about()
 {
     messageBox( { title: "About", contents: "<br>WebGL Editor<br>version 0.0.1<br><br>", type: EMessageBox.OK });
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+window.onload = setup;
+window.onresize = resize;

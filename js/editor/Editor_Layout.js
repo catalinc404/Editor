@@ -21,7 +21,7 @@ var editorLayout1View =
                         type: "viewWebGL",
                         config:
                         {
-                            cameraPosition: { x: -28.23, y: 14.34, z: 31.06 },
+                            cameraPosition: { x: -2.287055241885562, y: 3.5, z: 8.334068123389095 },
                             cameraLookat : { x: 0, y: 0, z: 0 },
                         },
                     },
