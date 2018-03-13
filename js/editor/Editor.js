@@ -80,6 +80,20 @@ Editor.prototype.initDefaultScene = function()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.getView = function( viewId )
+{
+    for( var i = 0; i < this.views.length; ++i )
+    {
+        if( this.views[i].getId() == viewId )
+        {
+            return this.views[i];
+        }
+    }
+
+    return undefined;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.render = function()
 {
     for( var i = 0; i < this.selection.length; ++i )

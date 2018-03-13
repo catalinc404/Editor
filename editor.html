@@ -52,6 +52,7 @@
         <script src="js/editor/Editor_Scene_Operations.js"></script>
 
         <!-- MAIN ------------------------------------------------------------------------ -->
+        <script src="js/scenes.js"></script>
         <script src="js/main.js"></script>
 
     </head>
@@ -104,6 +105,32 @@
             <!-- ----------------------------------------------------------------------------- -->
             <div id="panelViewTL" class="page_element">
                 <canvas id="viewTL" class="element noselect"></canvas>
+                <nav id="menu" class="menu background-color-element" style="left:4px; top:4px;height: 22px; width: 24px;">
+                    <ul>
+                        <li><a href="#" class="text13">+</a>
+                            <ul>
+                                <li><a href="#">Render<span class="icon-triangle-right" style="float:right; padding-top: 3px;"></span></a>
+                                    <ul>
+                                        <li><a href="#">Mode<span class="icon-triangle-right" style="float:right; padding-top: 3px;"></span></a>
+                                            <ul>
+                                                <li><a href="#">Color</a></li>
+                                                <li><a href="#">Color Wireframe</a></li>
+                                                <li><a href="#">Depth</a></li>
+                                                <li><a href="#">Picking</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#">Helpers<span class="icon-triangle-right" style="float:right; padding-top: 3px;"></span></a>
+                                            <ul>
+                                                <li><a href="#" onclick="changeViewHelpersRender('viewTLRenderHelpersHELPERS', EView.TL, ERenderHelpersMode.HELPERS);">Helpers<span id="viewTLRenderHelpersHELPERS" class="icon-checked" style="float:right; padding-top: 3px;"></span></a></li>
+                                                <li><a href="#" onclick="changeViewHelpersRender('viewTLRenderHelpersGIZMOS',  EView.TL, ERenderHelpersMode.GIZMOS);">Gizmos<span id="viewTLRenderHelpersGIZMOS" class="icon-checked" style="float:right; padding-top: 3px;"></span></a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
             </div>
             <div id="resizerXTop" class="resizerX"></div>
             <div id="panelViewTR" class="page_element">

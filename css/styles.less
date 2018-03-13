@@ -82,6 +82,11 @@
 {
     .icon(@content: "\64"; @size: 13px; @color: @icon-color);
 }
+.icon-checked:before
+{
+    .icon(@content: "\65"; @size: 13px; @color: @icon-color);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Main
@@ -118,6 +123,11 @@ body
 .background-color(@color: @element-color-background)
 {
     background-color: @color;
+}
+
+.background-color-element
+{
+    .background-color(@color: @element-color-background);
 }
 
 .border-solid-top(@size: 3px; @color: @element-color-border) 

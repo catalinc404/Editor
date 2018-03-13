@@ -6,6 +6,7 @@ var Control_ZOOM_pixel2world_ratio= 0.05;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var ERenderMode = { COLOR : 0, DEPTH: 1, PICKING : 2 };
+var ERenderHelpersMode = { HELPERS: 1, GIZMOS : 2 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function ViewWebGL( eventDispatcher, element, configuration ) 
@@ -27,6 +28,7 @@ function ViewWebGL( eventDispatcher, element, configuration )
     this.currentControlMode = EControlMode.NONE;    
 
     this.renderMode = ERenderMode.COLOR;
+    this.renderHelpersMode = ERenderHelpersMode.HELPERS | ERenderHelpersMode.GIZMOS;
     this.clearColor = 0xaaaaaa;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,8 +228,15 @@ ViewWebGL.prototype.render = function()
     this.renderer.clear();
    
     this.renderer.render( this.editor.scene, this.camera );
-    this.renderer.render( this.editor.sceneHelpers, this.camera );
-    this.renderer.render( this.sceneGizmos, this.camera );
+
+    if( this.renderHelpersMode & ERenderHelpersMode.HELPERS )
+    {
+        this.renderer.render( this.editor.sceneHelpers, this.camera );
+    }
+    if( this.renderHelpersMode & ERenderHelpersMode.GIZMOS )
+    {
+        this.renderer.render( this.sceneGizmos, this.camera );
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -245,7 +254,7 @@ ViewWebGL.prototype.resize = function( width, height )
 {
     View.prototype.resize.call( this, width, height );
 
-    console.log( "ViewWebGL2.prototype.resize, viewId = " + this.viewId );
+    //console.log( "ViewWebGL2.prototype.resize, viewId = " + this.viewId );
 
     this.setDimensions( width, height );
     this.renderer.setSize( this.width, this.height, false );
@@ -267,8 +276,6 @@ ViewWebGL.prototype.resize = function( width, height )
     this.camera.updateProjectionMatrix();
 
     this.pickingRenderTarget.setSize( this.width, this.height );
-
-    //this.composer.setSize( this.width, this.height );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -284,7 +291,7 @@ ViewWebGL.prototype.setView = function( position, lookAt )
     this.camera.lookAt( lookAt );
 
     this.camera.updateProjectionMatrix();
-},
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ViewWebGL.prototype.setDimensions = function( width, height )
@@ -296,7 +303,19 @@ ViewWebGL.prototype.setDimensions = function( width, height )
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.canvas.width  = this.width;
     this.canvas.height = this.height;
-},
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.getRenderHelpersMode = function()
+{
+    return this.renderHelpersMode;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.setRenderHelpersMode = function( renderHelpersMode )
+{
+    return this.renderHelpersMode = renderHelpersMode;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ViewWebGL.prototype.handleMouseDown = function( event ) 
@@ -361,7 +380,7 @@ ViewWebGL.prototype.handleMouseDown = function( event )
         this.requestRender();
     }
         
-},
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ViewWebGL.prototype.handleMouseMove = function( event ) 

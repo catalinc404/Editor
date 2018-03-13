@@ -9,7 +9,7 @@ var editorLayout1View =
             size_min: 128,
             class:
             {
-                onresize : genericResizeNotifier( "panelViewTL" )
+                onresize: genericResizeNotifier( "panelViewTL" )
             },
             rows:
             [
@@ -22,7 +22,8 @@ var editorLayout1View =
                         config:
                         {
                             cameraPosition: { x: -2.287055241885562, y: 3.5, z: 8.334068123389095 },
-                            cameraLookat : { x: 0, y: 0, z: 0 },
+                            cameraLookat: { x: 0, y: 0, z: 0 },
+                            viewId: EView.TL,
                         },
                     },
                 }
@@ -59,7 +60,8 @@ var editorLayout4Views =
                                 config:
                                 {
                                     cameraPosition: { x: -28.23, y: 14.34, z: 31.06 },
-                                    cameraLookat : { x: 0, y: 0, z: 0 },
+                                    cameraLookat: { x: 0, y: 0, z: 0 },
+                                    viewId: EView.TL,
                                 },
                             },                            
                         }
@@ -82,7 +84,7 @@ var editorLayout4Views =
                     size_min: 128,
                     class:
                     {
-                        onresize : genericResizeNotifier( "panelViewTR" )
+                        onresize: genericResizeNotifier( "panelViewTR" )
                     },
                     rows:
                     [
@@ -95,7 +97,8 @@ var editorLayout4Views =
                                 config:
                                 {
                                     cameraPosition: { x: -50, y: 5, z: 0 },
-                                    cameraLookat : { x: 0, y: 0, z: 0 },
+                                    cameraLookat: { x: 0, y: 0, z: 0 },
+                                    viewId: EView.TR,
                                 },
                             },                            
                         }
@@ -124,7 +127,7 @@ var editorLayout4Views =
                     size_min: 128,
                     class:
                     {
-                        onresize : genericResizeNotifier( "panelViewBL" )
+                        onresize: genericResizeNotifier( "panelViewBL" )
                     },
                     rows:
                     [
@@ -137,7 +140,8 @@ var editorLayout4Views =
                                 config:
                                 {
                                     cameraPosition: { x: 0, y: 5, z: -50 },
-                                    cameraLookat : { x: 0, y: 0, z: 0 },
+                                    cameraLookat: { x: 0, y: 0, z: 0 },
+                                    viewId: EView.BL,
                                 },
                             },                            
                         }
@@ -160,7 +164,7 @@ var editorLayout4Views =
                     size_min: 128,
                     class:
                     {
-                        onresize : genericResizeNotifier( "panelViewBR" )
+                        onresize: genericResizeNotifier( "panelViewBR" )
                     },
                     rows:
                     [
@@ -173,7 +177,8 @@ var editorLayout4Views =
                                 config:
                                 {
                                     cameraPosition: { x: 0, y: 55, z: 0 },
-                                    cameraLookat : { x: 0, y: 0, z: 0 },
+                                    cameraLookat: { x: 0, y: 0, z: 0 },
+                                    viewId: EView.BR,
                                 },
                             },
                         }
