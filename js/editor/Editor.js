@@ -193,6 +193,11 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
         editorObject.helpers.push( new THREE.HemisphereLightHelper( object ) );
     }
     else
+    if( object instanceof THREE.RectAreaLight )
+    {
+        editorObject.helpers.push( new THREE.RectAreaLightHelper( object ) );
+    }    
+    else
     if( object instanceof THREE.SkinnedMesh )
     {
         editorObject.helpers.push( new THREE.SkeletonHelper( object ) );

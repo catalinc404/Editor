@@ -78,7 +78,7 @@ Editor.prototype.loadOBJ = function ( path, objectName, callback )
 		objLoader.setPath( basePath );
         objLoader.load( name + ".obj", function ( object ) 
         {
-            object.name = name;
+            object.name = ( objectName !== undefined ) ? objectName : name;
 
             if( callback !== undefined )
             {

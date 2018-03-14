@@ -2,9 +2,10 @@
 function createInitialScene( editor )
 {
     //createDemoScene( editor );
-    createPBRTScene( editor );
+    //createPBRTScene( editor );
     //createPBRTScene2( editor );
     //createUnrealArchDemoScene( editor );
+    createCornellBoxScene( editor );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +70,7 @@ function createDemoScene( editor )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function createPBRTScene()
+function createPBRTScene( editor )
 {
     var lightMaterial = new THREE.MeshStandardMaterial(
         {
@@ -189,7 +190,7 @@ function createPBRTScene()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function createPBRTScene2()
+function createPBRTScene2( editor )
 {
     var lightMaterial = new THREE.MeshStandardMaterial(
         {
@@ -251,8 +252,89 @@ function createPBRTScene2()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function createUnrealArchDemoScene()
+function createUnrealArchDemoScene( editor )
 {
-    editor.loadOBJ( "../../Room/Room.obj", undefined, function( object ) { object.scale.x = 0.01; object.scale.y = 0.01; object.scale.z = 0.01; } );
-    editor.loadOBJ( "../../Room/Room.obj" );
+    editor.loadOBJ( "../Data/Room/Room.obj", undefined, function( object ) { object.scale.x = 0.01; object.scale.y = 0.01; object.scale.z = 0.01; } );
+    editor.loadOBJ( "../Data/Room/Room.obj" );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function createCornellBoxScene( editor )
+{
+    editor.loadOBJ( "../Data/CornellBox/CornellBox-Original.obj", "CornellBox", function( object )
+    {
+        for( var i = 0, count = object.children.length; i < count; ++i )
+        {
+            var childObject = object.children[i];
+            if( childObject.name == "light" )
+            {
+                continue;
+            }
+
+            var oldMaterial = childObject.material;
+            childObject.material = new THREE.MeshPhysicalMaterial( 
+                {
+                    color: oldMaterial.color,
+                    roughness: 0.5,
+                    metalness: 0.5,
+                    clearCoat: 0.5,
+                    clearCoatRoughness: 0.5,
+                    reflectivity: 0.7
+                } );
+
+            childObject.castShadow = true;
+            childObject.receiveShadow = true;
+        }
+    } );
+
+    var rectLight = new THREE.RectAreaLight( 0xffffff, 1, 1, 1 );
+    rectLight.name = "rectLight";
+    rectLight.intensity = 10;
+    rectLight.position.set( 0, 1.9, 0 );
+    rectLight.rotation.x = Math.PI/2.0;
+    rectLight.castShadow = true;
+
+    var lightMaterial = new THREE.MeshStandardMaterial(
+    {
+        emissive: 0xffffee,
+        emissiveIntensity: 1,
+        color: 0x000000
+    });
+
+    var rectLightMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry(), lightMaterial );
+    rectLightMesh.name = "rectLightMeshFace";
+    rectLightMesh.scale.x = rectLight.width;
+    rectLightMesh.scale.y = rectLight.height;
+    rectLight.add( rectLightMesh );
+
+    var rectLightMeshBack = new THREE.Mesh( new THREE.PlaneBufferGeometry(), lightMaterial );
+    rectLightMeshBack.name = "rectLightMeshFaceBack";
+    rectLightMeshBack.rotation.y = Math.PI;
+    rectLightMesh.add( rectLightMeshBack );
+
+    editor.addSceneObject( rectLight );
+
+    /*
+    var lightMaterial = new THREE.MeshStandardMaterial(
+        {
+            emissive: 0xffffee,
+            emissiveIntensity: 1,
+            color: 0x000000
+        });
+
+    var light = new THREE.PointLight(0xffffff, 1, 20, 2);
+    light.power = 1700;
+    light.castShadow = true;
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.heigth = 1024;
+    light.shadow.radius = 1.5;
+    light.position.set(0, 5, 3);
+
+    var lightGeometry = new THREE.SphereGeometry(0);
+    var lightMesh = new THREE.Mesh(lightGeometry, lightMaterial);
+    lightMesh.name = "light geometry";
+    light.add( lightMesh );
+    light.name = "light";
+    editor.addSceneObject( light );
+    */
 }
