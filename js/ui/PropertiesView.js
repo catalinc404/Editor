@@ -5,6 +5,7 @@ function PropertyView( eventDispatcher, element )
     //////////////////////////////////////////////////////////////////////////////
     this.eventDispatcher = eventDispatcher;
     this.element = element;
+    this.scrollbarVVisible = false;
    
     //////////////////////////////////////////////////////////////////////////////
     this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.onSceneObjectsSelected.bind( this ) );
@@ -40,6 +41,30 @@ PropertyView.prototype.onresize = function()
     if( this.gui !== undefined )
     {
         this.gui.width =  rectangle.width; 
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.onPropertiesPanelResize = function()
+{
+    if( this.gui !== undefined )
+    {
+        if( this.gui.domElement.scrollHeight > this.gui.domElement.clientHeight )
+        {
+            if( this.scrollbarVVisible = true )
+            {
+                this.gui.width = this.gui.width - 16;
+                this.scrollbarVVisible = true;
+            }
+        }
+        else
+        {
+            if( this.scrollbarVVisible == true )
+            {
+                this.gui.width = this.gui.width + 16;
+                this.scrollbarVVisible = false;
+            }
+        }
     }
 }
 
@@ -96,6 +121,111 @@ PropertyView.prototype.createMapGUI = function( gui, map, callback )
     else
     {
         gui.add( { map: "none" }, "map" );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.addMaterialDefine = function( gui, material, key, callback )
+{
+    if( key == "DIFFUSE_MODEL" )
+    {
+        gui.add( material.defines, key, { Lambert: 0, Disney: 1, DisneyNorm:2, OrenNayar: 3, Gotanda: 4 } ).onChange( callback );                
+    }
+    else
+    {
+        gui.add( material.defines, key ).onChange( callback );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createMaterialDefinesGUI = function( gui, material, callback )
+{
+    var stringPairBoxParameters = 
+    {
+        title: "Enter new key value",
+        first_text: "Key",
+        second_text: "Value",
+    }
+
+    var materialDefinesGUIButtons =
+    [ 
+        { 
+            name : "",
+            class : "",
+            style: "float: right; margin-right: 16px;",
+            span: 
+            { 
+                class: "icon-plus icon-hover",
+                style: "width: 24px; height: 24px; zorder:10; padding-top: 3px;",
+            },
+            
+            callback: function() { stringPairBox( stringPairBoxParameters ); return true;  }
+        }
+    ]
+
+    var materialDefinesGUI = gui.addFolder( "Defines", materialDefinesGUIButtons );
+
+    stringPairBoxParameters.onOK = function( define )
+    {
+        if( define !== undefined )
+        {
+            if( define.first !== undefined )
+            {
+                var existingItem = false;
+                if( material.defines[ define.first ] !== undefined )
+                {
+                    existingItem = true;
+                }
+
+                if( define.second == "true" || define.second == "True" || define.second == "TRUE" )
+                {
+                    material.defines[ define.first ] = true;
+                }
+                else
+                if( define.second == "false" || define.second == "False" || define.second == "FALSE" )
+                {
+                    material.defines[ define.first ] = false;
+                }
+                else
+                if( Number( define.second ) != Number.NaN )
+                {
+                    material.defines[ define.first ] = Number( define.second );
+                }
+                else
+                {
+                    material.defines[ define.first ] = define.second;
+                }
+
+                if( existingItem == false )
+                {
+                    if( define.first == "DIFFUSE_MODEL" )
+                    {
+                        materialDefinesGUI.add( material.defines, define.first, { Lambert: 0, Disney: 1, DisneyNorm:2, OrenNayar: 3, Gotanda: 4 } ).onChange( callback );                
+                    }
+                    else
+                    {
+                        materialDefinesGUI.add( material.defines, define.first ).onChange( callback );
+                    }
+                }
+            }
+
+            callback();            
+        }
+    }
+
+    if( material.defines !== undefined && material.defines != null )
+    {
+        for (var key in material.defines)
+        {
+            if( key == "DIFFUSE_MODEL" )
+            {
+                materialDefinesGUI.add( material.defines, key, { Lambert: 0, Disney: 1, DisneyNorm:2, OrenNayar: 3, Gotanda: 4 } ).onChange( callback );                
+            }
+            else
+            {
+                materialDefinesGUI.add( material.defines, key ).onChange( callback );
+            }
+        }
     }
 }
 
@@ -210,6 +340,14 @@ PropertyView.prototype.createMaterialGUI = function( gui, material )
         else
         if( material instanceof THREE.MeshStandardMaterial )
         {
+            if( material instanceof THREE.MeshPhysicalMaterial )
+            {
+                var physicallMaterialGUI = materialGUI.addFolder( "Physical Material" );
+                physicallMaterialGUI.add( material, "clearCoat" ).min( 0 ).max( 1 ).onChange( requestMateriaUpdate );
+                physicallMaterialGUI.add( material, "clearCoatRoughness" ).min( 0 ).max( 1 ).onChange( requestMateriaUpdate );
+                physicallMaterialGUI.add( material, "reflectivity" ).min( 0 ).max( 1 ).onChange( requestMateriaUpdate );
+            }
+
             var standardMaterialGUI = materialGUI.addFolder( "Standard Material" );
 
             var mapGUI = standardMaterialGUI.addFolder( "diffuse" );
@@ -271,15 +409,6 @@ PropertyView.prototype.createMaterialGUI = function( gui, material )
 
             standardMaterialGUI.add( material, "morphNormals" ).onChange( requestMateriaUpdate );
             standardMaterialGUI.add( material, "morphTargets" ).onChange( requestMateriaUpdate );
-            
-
-            if( material instanceof THREE.MeshPhysicalMaterial )
-            {
-                var physicallMaterialGUI = standardMaterialGUI.addFolder( "Physical Material" );
-                physicallMaterialGUI.add( material, "clearCoat" ).min( 0 ).max( 1 ).onChange( requestMateriaUpdate );
-                physicallMaterialGUI.add( material, "clearCoatRoughness" ).min( 0 ).max( 1 ).onChange( requestMateriaUpdate );
-                physicallMaterialGUI.add( material, "reflectivity" ).min( 0 ).max( 1 ).onChange( requestMateriaUpdate );
-            }
         }
         else
         if( material instanceof THREE.MeshToonMaterial )
@@ -315,6 +444,30 @@ PropertyView.prototype.createMaterialGUI = function( gui, material )
         {
             console.log("unknown material type for: " + material );
         }
+
+        //////////////////////////////////////////////////////////////////////////////
+        //Base Material
+        materialGUI.add( material, "fog" ).onChange( requestMateriaUpdate );
+        materialGUI.add( material, "lights" ).onChange( requestMateriaUpdate );
+
+        materialGUI.add( material, "blending",  { 
+                                                    NoBlending: THREE.NoBlending, 
+                                                    NormalBlending: THREE.NormalBlending, 
+                                                    AdditiveBlending: THREE.AdditiveBlending,
+                                                    SubtractiveBlending: THREE.SubtractiveBlending,
+                                                    MultiplyBlending: THREE.MultiplyBlending,
+                                                    CustomBlending: THREE.CustomBlending 
+                                                } ).onChange( requestMateriaUpdate );
+        
+        materialGUI.add( material, "side", { FrontSide: THREE.FrontSide, BackSide: THREE.BackSide, DoubleSide: THREE.DoubleSide } ).onChange( requestMateriaUpdate );
+        materialGUI.add( material, "flatShading" ).onChange( requestMateriaUpdate );
+        materialGUI.add( material, "vertexColors", { NoColors: THREE.NoColors, VertexColors: THREE.VertexColors, FaceColors: THREE.FaceColors } ).onChange( requestMateriaUpdate );
+
+        materialGUI.add( material, "opacity" ).min( 0.0 ).max( 1.0 ).onChange( requestMateriaUpdate );
+        materialGUI.add( material, "transparent" ).onChange( requestMateriaUpdate );
+
+        //////////////////////////////////////////////////////////////////////////////
+        this.createMaterialDefinesGUI( materialGUI, material, requestMateriaUpdate );
     }
 }
 
@@ -393,7 +546,7 @@ PropertyView.prototype.createLightGUI = function( gui, object )
 PropertyView.prototype.setProperties = function( object )
 {
     var width = parseInt( this.element.style.width, 10 ) - 1;
-    gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width } );
+    gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width, resizeCallback: this.onPropertiesPanelResize.bind(this) } );
     this.element.appendChild( gui.domElement );
     this.gui = gui;
 

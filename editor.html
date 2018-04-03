@@ -3,13 +3,15 @@
     <!-- ----------------------------------------------------------------------------- -->
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <script src="http://benvanik.github.com/WebGL-Inspector/core/embed.js"></script>
         <!-- LESS ------------------------------------------------------------------------ -->
         <link rel="stylesheet/less" type="text/css" href="css/styles.less"/>
         <script>less = { env: 'development' };</script>
         <script src="js/libs/less.js" data-env="development" type="text/javascript"></script>
         
+
         <!-- THREE.js--------------------------------------------------------------------- -->
+
         <script src="js/libs/three.js/three.js"></script>
         <script src="js/libs/three.js/TransformControls.js"></script>
 
@@ -155,13 +157,37 @@
 
         <div id="messageboxcontainer" class="page_element noselect" style="visibility:hidden; float:left; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1000000;">
             <div id="messagebox" class="page_element border-solid-1px" style="left:calc(50% - 200px); top:40%; width:400px;">
-                <div id="messageboxtitle" class="text13 background-color border-bottom-page-element" style="height:26px; padding-top: 8px; padding-left: 6px;">Title</div>
-                <div id="messageboxcontents" class="text13 background-color border-bottom-page-element" style="padding-top: 8px; padding-left: 6px;">Contents</div>
+                <div id="messageboxtitle" class="text13 background-color border-bottom-page-element" style="height:26px; padding-top: 8px; padding-left: 6px;"></div>
+                <div id="messageboxcontents" class="background-color border-bottom-page-element">
+                    <div id="messageboxcontents_text" class="text13" style="visibility: hidden; padding-top: 8px; padding-left: 6px;"></div>
+                    <div id="messageboxcontents_stringpair" style="visibility: hidden; padding-left: 6px; padding-bottom: 12px;">
+                        <div class="dg main" style="width: 100%;">
+                            <ul>
+                                <li class="cr string">
+                                    <div>
+                                        <span class="property-name" id="messageboxcontents_stringpair_first_text"></span>
+                                        <div class="c">
+                                            <input type="text" id="messageboxcontents_stringpair_first_value">
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="cr string">
+                                    <div>
+                                        <span class="property-name" id="messageboxcontents_stringpair_second_text"></span>
+                                        <div class="c">
+                                            <input type="text" id="messageboxcontents_stringpair_second_value">
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <div id="messageboxbuttons" class="background-color" style="height:30px; padding-top: 8px">
                     <div id="messageboxbuttonscontainer" style="text-align:center;">
-                        <button id="messageboxbuttonok" type="button" style="visibility:hidden;">OK</button>
-                        <div id="messageboxbuttonspacer" style="visibility:hidden;">&nbsp;&nbsp;&nbsp;</div>
-                        <button id="messageboxbuttoncancel" type="button" style="visibility:hidden;">Cancel</button>
+                        <button id="messageboxbuttonok" type="button" style="visibility:hidden;display: inline-block;">OK</button>
+                        <div id="messageboxbuttonspacer" style="visibility:hidden;display: inline-block;">&nbsp;&nbsp;&nbsp;</div>
+                        <button id="messageboxbuttoncancel" type="button" style="visibility:hidden;display: inline-block;">Cancel</button>
                     </div>
                 </div>
             </div>

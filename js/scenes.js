@@ -5,7 +5,8 @@ function createInitialScene( editor )
     //createPBRTScene( editor );
     //createPBRTScene2( editor );
     //createUnrealArchDemoScene( editor );
-    createCornellBoxScene( editor );
+    //createCornellBoxScene( editor );
+    createCornellBoxScene2( editor );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,6 +262,10 @@ function createUnrealArchDemoScene( editor )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function createCornellBoxScene( editor )
 {
+    var view = editor.getView( EView.TL );
+    view.setView( new THREE.Vector3( -0.2758176499040841, 1.0747734896927836, 3.1026880324612622 ),
+                  new THREE.Vector3( -0.15737317350893537, 1.0302500654463793, 2.1107260519877897 ) );
+
     editor.loadOBJ( "../Data/CornellBox/CornellBox-Original.obj", "CornellBox", function( object )
     {
         for( var i = 0, count = object.children.length; i < count; ++i )
@@ -282,10 +287,34 @@ function createCornellBoxScene( editor )
                     reflectivity: 0.7
                 } );
 
+            childObject.material.defines["DIFFUSE_DISNEY"] = 1;
+
             childObject.castShadow = true;
             childObject.receiveShadow = true;
         }
     } );
+
+    var sphereGeometry = new THREE.SphereGeometry( 0.4, 20, 20 );
+    var sphereMaterial = new THREE.MeshPhysicalMaterial( 
+        {
+            color: 0x3F51B5,
+            roughness: 0.5,
+            metalness: 0.5,
+            clearCoat: 0.5,
+            clearCoatRoughness: 0.5,
+            reflectivity: 0.7
+        } );
+    sphereMaterial.defines["DIFFUSE_DISNEY"] = 1;
+
+    var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    sphere.name = "sphere";
+    sphere.position.x = -0.57;
+    sphere.position.y = 0.33;
+    sphere.position.z = 0;
+    sphere.castShadow = true;
+    sphere.receiveShadow = true;
+    editor.addSceneObject( sphere );
+
 
     var rectLight = new THREE.RectAreaLight( 0xffffff, 1, 1, 1 );
     rectLight.name = "rectLight";
@@ -337,4 +366,116 @@ function createCornellBoxScene( editor )
     light.name = "light";
     editor.addSceneObject( light );
     */
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function createCornellBoxScene2( editor )
+{
+    var view = editor.getView( EView.TL );
+    view.setView( new THREE.Vector3( -0.2758176499040841, 1.0747734896927836, 3.1026880324612622 ),
+                  new THREE.Vector3( -0.15737317350893537, 1.0302500654463793, 2.1107260519877897 ) );
+
+    editor.loadOBJ( "../Data/CornellBox/CornellBox-Original.obj", "CornellBox", function( object )
+    {
+        for( var i = 0, count = object.children.length; i < count; ++i )
+        {
+            var childObject = object.children[i];
+            if( childObject.name == "light" )
+            {
+                continue;
+            }
+
+            var oldMaterial = childObject.material;
+            childObject.material = new THREE.MeshPhysicalMaterial( 
+                {
+                    color: oldMaterial.color,
+                    roughness: 1.0,
+                    metalness: 0.0,
+                    clearCoat: 0.0,
+                    clearCoatRoughness: 0.0,
+                    reflectivity: 0.7
+                } );
+
+            if( childObject.name != "ceiling" )
+            {
+                childObject.castShadow = true;
+               childObject.receiveShadow = true;
+            }
+        }
+    } );
+
+    var sphereGeometry = new THREE.SphereGeometry( 0.4, 20, 20 );
+    var sphereMaterial = new THREE.MeshPhysicalMaterial( 
+        {
+            color: 0x3F51B5,
+            roughness: 1.0,
+            metalness: 0.0,
+            clearCoat: 0.0,
+            clearCoatRoughness: 0.0,
+            reflectivity: 0.7
+        } );
+    sphereMaterial.defines["DIFFUSE_MODEL"] = 1;
+    sphereMaterial.needsUpdate = true;
+    sphereMaterial.name = "sph1";
+
+    var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    sphere.name = "sphere";
+    sphere.position.x = -0.57;
+    sphere.position.y = 0.33;
+    sphere.position.z = 0.2;
+    sphere.castShadow = true;
+    sphere.receiveShadow = true;
+    editor.addSceneObject( sphere );
+
+    var sphereGeometry2 = new THREE.SphereGeometry( 0.4, 20, 20 );
+    var sphereMaterial2 = new THREE.MeshPhysicalMaterial( 
+        {
+            color: 0x3F51B5,
+            roughness: 1.0,
+            metalness: 0.0,
+            clearCoat: 0.0,
+            clearCoatRoughness: 0.0,
+            reflectivity: 0.7
+        } );
+    sphereMaterial2.defines["DIFFUSE_MODEL"] = 0;
+
+    var sphere2 = new THREE.Mesh(sphereGeometry2, sphereMaterial2);
+    sphere2.name = "sphere";
+    sphere2.position.x = 0.57;
+    sphere2.position.y = 0.33;
+    sphere2.position.z = 0.2;
+    sphere2.castShadow = true;
+    sphere2.receiveShadow = true;
+    editor.addSceneObject( sphere2 );
+    
+    var lightMaterial = new THREE.MeshStandardMaterial(
+    {
+        emissive: 0xffffff,
+        emissiveIntensity: 1,
+        color: 0xffffff
+    });
+
+    lightMaterial.needsUpdate = true;
+
+    var light = new THREE.PointLight(0xffffff, 1, 20, 2);
+    light.power = 100;
+    light.castShadow = false;
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.heigth = 1024;
+    light.shadow.radius = 1.5;
+    light.position.set( 0.11, 2.7, 0 );
+
+    var lightGeometry = new THREE.SphereGeometry(0.1)
+    var lightMesh = new THREE.Mesh(lightGeometry, lightMaterial);
+    lightMesh.name = "light geometry";
+    light.add( lightMesh );
+    light.name = "light";
+    editor.addSceneObject( light );
+
+    var hemisphereLight = new THREE.HemisphereLight(0x303F9F, 0x000000, 1);
+    hemisphereLight.name = "hemisphereLight";
+    editor.addSceneObject( hemisphereLight );
+
+    editor.render();
+
 }

@@ -67,22 +67,26 @@ ThemeManager.prototype.handleThemeUpdated = function()
     for(var i = 0; i < styleSheetList.length; i++)
     {
         var sheet = styleSheetList[i];
-        for( var i = 0; i < sheet.cssRules.length; ++i )
-        {
-            var rule = sheet.cssRules[i];
 
-            if( rule.selectorText == ".font-color" )                 colors.font_color                 = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".font-color-shadow" )          colors.font_color_shadow          = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".font-color-selected" )        colors.font_color_selected        = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".font-color-shadow-selected" ) colors.font_color_shadow_selected = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".element-color-background" )   colors.element_color_background   = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".element-color-border" )       colors.element_color_border       = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".element-color-highlight" )    colors.element_color_highlight    = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".element-color-selected" )     colors.element_color_selected     = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".icon-color" )                 colors.icon_color                 = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".resizer-color" )              colors.resizer_color              = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".resizer-color-background" )   colors.resizer_color_background   = this.parseRGBColor( rule.style.color );
-            if( rule.selectorText == ".editor-view-background" )     colors.editor_view_background     = this.parseRGBColor( rule.style.color );
+        if( sheet.ownerNode !== undefined && sheet.ownerNode != null && sheet.ownerNode.id.search("less") != -1 )
+        {
+            for( var i = 0; i < sheet.cssRules.length; ++i )
+            {
+                var rule = sheet.cssRules[i];
+
+                if( rule.selectorText == ".font-color" )                 colors.font_color                 = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".font-color-shadow" )          colors.font_color_shadow          = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".font-color-selected" )        colors.font_color_selected        = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".font-color-shadow-selected" ) colors.font_color_shadow_selected = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".element-color-background" )   colors.element_color_background   = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".element-color-border" )       colors.element_color_border       = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".element-color-highlight" )    colors.element_color_highlight    = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".element-color-selected" )     colors.element_color_selected     = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".icon-color" )                 colors.icon_color                 = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".resizer-color" )              colors.resizer_color              = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".resizer-color-background" )   colors.resizer_color_background   = this.parseRGBColor( rule.style.color );
+                if( rule.selectorText == ".editor-view-background" )     colors.editor_view_background     = this.parseRGBColor( rule.style.color );
+            }
         }
     }
 

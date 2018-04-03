@@ -120,6 +120,84 @@ ViewWebGL.prototype.render = function()
 
     this.transformControls.update();
 
+    this.renderer.setClearColor( this.clearColor );
+    this.renderer.clear( true, true, true );
+
+    //Debug
+    var position = this.camera.position;
+    var lookAt = new THREE.Vector3;
+    lookAt = this.camera.getWorldDirection( lookAt );
+    lookAt.add( position );
+   
+    this.renderer.render( this.editor.scene, this.camera );
+
+    if( this.renderHelpersMode & ERenderHelpersMode.HELPERS )
+    {
+        this.renderer.render( this.editor.sceneHelpers, this.camera );
+    }
+    if( this.renderHelpersMode & ERenderHelpersMode.GIZMOS )
+    {
+        this.renderer.render( this.sceneGizmos, this.camera );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.requestRender = function()
+{
+    View.prototype.requestRender.call( this );
+
+    //console.log( "ViewWebGL2.prototype.requestRender, viewId = " + this.viewId );
+
+    requestAnimationFrame( this.fnRender );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.resize = function( width, height )
+{
+    View.prototype.resize.call( this, width, height );
+
+    //console.log( "ViewWebGL2.prototype.resize, viewId = " + this.viewId );
+
+    this.setDimensions( width, height );
+    this.renderer.setSize( this.width, this.height, false );
+    
+    if( this.camera.isPerspectiveCamera )
+    {
+        this.camera.aspect = this.width / this.height;
+    }
+    else
+    if( this.camera.isOrthographicCamera )
+    {
+        //TODO
+    }
+    else
+    {
+        console.log( "ViewWebGL.prototype.resize: invalid camera type!" );
+    }
+
+    this.camera.updateProjectionMatrix();
+
+    this.pickingRenderTarget.setSize( this.width, this.height );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.setView = function( position, lookAt )
+{
+    View.prototype.setView.call( this, position, lookAt );
+
+    //console.log( "View.prototype.setView, viewId = " + this.viewId );
+
+    this.camera.position.x = position.x;
+    this.camera.position.y = position.y;
+    this.camera.position.z = position.z;
+    this.camera.lookAt( lookAt );
+
+    this.camera.updateProjectionMatrix();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.updateView = function()
+{
     if( this.currentControlMode != EControlMode.NONE )
     {
         var deltaMouseX = this.mouseX - this.mousePrevX;
@@ -223,74 +301,6 @@ ViewWebGL.prototype.render = function()
             }
         }
     }
-
-    this.renderer.setClearColor( this.clearColor );
-    this.renderer.clear();
-   
-    this.renderer.render( this.editor.scene, this.camera );
-
-    if( this.renderHelpersMode & ERenderHelpersMode.HELPERS )
-    {
-        this.renderer.render( this.editor.sceneHelpers, this.camera );
-    }
-    if( this.renderHelpersMode & ERenderHelpersMode.GIZMOS )
-    {
-        this.renderer.render( this.sceneGizmos, this.camera );
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.requestRender = function()
-{
-    View.prototype.requestRender.call( this );
-
-    //console.log( "ViewWebGL2.prototype.requestRender, viewId = " + this.viewId );
-
-    requestAnimationFrame( this.fnRender );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.resize = function( width, height )
-{
-    View.prototype.resize.call( this, width, height );
-
-    //console.log( "ViewWebGL2.prototype.resize, viewId = " + this.viewId );
-
-    this.setDimensions( width, height );
-    this.renderer.setSize( this.width, this.height, false );
-    
-    if( this.camera.isPerspectiveCamera )
-    {
-        this.camera.aspect = this.width / this.height;
-    }
-    else
-    if( this.camera.isOrthographicCamera )
-    {
-        //TODO
-    }
-    else
-    {
-        console.log( "ViewWebGL.prototype.resize: invalid camera type!" );
-    }
-
-    this.camera.updateProjectionMatrix();
-
-    this.pickingRenderTarget.setSize( this.width, this.height );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.setView = function( position, lookAt )
-{
-    View.prototype.setView.call( this, position, lookAt );
-
-    //console.log( "View.prototype.setView, viewId = " + this.viewId );
-
-    this.camera.position.x = position.x;
-    this.camera.position.y = position.y;
-    this.camera.position.z = position.z;
-    this.camera.lookAt( lookAt );
-
-    this.camera.updateProjectionMatrix();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -377,9 +387,9 @@ ViewWebGL.prototype.handleMouseDown = function( event )
             this.selectionRectangle.height = 0; 
         }
 
+        this.updateView();
         this.requestRender();
     }
-        
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -394,9 +404,10 @@ ViewWebGL.prototype.handleMouseMove = function( event )
         var position = getRelativePosition( event );
         this.mouseX = position.x;
         this.mouseY = position.y;
-    }
 
-    this.requestRender();
+        this.updateView();
+        this.requestRender();        
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -424,6 +435,7 @@ ViewWebGL.prototype.handleMouseUp = function( event )
     this.mouseX = null;
     this.mouseY = null;
     
+    this.updateView();            
     this.requestRender();
 }
 
@@ -513,9 +525,9 @@ ViewWebGL.prototype.selectObjects = function()
 
         this.editor.selectObjectsFromEditorIds( editorObjectsIds );
 
-        this.renderer.physicallyCorrectLights = false;
-        this.renderer.gammaInput = false;
-        this.renderer.gammaOutput = false;
+        this.renderer.physicallyCorrectLights = true;
+        this.renderer.gammaInput = true;
+        this.renderer.gammaOutput = true;
 
         this.requestRender();
     }

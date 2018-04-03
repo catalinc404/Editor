@@ -12,7 +12,8 @@ function messageBox( parameters )
     var messageBoxTitle = document.getElementById( "messageboxtitle" );
     messageBoxTitle.innerHTML  =  parameters.title || "Message";
 
-    var messageBoxcontents = document.getElementById( "messageboxcontents" );
+    var messageBoxcontents = document.getElementById( "messageboxcontents_text" );
+    messageBoxcontents.style.visibility = "visible";
     messageBoxcontents.innerHTML  =  parameters.contents || "";
     
     switch( parameters.type )
@@ -27,6 +28,7 @@ function messageBox( parameters )
                 messageBoxContainer.style.visibility = "hidden";
                 messageBox.style.visibility = "hidden";
                 messageBoxButtonOK.style.visibility = "hidden";
+                messageBoxcontents.style.visibility = "hidden";
                 if( parameters.onOK !== undefined )
                 {
                     parameters.onOK();
@@ -40,5 +42,73 @@ function messageBox( parameters )
             messageBoxButtonCancel.style.visibility = "hidden";
         }
         break;
+    }
+}
+
+function stringPairBox( parameters )
+{
+    var messageBoxContainer = document.getElementById( "messageboxcontainer" );
+    messageBoxContainer.style.visibility = "visible";
+
+    var messageBox = document.getElementById( "messagebox" );
+    messageBox.style.visibility = "visible";
+
+    var messageBoxTitle = document.getElementById( "messageboxtitle" );
+    messageBoxTitle.innerHTML  =  parameters.title || "Message";
+
+    var messageBoxcontents_stringPair = document.getElementById( "messageboxcontents_stringpair" );
+    messageBoxcontents_stringPair.style.visibility = "visible";
+
+    var messageBoxcontents_stringPair_first_text = document.getElementById( "messageboxcontents_stringpair_first_text" );
+    messageBoxcontents_stringPair_first_text.innerHTML = parameters.firts_text || "Name";
+    var messageBoxcontents_stringPair_first_value = document.getElementById( "messageboxcontents_stringpair_first_value" );
+    messageBoxcontents_stringPair_first_value.innerHTML = "";
+
+    var messageBoxcontents_stringPair_first_text = document.getElementById( "messageboxcontents_stringpair_second_text" );
+    messageBoxcontents_stringPair_first_text.innerHTML = parameters.second_text || "Value";
+    var messageBoxcontents_stringPair_second_value = document.getElementById( "messageboxcontents_stringpair_second_value" );
+    messageBoxcontents_stringPair_second_value.innerHTML = "";
+    
+    var messageBoxButtonOK = document.getElementById( "messageboxbuttonok" ); 
+    messageBoxButtonOK.style.visibility = "visible";
+    var messageBoxButtonSpacer = document.getElementById( "messageboxbuttonspacer" ); 
+    messageBoxButtonSpacer.style.visibility = "visible";
+    var messageBoxButtonCancel = document.getElementById( "messageboxbuttoncancel" );
+    messageBoxButtonCancel.style.visibility = "visible";
+    
+    messageBoxButtonOK.onclick = function()
+    {
+        if( parameters.onOK !== undefined )
+        {
+            var messageBoxcontents_stringPair_first_value = document.getElementById( "messageboxcontents_stringpair_first_value" );
+            var first = messageBoxcontents_stringPair_first_value.value;
+        
+            var messageBoxcontents_stringPair_second_value = document.getElementById( "messageboxcontents_stringpair_second_value" );
+            var second = messageBoxcontents_stringPair_second_value.value;
+
+            parameters.onOK( { first: first, second: second } );
+        }
+
+        messageBoxContainer.style.visibility = "hidden";
+        messageBoxButtonOK.style.visibility = "hidden";
+        messageBoxButtonSpacer.style.visibility = "hidden";
+        messageBoxButtonCancel.style.visibility = "hidden";
+        messageBoxcontents_stringPair.style.visibility = "hidden";
+        messageBox.style.visibility = "hidden";
+    }
+
+    messageBoxButtonCancel.onclick = function()
+    {
+        if( parameters.onCancel !== undefined )
+        {
+            parameters.onCancel();
+        }
+
+        messageBoxContainer.style.visibility = "hidden";
+        messageBoxButtonOK.style.visibility = "hidden";
+        messageBoxButtonSpacer.style.visibility = "hidden";
+        messageBoxButtonCancel.style.visibility = "hidden";
+        messageBoxcontents_stringPair.style.visibility = "hidden";
+        messageBox.style.visibility = "hidden";
     }
 }

@@ -21,7 +21,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome W - editor.html",
-            "url": "file:///C:/Users/CCalugarita/Documents/CodeProjects/Editor/editor.html",
+            "url": "file:///D:/Catalin/Projects/_CodeProjects/Editor/editor.html",
             "webRoot": "${workspaceRoot}/editor.html",
             "runtimeArgs": [
                 "--allow-file-access-from-files"
