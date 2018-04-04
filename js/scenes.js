@@ -399,7 +399,7 @@ function createCornellBoxScene2( editor )
             if( childObject.name != "ceiling" )
             {
                 childObject.castShadow = true;
-               childObject.receiveShadow = true;
+                childObject.receiveShadow = true;
             }
         }
     } );
@@ -459,7 +459,7 @@ function createCornellBoxScene2( editor )
 
     var light = new THREE.PointLight(0xffffff, 1, 20, 2);
     light.power = 100;
-    light.castShadow = false;
+    light.castShadow = true;
     light.shadow.mapSize.width = 1024;
     light.shadow.mapSize.heigth = 1024;
     light.shadow.radius = 1.5;

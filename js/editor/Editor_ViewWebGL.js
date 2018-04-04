@@ -100,9 +100,17 @@ ViewWebGL.prototype.init = function( editor )
     this.pickingRenderTarget.texture.minFilter = THREE.LinearFilter;
     this.pickingRenderTarget.texture.maxFilter = THREE.NearestFilter;
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
     this.transformControls = new THREE.TransformControls( this.camera, this.canvas );
-    this.transformControls.addEventListener( "change", this.handleObjectTransformChange.bind( this ) );
+    this.transformControls.addEventListener( "change",      this.handleObjectTransformChange.bind( this )    );
+    this.transformControls.addEventListener( "mouseDown",   this.handleObjectTransformMouseDown.bind( this ) );
+    this.transformControls.addEventListener( "mouseUp",     this.handleObjectTransformMouseUp.bind( this )   );
     this.sceneGizmos.add( this.transformControls );
+
+    this.transformControlsData = {};
+    this.transformControlsData.position = new THREE.Vector3();
+    this.transformControlsData.scale = new THREE.Vector3();
+    this.transformControlsData.quaternion = new THREE.Quaternion();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.canvas.addEventListener( "mousedown",  this.handleMouseDown.bind( this ),  false );
@@ -137,6 +145,7 @@ ViewWebGL.prototype.render = function()
     }
     if( this.renderHelpersMode & ERenderHelpersMode.GIZMOS )
     {
+        this.renderer.render( editor.sceneGizmos, this.camera );
         this.renderer.render( this.sceneGizmos, this.camera );
     }
 }
@@ -456,6 +465,7 @@ ViewWebGL.prototype.handleSceneObjectsSelected = function( objects )
     {
         var object = objects[0];
         this.transformControls.attach( object );
+        this.transformControlsData.object = object;
     }
 
     this.requestRender();
@@ -465,6 +475,7 @@ ViewWebGL.prototype.handleSceneObjectsSelected = function( objects )
 ViewWebGL.prototype.handleSceneObjectsDeselected = function( objects )
 {
     this.transformControls.detach();
+    this.transformControlsData.object = undefined;
 
     this.requestRender();
 }
@@ -473,6 +484,58 @@ ViewWebGL.prototype.handleSceneObjectsDeselected = function( objects )
 ViewWebGL.prototype.handleObjectTransformChange = function(  )
 {
     this.eventDispatcher.dispatchEvent( "render" );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.handleObjectTransformMouseDown = function( event )
+{
+    this.transformControlsData.position.x = this.transformControls.object.position.x;
+    this.transformControlsData.position.y = this.transformControls.object.position.y;
+    this.transformControlsData.position.z = this.transformControls.object.position.z;
+
+    this.transformControlsData.scale.x = this.transformControls.object.scale.x;
+    this.transformControlsData.scale.y = this.transformControls.object.scale.y;
+    this.transformControlsData.scale.z = this.transformControls.object.scale.z;
+        
+    this.transformControlsData.quaternion.x = this.transformControls.object.quaternion.x;
+    this.transformControlsData.quaternion.y = this.transformControls.object.quaternion.y;
+    this.transformControlsData.quaternion.z = this.transformControls.object.quaternion.z;
+    this.transformControlsData.quaternion.w = this.transformControls.object.quaternion.y;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.handleObjectTransformMouseUp = function( event )
+{
+    if( event.mode == "translate" )
+    {
+        var newPosition = new THREE.Vector3();
+        newPosition.x = this.transformControls.object.position.x;
+        newPosition.y = this.transformControls.object.position.y;
+        newPosition.z = this.transformControls.object.position.z;
+
+        editor.sceneObjectTranslated( this.transformControlsData.object, this.transformControlsData.position, newPosition );
+    }
+    else
+    if( event.mode == "rotate" )    
+    {
+        var newRotation = new THREE.Quaternion();
+        newRotation.x = this.transformControls.object.quaternion.x;
+        newRotation.y = this.transformControls.object.quaternion.y;
+        newRotation.z = this.transformControls.object.quaternion.z;
+        newRotation.w = this.transformControls.object.quaternion.w;
+
+        editor.sceneObjectRotated( this.transformControlsData.object, this.transformControlsData.quaternion, newRotation );
+    }
+    else
+    if( event.mode == "scale" )    
+    {
+        var newScale = new THREE.Vector3();
+        newScale.x = this.transformControls.object.scale.x;
+        newScale.y = this.transformControls.object.scale.y;
+        newScale.z = this.transformControls.object.scale.z;
+
+        editor.sceneObjectScaled( this.transformControlsData.object, this.transformControlsData.scale, newScale );
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

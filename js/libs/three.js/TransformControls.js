@@ -669,6 +669,7 @@
 
 		var oldPosition = new THREE.Vector3();
 		var oldScale = new THREE.Vector3();
+		var oldRotation = new THREE.Euler();
 		var oldRotationMatrix = new THREE.Matrix4();
 
 		var parentRotationMatrix  = new THREE.Matrix4();
@@ -876,6 +877,7 @@
 
 						oldPosition.copy( scope.object.position );
 						oldScale.copy( scope.object.scale );
+						oldRotation.copy( scope.object.rotation );
 
 						oldRotationMatrix.extractRotation( scope.object.matrix );
 						worldRotationMatrix.extractRotation( scope.object.matrixWorld );
@@ -1110,7 +1112,6 @@
 
 				mouseUpEvent.mode = _mode;
 				scope.dispatchEvent( mouseUpEvent );
-
 			}
 
 			_dragging = false;

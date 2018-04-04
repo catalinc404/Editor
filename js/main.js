@@ -9,6 +9,8 @@ function setup()
 
     resize();
 
+    window.addEventListener( "keydown", editor.onKeyDown.bind( editor ), false );
+    
     createInitialScene( editor );
 }
 
