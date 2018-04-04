@@ -69,8 +69,16 @@ function TranslateObjectCommand( editor, object, oldPosition, newPosition )
 {
     this.editor = editor;
     this.object = object;
-    this.oldPosition = oldPosition;
-    this.newPosition = newPosition;
+
+    this.oldPosition = new THREE.Vector3();
+    this.oldPosition.x = oldPosition.x;
+    this.oldPosition.y = oldPosition.y;
+    this.oldPosition.z = oldPosition.z;
+
+    this.newPosition = new THREE.Vector3();
+    this.newPosition.x = newPosition.x;
+    this.newPosition.y = newPosition.y;
+    this.newPosition.z = newPosition.z;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -114,8 +122,16 @@ function ScaleObjectCommand( editor, object, oldScale, newScale )
 {
     this.editor = editor;
     this.object = object;
-    this.oldScale = oldScale;
-    this.newScale = newScale;
+
+    this.oldScale = new THREE.Vector3();
+    this.oldScale.x = oldScale.x;
+    this.oldScale.y = oldScale.y;
+    this.oldScale.z = oldScale.z;
+
+    this.newScale = new THREE.Vector3();
+    this.newScale.x = newScale.x;
+    this.newScale.y = newScale.y;
+    this.newScale.z = newScale.z;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -159,8 +175,18 @@ function RotateObjectCommand( editor, object, oldRotation, newRotation )
 {
     this.editor = editor;
     this.object = object;
-    this.oldRotation = oldRotation;
-    this.newRotation = newRotation;
+
+    this.oldRotation = new THREE.Quaternion();
+    this.oldRotation.x = oldRotation.x;
+    this.oldRotation.y = oldRotation.y;
+    this.oldRotation.z = oldRotation.z;
+    this.oldRotation.w = oldRotation.w;
+
+    this.newRotation =  new THREE.Quaternion();
+    this.newRotation.x = newRotation.x;
+    this.newRotation.y = newRotation.y;
+    this.newRotation.z = newRotation.z;
+    this.newRotation.w = newRotation.w;
 }
 
 //////////////////////////////////////////////////////////////////////////////
