@@ -1825,28 +1825,30 @@ var GUI = function GUI(pars) {
     dom.addClass(titleRow, 'title');
     if (params.buttons !== undefined) {
       var length = params.buttons.length;
-      for (var i = 0; i < length; ++i) {
-        var name = params.name + "_button" + i;
-        var callback = params.buttons[i].callback;
+      for (var i = 0; i < length; ++i) 
+      {
         var button = document.createElement("A");
         dom.addClass(button, params.buttons[i].class);
         button.setAttribute("style", params.buttons[i].style);
+        button.callback = params.buttons[i].callback;
         var button_span = document.createElement("SPAN");
         dom.addClass(button_span, params.buttons[i].span.class);
         button_span.setAttribute("style", params.buttons[i].span.style);
         button.appendChild(button_span);
-        var onClickButton = function onClickButton(e) {
+        var onClickButton = function onClickButton(e)
+        {
           e.preventDefault();
           e.stopPropagation();
-          var result = false;
-          if (callback != null) {
-            result = callback();
+
+          if (_this.closed == true) {
+            _this.closed = false;
           }
-          if (result !== undefined && result == true) {
-            if (_this.closed == true) {
-              _this.closed = false;
-            }
+
+          if (this.callback !== undefined) 
+          {
+            this.callback();
           }
+
           return false;
         };
         dom.bind(button, 'click', onClickButton);

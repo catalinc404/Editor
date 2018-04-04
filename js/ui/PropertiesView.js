@@ -140,36 +140,53 @@ PropertyView.prototype.addMaterialDefine = function( gui, material, key, callbac
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.createMaterialDefinesGUI = function( gui, material, callback )
 {
-    var stringPairBoxParameters = 
+    var stringPairAddBoxParameters = 
     {
         title: "Enter new key value",
         first_text: "Key",
         second_text: "Value",
     }
+    var stringPairRemoveBoxParameters = 
+    {
+        title: "Enter key name to delete",
+        first_text: "Key",
+    }
 
     var materialDefinesGUIButtons =
     [ 
         { 
-            name : "",
+            name : "Remove",
             class : "",
             style: "float: right; margin-right: 16px;",
+            span: 
+            { 
+                class: "icon-trash icon-hover",
+                style: "width: 24px; height: 24px; zorder:10; padding-top: 3px;",
+            },
+            
+            callback: function() { stringBox( stringPairRemoveBoxParameters ); return true;  }
+        },
+        { 
+            name : "Add",
+            class : "",
+            style: "float: right; margin-right: 6px;",
             span: 
             { 
                 class: "icon-plus icon-hover",
                 style: "width: 24px; height: 24px; zorder:10; padding-top: 3px;",
             },
             
-            callback: function() { stringPairBox( stringPairBoxParameters ); return true;  }
-        }
+            callback: function() { stringPairBox( stringPairAddBoxParameters ); return true;  }
+        },
     ]
 
     var materialDefinesGUI = gui.addFolder( "Defines", materialDefinesGUIButtons );
 
-    stringPairBoxParameters.onOK = function( define )
+    stringPairAddBoxParameters.onOK = function( define )
     {
         if( define !== undefined )
         {
-            if( define.first !== undefined )
+            if( ( define.first !== undefined ) && ( define.first != "" ) )
             {
                 var existingItem = false;
                 if( material.defines[ define.first ] !== undefined )
@@ -212,6 +229,25 @@ PropertyView.prototype.createMaterialDefinesGUI = function( gui, material, callb
             callback();            
         }
     }
+
+    stringPairRemoveBoxParameters.onOK = function( key )
+    {
+        if( key !== undefined && key != "PHYSICAL" && key != "STANDARD" )
+        {
+            if( material.defines[ key ] !== undefined )
+            {
+                for( var i = 0; i < materialDefinesGUI.__controllers.length; ++i )
+                {
+                    if( materialDefinesGUI.__controllers[i].property == key )
+                    {
+                        materialDefinesGUI.remove( materialDefinesGUI.__controllers[i] );
+                    }
+                }
+            }
+
+            callback();            
+        }
+    }    
 
     if( material.defines !== undefined && material.defines != null )
     {
