@@ -157,11 +157,11 @@ PropertyView.prototype.createMaterialDefinesGUI = function( gui, material, callb
         { 
             name : "Remove",
             class : "",
-            style: "float: right; margin-right: 16px;",
+            style: "float: right; margin-right: 16px; margin-top: 3px;",
             span: 
             { 
                 class: "icon-trash icon-hover",
-                style: "width: 24px; height: 24px; zorder:10; padding-top: 3px;",
+                style: "width: 24px; height: 24px; zorder:10; padding-top: 6px;",
             },
             
             callback: function() { stringBox( stringPairRemoveBoxParameters ); return true;  }
@@ -169,11 +169,11 @@ PropertyView.prototype.createMaterialDefinesGUI = function( gui, material, callb
         { 
             name : "Add",
             class : "",
-            style: "float: right; margin-right: 6px;",
+            style: "float: right; margin-right: 6px; margin-top: 3px;",
             span: 
             { 
                 class: "icon-plus icon-hover",
-                style: "width: 24px; height: 24px; zorder:10; padding-top: 3px;",
+                style: "width: 24px; height: 24px; zorder:10; padding-top: 6px;",
             },
             
             callback: function() { stringPairBox( stringPairAddBoxParameters ); return true;  }

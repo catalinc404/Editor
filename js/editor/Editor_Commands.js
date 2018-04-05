@@ -153,7 +153,7 @@ ScaleObjectCommand.prototype.Undo = function()
     this.object.scale.x = this.oldScale.x;
     this.object.scale.y = this.oldScale.y;
     this.object.scale.z = this.oldScale.z;
-    this.object.matrixNeedUpdate = true;
+    this.object.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.object );
 }
@@ -164,7 +164,7 @@ ScaleObjectCommand.prototype.Redo = function()
     this.object.scale.x = this.newScale.x;
     this.object.scale.y = this.newScale.y;
     this.object.scale.z = this.newScale.z;
-    this.object.matrixNeedUpdate = true;
+    this.object.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.object );
 }
@@ -209,7 +209,7 @@ RotateObjectCommand.prototype.Undo = function()
     this.object.quaternion.y = this.oldRotation.y;
     this.object.quaternion.z = this.oldRotation.z;
     this.object.quaternion.w = this.oldRotation.w;
-    this.object.matrixNeedUpdate = true;
+    this.object.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.object );
 }
@@ -221,8 +221,90 @@ RotateObjectCommand.prototype.Redo = function()
     this.object.quaternion.y = this.newRotation.y;
     this.object.quaternion.z = this.newRotation.z;
     this.object.quaternion.w = this.newRotation.w;
-    this.object.matrixNeedUpdate = true;
+    this.object.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.object );
 }
 
+//////////////////////////////////////////////////////////////////////////////
+ViewCameraTransformedCommand
+
+//////////////////////////////////////////////////////////////////////////////
+function ViewCameraTransformedCommand( editor, viewId, oldPosition, oldRotation, newPosition, newRotation )
+{
+    this.editor = editor;
+    this.viewId = viewId;
+
+    this.oldPosition = new THREE.Vector3();
+    this.oldPosition.x = oldPosition.x;
+    this.oldPosition.y = oldPosition.y;
+    this.oldPosition.z = oldPosition.z;
+
+    this.oldRotation = new THREE.Quaternion();
+    this.oldRotation.x = oldRotation.x;
+    this.oldRotation.y = oldRotation.y;
+    this.oldRotation.z = oldRotation.z;
+    this.oldRotation.w = oldRotation.w;
+
+    this.newPosition = new THREE.Vector3();
+    this.newPosition.x = newPosition.x;
+    this.newPosition.y = newPosition.y;
+    this.newPosition.z = newPosition.z;
+        
+    this.newRotation =  new THREE.Quaternion();
+    this.newRotation.x = newRotation.x;
+    this.newRotation.y = newRotation.y;
+    this.newRotation.z = newRotation.z;
+    this.newRotation.w = newRotation.w;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewCameraTransformedCommand.prototype = Object.assign( Object.create( Object.prototype ), 
+{
+    //////////////////////////////////////////////////////////////////////////////
+    constructor: ViewCameraTransformedCommand
+} );
+
+//////////////////////////////////////////////////////////////////////////////
+ViewCameraTransformedCommand.prototype.Do = function()
+{
+    this.editor.eventDispatcher.dispatchEvent( "onViewCameraTransformed", this.object );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewCameraTransformedCommand.prototype.Undo = function()
+{
+    var camera = this.editor.getView( this.viewId ).camera;
+    
+    camera.position.x = this.oldPosition.x;
+    camera.position.y = this.oldPosition.y;
+    camera.position.z = this.oldPosition.z;
+
+    camera.quaternion.x = this.oldRotation.x;
+    camera.quaternion.y = this.oldRotation.y;
+    camera.quaternion.z = this.oldRotation.z;
+    camera.quaternion.w = this.oldRotation.w;
+
+    camera.matrixWorldNeedsUpdate = true;
+    
+    this.editor.eventDispatcher.dispatchEvent( "onViewCameraTransformed", this.viewId );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewCameraTransformedCommand.prototype.Redo = function()
+{
+    var camera = this.editor.getView( this.viewId ).camera;
+
+    camera.position.x = this.newPosition.x;
+    camera.position.y = this.newPosition.y;
+    camera.position.z = this.newPosition.z;
+
+    camera.quaternion.x = this.newRotation.x;
+    camera.quaternion.y = this.newRotation.y;
+    camera.quaternion.z = this.newRotation.z;
+    camera.quaternion.w = this.newRotation.w;
+
+    camera.matrixWorldNeedsUpdate = true;
+
+    this.editor.eventDispatcher.dispatchEvent( "onViewCameraTransformed", this.viewId );
+}

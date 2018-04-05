@@ -42,6 +42,7 @@ function Editor( eventDispatcher, UIData )
     this.eventDispatcher.addEventListener( "onSceneObjectTranslated",  this.onSceneObjectsTranslated.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectScaled",      this.onSceneObjectsScaled.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectRotated",     this.onSceneObjectsRotated.bind( this ) );
+    this.eventDispatcher.addEventListener( "onViewCameraTransformed",  this.onViewCameraTransformed.bind( this ) );
 
     editor = this;
 };
@@ -353,6 +354,13 @@ Editor.prototype.sceneObjectRotated = function( object, oldRotation, newRotation
 }
 
 //////////////////////////////////////////////////////////////////////////////
+Editor.prototype.viewCameraTransformed = function( viewId, oldPosition, oldRotation, newPosition, newRotation )
+{
+    this.doUndoManager.AddCommand( new ViewCameraTransformedCommand( this, viewId, oldPosition, oldRotation, newPosition, newRotation ) );
+    this.doUndoManager.Do();
+}
+
+//////////////////////////////////////////////////////////////////////////////
 Editor.prototype.onSceneObjectsTranslated = function( object )
 {
     this.render();
@@ -366,6 +374,12 @@ Editor.prototype.onSceneObjectsScaled = function( object )
 
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.onSceneObjectsRotated = function( object )
+{
+    this.render();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onViewCameraTransformed = function( viewId )
 {
     this.render();
 }

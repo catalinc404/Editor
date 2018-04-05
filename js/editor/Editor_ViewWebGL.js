@@ -82,6 +82,9 @@ ViewWebGL.prototype.init = function( editor )
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+    this.transformCameraData = { position : new THREE.Vector3(), quaternion : new THREE.Quaternion() };
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true, devicePixelRatio: window.devicePixelRatio } );
     this.renderer.setSize( this.width, this.height, false );
@@ -107,10 +110,7 @@ ViewWebGL.prototype.init = function( editor )
     this.transformControls.addEventListener( "mouseUp",     this.handleObjectTransformMouseUp.bind( this )   );
     this.sceneGizmos.add( this.transformControls );
 
-    this.transformControlsData = {};
-    this.transformControlsData.position = new THREE.Vector3();
-    this.transformControlsData.scale = new THREE.Vector3();
-    this.transformControlsData.quaternion = new THREE.Quaternion();
+    this.transformControlsData = { position : new THREE.Vector3(), scale : new THREE.Vector3(), quaternion : new THREE.Quaternion() };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.canvas.addEventListener( "mousedown",  this.handleMouseDown.bind( this ),  false );
@@ -395,6 +395,10 @@ ViewWebGL.prototype.handleMouseDown = function( event )
             this.selectionRectangle.width  = 0; 
             this.selectionRectangle.height = 0; 
         }
+        else
+        {
+            this.beginCameraTransform();
+        }
 
         this.updateView();
         this.requestRender();
@@ -426,9 +430,16 @@ ViewWebGL.prototype.handleMouseUp = function( event )
 
     //console.log( "ViewWebGL2.prototype.handleMouseUp, viewId = " + this.viewId );
 
-    if( this.currentControlMode == EControlMode.SELECT )
+    if( this.currentControlMode != EControlMode.NONE )
     {
-        this.selectObjects();
+        if( this.currentControlMode == EControlMode.SELECT )
+        {
+            this.selectObjects();
+        }
+        else
+        {
+            this.endCameraTransform();
+        }
     }
 
     this.currentControlMode = EControlMode.NONE;
@@ -500,7 +511,7 @@ ViewWebGL.prototype.handleObjectTransformMouseDown = function( event )
     this.transformControlsData.quaternion.x = this.transformControls.object.quaternion.x;
     this.transformControlsData.quaternion.y = this.transformControls.object.quaternion.y;
     this.transformControlsData.quaternion.z = this.transformControls.object.quaternion.z;
-    this.transformControlsData.quaternion.w = this.transformControls.object.quaternion.y;
+    this.transformControlsData.quaternion.w = this.transformControls.object.quaternion.w;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -508,33 +519,17 @@ ViewWebGL.prototype.handleObjectTransformMouseUp = function( event )
 {
     if( event.mode == "translate" )
     {
-        var newPosition = new THREE.Vector3();
-        newPosition.x = this.transformControls.object.position.x;
-        newPosition.y = this.transformControls.object.position.y;
-        newPosition.z = this.transformControls.object.position.z;
-
-        editor.sceneObjectTranslated( this.transformControlsData.object, this.transformControlsData.position, newPosition );
+        editor.sceneObjectTranslated( this.transformControlsData.object, this.transformControlsData.position, this.transformControls.object.position );
     }
     else
     if( event.mode == "rotate" )    
     {
-        var newRotation = new THREE.Quaternion();
-        newRotation.x = this.transformControls.object.quaternion.x;
-        newRotation.y = this.transformControls.object.quaternion.y;
-        newRotation.z = this.transformControls.object.quaternion.z;
-        newRotation.w = this.transformControls.object.quaternion.w;
-
-        editor.sceneObjectRotated( this.transformControlsData.object, this.transformControlsData.quaternion, newRotation );
+        editor.sceneObjectRotated( this.transformControlsData.object, this.transformControlsData.quaternion, this.transformControls.object.quaternion );
     }
     else
     if( event.mode == "scale" )    
     {
-        var newScale = new THREE.Vector3();
-        newScale.x = this.transformControls.object.scale.x;
-        newScale.y = this.transformControls.object.scale.y;
-        newScale.z = this.transformControls.object.scale.z;
-
-        editor.sceneObjectScaled( this.transformControlsData.object, this.transformControlsData.scale, newScale );
+        editor.sceneObjectScaled( this.transformControlsData.object, this.transformControlsData.scale, this.transformControls.object );
     }
 }
 
@@ -596,5 +591,27 @@ ViewWebGL.prototype.selectObjects = function()
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.beginCameraTransform = function()
+{
+    this.transformCameraData.position.x = this.camera.position.x;
+    this.transformCameraData.position.y = this.camera.position.y;
+    this.transformCameraData.position.z = this.camera.position.z;
 
+    this.transformCameraData.quaternion.x = this.camera.quaternion.x;
+    this.transformCameraData.quaternion.y = this.camera.quaternion.y;
+    this.transformCameraData.quaternion.z = this.camera.quaternion.z;
+    this.transformCameraData.quaternion.w = this.camera.quaternion.w;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.endCameraTransform = function()
+{
+    editor.viewCameraTransformed( this.viewId, 
+                                  this.transformCameraData.position, 
+                                  this.transformCameraData.quaternion,
+                                  this.camera.position, 
+                                  this.camera.quaternion );
+
+}
 
