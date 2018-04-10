@@ -150,13 +150,13 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
     {
         var selectionHelper = new THREE.BoxHelper( object );
         selectionHelper.visible = false;
-        selectionHelper.matrix = object.matrixWorld;
+        selectionHelper.matrixWorld = object.matrixWorld;
         selectionHelper.matrixAutoUpdate = false;
         editorObject.gizmos.push( selectionHelper );
 
         var objectPicking = object.clone();
         objectPicking.material = new THREE.MeshBasicMaterial( { color: editorObject.id } );
-        objectPicking.matrix = object.matrixWorld;
+        objectPicking.matrixWorld = object.matrixWorld;
         objectPicking.matrixAutoUpdate = false;
         this.scenePicking.add( objectPicking );
         editorObject.objectPicking = objectPicking;
@@ -181,7 +181,7 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
     {
         var objectPickingMaterial = new THREE.MeshBasicMaterial( { color: editorObject.id } );
         var objectPicking = new THREE.Mesh( new THREE.TetrahedronGeometry( 0.6, 0 ), objectPickingMaterial );
-        objectPicking.matrix = object.matrixWorld;
+        objectPicking.matrixWorld = object.matrixWorld;
         objectPicking.matrixAutoUpdate = false;
         this.scenePicking.add( objectPicking );
         editorObject.objectPicking = objectPicking;
@@ -191,7 +191,7 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
         editorObject.gizmos.push( selectionHelper );
 
         var spotLightHelper1 = new THREE.Mesh(  new THREE.TetrahedronGeometry( 0.6, 0 ), new THREE.MeshBasicMaterial( { color: 0xff00ff } ) );
-        spotLightHelper1.matrix = object.matrixWorld;
+        spotLightHelper1.matrixWorld = object.matrixWorld;
         spotLightHelper1.matrixAutoUpdate = false;
         editorObject.helpers.push( spotLightHelper1 );
 

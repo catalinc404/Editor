@@ -414,7 +414,7 @@ function createCornellBoxScene2( editor )
             clearCoatRoughness: 0.0,
             reflectivity: 0.7
         } );
-    sphereMaterial.defines["DIFFUSE_MODEL"] = 1;
+    //sphereMaterial.defines["DIFFUSE_MODEL"] = 1;
     sphereMaterial.needsUpdate = true;
     sphereMaterial.name = "sph1";
 
@@ -437,7 +437,7 @@ function createCornellBoxScene2( editor )
             clearCoatRoughness: 0.0,
             reflectivity: 0.7
         } );
-    sphereMaterial2.defines["DIFFUSE_MODEL"] = 0;
+    //sphereMaterial2.defines["DIFFUSE_MODEL"] = 0;
 
     var sphere2 = new THREE.Mesh(sphereGeometry2, sphereMaterial2);
     sphere2.name = "sphere";
