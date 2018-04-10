@@ -208,7 +208,16 @@ var editorPageLayout =
                     name: "header_tabs",
                     id: "header-tabs",
                     height: 30,
-                    size_min: 30
+                    size_min: 30,
+                    class:
+                    {
+                        type: "tabs",
+                        config:
+                        {
+                            tabs: { HeaderTabGeneral: "HeaderToolbarGeneral", HeaderTabObjects: "HeaderToolbarObjects", HeaderTabMaterials: "HeaderToolbarMaterials" },
+                            default: "HeaderTabGeneral",
+                        },
+                    },
                 },
                 { 
                     name: "header_toolbar",

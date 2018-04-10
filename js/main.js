@@ -9,8 +9,10 @@ function setup()
 
     resize();
 
+    eventDispatcher.dispatchEvent( "onUIReady" );
+
     window.addEventListener( "keydown", editor.onKeyDown.bind( editor ), false );
-    
+
     createInitialScene( editor );
 }
 

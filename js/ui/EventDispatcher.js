@@ -55,6 +55,11 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
 
     dispatchEvent : function( event, data )
     {
+        //console.log( "dispatch event -----------------------------------" )
+        //console.log( "event = " + event );
+        //console.log( data );
+        //console.log( "--------------------------------------------------" )
+
         if( this.listeners === undefined )
         {
             return;

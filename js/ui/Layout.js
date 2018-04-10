@@ -379,6 +379,11 @@ UI.prototype.setupElementClass = function( element, uiClass )
                 element.onresize = element.ui.onResize.bind( element.ui );
             }
             break;
+            case "tabs":
+            {
+                element.ui = new Tabs( eventDispatcher, element, uiClass.config );
+            }
+            break;
             default:
             {}
             break;
