@@ -375,6 +375,51 @@ function createCornellBoxScene2( editor )
     view.setView( new THREE.Vector3( -0.2758176499040841, 1.0747734896927836, 3.1026880324612622 ),
                   new THREE.Vector3( -0.15737317350893537, 1.0302500654463793, 2.1107260519877897 ) );
 
+                  var sphereGeometry = new THREE.SphereGeometry( 0.4, 20, 20 );
+                  var sphereMaterial = new THREE.MeshPhysicalMaterial( 
+                      {
+                          color: 0x3F51B5,
+                          roughness: 1.0,
+                          metalness: 0.0,
+                          clearCoat: 0.0,
+                          clearCoatRoughness: 0.0,
+                          reflectivity: 0.7
+                      } );
+                  //sphereMaterial.defines["DIFFUSE_MODEL"] = 1;
+                  sphereMaterial.needsUpdate = true;
+                  sphereMaterial.name = "sph1";
+              
+                  var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+                  sphere.name = "sphere";
+                  sphere.position.x = -0.57;
+                  sphere.position.y = 0.33;
+                  sphere.position.z = 0.2;
+                  sphere.castShadow = true;
+                  sphere.receiveShadow = true;
+                  editor.addSceneObject( sphere );
+              
+                  var sphereGeometry2 = new THREE.SphereGeometry( 0.4, 20, 20 );
+                  var sphereMaterial2 = new THREE.MeshPhysicalMaterial( 
+                      {
+                          color: 0x3F51B5,
+                          roughness: 1.0,
+                          metalness: 0.0,
+                          clearCoat: 0.0,
+                          clearCoatRoughness: 0.0,
+                          reflectivity: 0.7
+                      } );
+                  //sphereMaterial2.defines["DIFFUSE_MODEL"] = 0;
+              
+                  var sphere2 = new THREE.Mesh(sphereGeometry2, sphereMaterial2);
+                  sphere2.name = "sphere";
+                  sphere2.position.x = 0.57;
+                  sphere2.position.y = 0.33;
+                  sphere2.position.z = 0.2;
+                  sphere2.castShadow = true;
+                  sphere2.receiveShadow = true;
+                  editor.addSceneObject( sphere2 );
+              
+
     editor.loadOBJ( "../Data/CornellBox/CornellBox-Original.obj", "CornellBox", function( object )
     {
         for( var i = 0, count = object.children.length; i < count; ++i )
@@ -404,49 +449,6 @@ function createCornellBoxScene2( editor )
         }
     } );
 
-    var sphereGeometry = new THREE.SphereGeometry( 0.4, 20, 20 );
-    var sphereMaterial = new THREE.MeshPhysicalMaterial( 
-        {
-            color: 0x3F51B5,
-            roughness: 1.0,
-            metalness: 0.0,
-            clearCoat: 0.0,
-            clearCoatRoughness: 0.0,
-            reflectivity: 0.7
-        } );
-    //sphereMaterial.defines["DIFFUSE_MODEL"] = 1;
-    sphereMaterial.needsUpdate = true;
-    sphereMaterial.name = "sph1";
-
-    var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    sphere.name = "sphere";
-    sphere.position.x = -0.57;
-    sphere.position.y = 0.33;
-    sphere.position.z = 0.2;
-    sphere.castShadow = true;
-    sphere.receiveShadow = true;
-    editor.addSceneObject( sphere );
-
-    var sphereGeometry2 = new THREE.SphereGeometry( 0.4, 20, 20 );
-    var sphereMaterial2 = new THREE.MeshPhysicalMaterial( 
-        {
-            color: 0x3F51B5,
-            roughness: 1.0,
-            metalness: 0.0,
-            clearCoat: 0.0,
-            clearCoatRoughness: 0.0,
-            reflectivity: 0.7
-        } );
-    //sphereMaterial2.defines["DIFFUSE_MODEL"] = 0;
-
-    var sphere2 = new THREE.Mesh(sphereGeometry2, sphereMaterial2);
-    sphere2.name = "sphere";
-    sphere2.position.x = 0.57;
-    sphere2.position.y = 0.33;
-    sphere2.position.z = 0.2;
-    sphere2.castShadow = true;
-    sphere2.receiveShadow = true;
-    editor.addSceneObject( sphere2 );
     
     var lightMaterial = new THREE.MeshStandardMaterial(
     {

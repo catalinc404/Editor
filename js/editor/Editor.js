@@ -29,20 +29,23 @@ function Editor( eventDispatcher, UIData )
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.selection = [];
+    this.objectTransformMode = ETransformMode.TRANSLATE;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.doUndoManager = new DoUndoManager( eventDispatcher );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.eventDispatcher.addEventListener( "render",                   this.render.bind( this ) );
+    this.eventDispatcher.addEventListener( "render",                        this.render.bind( this ) );
 
-    this.eventDispatcher.addEventListener( "onViewCreated",            this.onViewCreated.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.onSceneObjectsSelected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectsDeselected", this.onSceneObjectsDeselected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectTranslated",  this.onSceneObjectsTranslated.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectScaled",      this.onSceneObjectsScaled.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectRotated",     this.onSceneObjectsRotated.bind( this ) );
-    this.eventDispatcher.addEventListener( "onViewCameraTransformed",  this.onViewCameraTransformed.bind( this ) );
+    this.eventDispatcher.addEventListener( "onViewCreated",                 this.onViewCreated.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectsSelected",        this.onSceneObjectsSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectsDeselected",      this.onSceneObjectsDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectTranslated",       this.onSceneObjectsTranslated.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectScaled",           this.onSceneObjectsScaled.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectRotated",          this.onSceneObjectsRotated.bind( this ) );
+    this.eventDispatcher.addEventListener( "onViewCameraTransformed",       this.onViewCameraTransformed.bind( this ) );
+    this.eventDispatcher.addEventListener( "onToolbarButtonActivated",      this.onToolbarButtonActivated.bind( this ) );
+    this.eventDispatcher.addEventListener( "onToolbarButtonDeactivated",    this.onToolbarButtonDeactivated.bind( this ) );
 
     editor = this;
 };
@@ -63,7 +66,9 @@ Editor.prototype.init = function()
     this.scene = new THREE.Scene( { name: "Scene" } );
     this.sceneHelpers = new THREE.Scene();
     this.sceneGizmos  = new THREE.Scene();
+    this.sceneGizmos.autoUpdate = false;
     this.scenePicking = new THREE.Scene();
+    this.scenePicking.autoUpdate = false;
     this.sceneHUD     = new THREE.Scene();
 
     this.eventDispatcher.dispatchEvent( "onSceneCreated", this.scene );
@@ -222,12 +227,9 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
         }
     }
 
-    if( editorObject.gizmos.length > 0 )
+    for( var i = 0; i < editorObject.gizmos.length; ++i )
     {
-        for( var i = 0; i < editorObject.gizmos.length; ++i )
-        {
-            this.sceneGizmos.add( editorObject.gizmos[i] );
-        }
+        this.sceneGizmos.add( editorObject.gizmos[i] );
     }
      
     this.sceneObjects.push( editorObject );
@@ -405,6 +407,46 @@ Editor.prototype.onKeyDown = function( event )
     if( (event.key == "y" ) && (event.ctrlKey == true) )
     {
         this.doUndoManager.Redo();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onToolbarButtonActivated = function( event )
+{
+    if( event.parent == "HeaderToolbarGeneral" )
+    {
+        switch( event.button )
+        {
+            case "HeaderToolbarGeneral-translate":
+            {
+                this.objectTransformMode = ETransformMode.TRANSLATE;
+            }
+            break;
+            case "HeaderToolbarGeneral-rotate":
+            {
+                this.objectTransformMode = ETransformMode.ROTATE;
+            }
+            break;
+            case "HeaderToolbarGeneral-scale":
+            {
+                this.objectTransformMode = ETransformMode.SCALE;
+            }
+            break;
+            default:
+            {}
+            break;
+        }
+
+        this.eventDispatcher.dispatchEvent( "onObjectTransformModeChanged", this.objectTransformMode );
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onToolbarButtonDeactivated = function( event )
+{
+    if( event.parent == "HeaderToolbarGeneral" )
+    {
+        this.objectTransformMode = ETransformMode.NONE;
     }
 }
 

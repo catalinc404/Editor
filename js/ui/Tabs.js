@@ -42,7 +42,7 @@ Tabs.prototype.openTab = function( tabName )
 {
     if( tabName == this.activeTab )
     {
-        //return;
+        return;
     }
 
     var element;

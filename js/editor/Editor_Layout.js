@@ -223,7 +223,34 @@ var editorPageLayout =
                     name: "header_toolbar",
                     id: "header-toolbar",
                     height: 30,
-                    size_min: 30
+                    size_min: 30,
+                    class:
+                    {
+                        type: "forward",
+                        config:
+                        {
+                            HeaderToolbarGeneral: 
+                            {
+                                id: "HeaderToolbarGeneral",
+                                class:
+                                {
+                                    type: "toolbar",
+                                    config:
+                                    {
+                                        buttons: 
+                                        [ 
+                                            "HeaderToolbarGeneral-translate",
+                                            "HeaderToolbarGeneral-rotate",
+                                            "HeaderToolbarGeneral-scale",
+                                        ],
+
+                                        mode: "exclusive",
+                                        default: "HeaderToolbarGeneral-translate",
+                                    },
+                                },                            
+                            },
+                        },
+                    },
                 }                
             ]
         },

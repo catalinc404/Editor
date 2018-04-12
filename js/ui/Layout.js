@@ -384,6 +384,20 @@ UI.prototype.setupElementClass = function( element, uiClass )
                 element.ui = new Tabs( eventDispatcher, element, uiClass.config );
             }
             break;
+            case "toolbar":
+            {
+                element.ui = new Toolbar( eventDispatcher, element, uiClass.config );
+            }
+            break;
+            case "forward":
+            {
+                for( var key in uiClass.config )
+                {
+                    var childElement = document.getElementById( uiClass.config[key].id );
+                    this.setupElementClass( childElement,  uiClass.config[key].class );
+                }
+            }
+            break;
             default:
             {}
             break;

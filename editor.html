@@ -31,6 +31,7 @@
         <script src="js/ui/Theme.js"></script>
         <script src="js/ui/Resizer.js"></script>
         <script src="js/ui/Tabs.js"></script>
+        <script src="js/ui/Toolbar.js"></script>
         <script src="js/ui/PropertiesView.js"></script>
         <script src="js/ui/TreeView.js"></script>
         <script src="js/ui/Layout.js"></script>
@@ -95,7 +96,11 @@
             </div>
         </div>
         <div id="header-toolbar" class="page_element background-color-dark border-bottom-page-element">
-            <div id="HeaderToolbarGeneral" class="tabcontent"></div>
+            <div id="HeaderToolbarGeneral" class="tabcontent toolbar">
+                <button id="HeaderToolbarGeneral-translate"><span class="icon-tb-translate icon-hover" style="width: 24px; height: 24px;"></span></button>
+                <button id="HeaderToolbarGeneral-rotate"><span class="icon-tb-rotate icon-hover" style="width: 24px; height: 24px;"></span></button>
+                <button id="HeaderToolbarGeneral-scale"><span class="icon-tb-scale icon-hover" style="width: 24px; height: 24px;"></span></button>
+            </div>
             <div id="HeaderToolbarObjects" class="tabcontent"></div>
             <div id="HeaderToolbarMaterials" class="tabcontent"></div>
         </div>

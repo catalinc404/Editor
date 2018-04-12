@@ -39,9 +39,10 @@ function ViewWebGL( eventDispatcher, element, configuration )
     this.fnRequestRender = this.requestRender.bind( this );
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.handleSceneObjectsSelected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectsDeselected", this.handleSceneObjectsDeselected.bind( this ) );
-    this.eventDispatcher.addEventListener( "themeChanged",             this.handleThemeChanged.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectsSelected",        this.handleSceneObjectsSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectsDeselected",      this.handleSceneObjectsDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onObjectTransformModeChanged",  this.handleObjectTransformModeChanged.bind( this ) );
+    this.eventDispatcher.addEventListener( "themeChanged",                  this.handleThemeChanged.bind( this ) );
 
     this.eventDispatcher.dispatchEvent( "onViewCreated", this );
 }
@@ -476,6 +477,8 @@ ViewWebGL.prototype.handleSceneObjectsSelected = function( objects )
     {
         var object = objects[0];
         this.transformControls.attach( object );
+        this.setObjectTransformMode( this.editor.objectTransformMode );
+
         this.transformControlsData.object = object;
     }
 
@@ -541,6 +544,13 @@ ViewWebGL.prototype.handleThemeChanged = function( colors )
 }
 
 //////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.handleObjectTransformModeChanged = function( mode )
+{
+    this.setObjectTransformMode( mode );
+    this.requestRender();
+}
+
+//////////////////////////////////////////////////////////////////////////////
 ViewWebGL.prototype.selectObjects = function()
 {
     if( this.selectionRectangle.width >= 0 && this.selectionRectangle.height >= 0 )
@@ -589,6 +599,21 @@ ViewWebGL.prototype.selectObjects = function()
 
         this.requestRender();
     }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.setObjectTransformMode = function()
+{
+    var mode = "translate";
+    
+    switch( this.editor.objectTransformMode )
+    {
+        case ETransformMode.TRANSLATE:  mode = "translate"; break;
+        case ETransformMode.ROTATE:     mode = "rotate"; break;
+        case ETransformMode.SCALE:      mode = "scale"; break;
+    }
+
+    this.transformControls.setMode( mode );
 }
 
 //////////////////////////////////////////////////////////////////////////////
