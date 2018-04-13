@@ -150,6 +150,11 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
     editorObject.object = object;
     editorObject.helpers = [];
     editorObject.gizmos  = [];
+
+    var position = new THREE.Vector3();
+    position.copy( object.position );
+    object.position.set( 0, 0, 0 );
+    object.updateMatrixWorld();
     
     if( object instanceof THREE.Mesh )
     {
@@ -218,6 +223,24 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
     {
         editorObject.helpers.push( new THREE.SkeletonHelper( object ) );
     }
+    else
+    {
+        var selectionHelper = new THREE.BoxHelper( object );
+        selectionHelper.visible = false;
+        selectionHelper.matrixWorld = object.matrixWorld;
+        selectionHelper.matrixAutoUpdate = false;
+        editorObject.gizmos.push( selectionHelper );
+
+        var objectPicking = object.clone();
+        objectPicking.material = new THREE.MeshBasicMaterial( { color: editorObject.id } );
+        objectPicking.matrixWorld = object.matrixWorld;
+        objectPicking.matrixAutoUpdate = false;
+        this.scenePicking.add( objectPicking );
+        editorObject.objectPicking = objectPicking;
+    }
+
+    object.position.set( position.x, position.y, position.z );
+    object.updateMatrixWorld();
 
     if( editorObject.helpers.length > 0 )
     {
