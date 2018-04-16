@@ -214,24 +214,24 @@ var editorPageLayout =
                         type: "tabs",
                         config:
                         {
-                            tabs: { HeaderTabGeneral: "HeaderToolbarGeneral", HeaderTabObjects: "HeaderToolbarObjects", HeaderTabMaterials: "HeaderToolbarMaterials" },
-                            default: "HeaderTabGeneral",
+                            tabs: { TabGeneral: "ToolbarGeneral", TabObjects: "ToolbarObjects", TabMaterials: "ToolbarMaterials" },
+                            default: "TabGeneral",
                         },
                     },
                 },
                 { 
                     name: "header_toolbar",
                     id: "header-toolbar",
-                    height: 30,
-                    size_min: 30,
+                    height: 32,
+                    size_min: 32,
                     class:
                     {
                         type: "forward",
                         config:
                         {
-                            HeaderToolbarGeneral: 
+                            ToolbarGeneralTransformSpace: 
                             {
-                                id: "HeaderToolbarGeneral",
+                                id: "ToolbarGeneralTransformSpace",
                                 class:
                                 {
                                     type: "toolbar",
@@ -239,13 +239,32 @@ var editorPageLayout =
                                     {
                                         buttons: 
                                         [ 
-                                            "HeaderToolbarGeneral-translate",
-                                            "HeaderToolbarGeneral-rotate",
-                                            "HeaderToolbarGeneral-scale",
+                                            "ToolbarGeneralTransformSpace-global",
+                                            "ToolbarGeneralTransformSpace-local",
                                         ],
 
                                         mode: "exclusive",
-                                        default: "HeaderToolbarGeneral-translate",
+                                        default: "ToolbarGeneralTransformSpace-global",
+                                    },
+                                },                            
+                            },
+                            ToolbarGeneralTransformMode: 
+                            {
+                                id: "ToolbarGeneralTransformMode",
+                                class:
+                                {
+                                    type: "toolbar",
+                                    config:
+                                    {
+                                        buttons: 
+                                        [ 
+                                            "ToolbarGeneralTransformMode-translate",
+                                            "ToolbarGeneralTransformMode-rotate",
+                                            "ToolbarGeneralTransformMode-scale",
+                                        ],
+
+                                        mode: "exclusive",
+                                        default: "ToolbarGeneralTransformMode-translate",
                                     },
                                 },                            
                             },

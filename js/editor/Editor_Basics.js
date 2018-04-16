@@ -14,4 +14,5 @@ var EView       = { TL: 0, TR: 1, BL: 2, BR: 3  };
 var EViewMode   = { TL_TR_BL_BR: 0, TL_TR_BL: 1, TL_BL_BR: 2, TL_TR: 3, TL_BL_BR: 4, TL_BL: 5, TL: 6, TR: 7, BL: 8, BR: 9  };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var ETransformMode = { NONE: 0, TRANSLATE: 1, ROTATE: 2, SCALE: 3, TRANSLATE_LOCAL: 1, ROTATE_LOCAL: 2, SCALE_LOCAL: 3 };
+var ETransformMode  = { NONE: 0, TRANSLATE: 1, ROTATE: 2, SCALE: 3 };
+var ETransformSpace = { GLOBAL: 0, LOCAL: 1 };

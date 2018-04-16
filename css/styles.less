@@ -80,6 +80,8 @@
 .icon-rotate:before             { .icon(@content: "\73"); }
 .icon-scale:before              { .icon(@content: "\74"); }
 .icon-translate:before          { .icon(@content: "\75"); }
+.icon-global:before             { .icon(@content: "\6a"); }
+.icon-local:before              { .icon(@content: "\6c"); }
 
 ///////////////////////////////////////////////////////////////
 
@@ -97,6 +99,8 @@
 .icon18-rotate:before         { .icon(@content: "\73"; @size: 18px; @color: @icon-color); }
 .icon18-scale:before          { .icon(@content: "\74"; @size: 18px; @color: @icon-color); }
 .icon18-translate:before      { .icon(@content: "\75"; @size: 18px; @color: @icon-color); }
+.icon18-global:before         { .icon(@content: "\6a"; @size: 18px; @color: @icon-color); }
+.icon18-local:before          { .icon(@content: "\6c"; @size: 18px; @color: @icon-color); }
 
 ////////////////////////////////////////////////////////////////
 // Icons
@@ -237,13 +241,9 @@ body
 
 .resizerY 
 {
-    cursor: n-resize;
-
-    //background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAADCAYAAAB1c+RqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAG0lEQVQYV2P4++c/CFBEM4AYlGKibMJP//8PAO7Dqfz5wz1UAAAAAElFTkSuQmCC') no-repeat center center;
-    //background: url('./../textures/v-resizer.png') no-repeat center center transparent;
-
     .background-color(@color: @resizer-color-background);
     .element;
+    cursor: n-resize;
 }
 
 .resizerY::after
@@ -446,13 +446,15 @@ body
 }
 
 //------------------------------------------------------------------------------
-// Vanilla Tree 
+// Toolbars
 //------------------------------------------------------------------------------
 
 .toolbar
 {
-    overflow: hidden;
     .background-color;
+
+    overflow: hidden;
+    float: left;
 }
 
 .toolbar button
@@ -462,7 +464,12 @@ body
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 6px 6px;
+    padding-top: 2px;
+    padding-bottom: 0px;
+    padding-left: 3px;
+    padding-right: 3px;
+
+    margin: 3px;
 }
 
 .toolbar button:hover
@@ -480,6 +487,19 @@ body
     .background-color(@color: @element-color-highlight);
 }
 
+.toolbar div.separator
+{
+    .background-color(@color: @element-color-border);
+
+    float: left;
+    border: none;
+    outline: none;
+    cursor: default;
+    margin-top: 3px;
+    margin-bottom: 2px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
 
 //------------------------------------------------------------------------------
 // Vanilla Tree 

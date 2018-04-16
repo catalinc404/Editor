@@ -42,6 +42,7 @@ function ViewWebGL( eventDispatcher, element, configuration )
     this.eventDispatcher.addEventListener( "onSceneObjectsSelected",        this.handleSceneObjectsSelected.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectsDeselected",      this.handleSceneObjectsDeselected.bind( this ) );
     this.eventDispatcher.addEventListener( "onObjectTransformModeChanged",  this.handleObjectTransformModeChanged.bind( this ) );
+    this.eventDispatcher.addEventListener( "onObjectTransformSpaceChanged", this.handleObjectTransformSpaceChanged.bind( this ) );
     this.eventDispatcher.addEventListener( "themeChanged",                  this.handleThemeChanged.bind( this ) );
 
     this.eventDispatcher.dispatchEvent( "onViewCreated", this );
@@ -477,8 +478,10 @@ ViewWebGL.prototype.handleSceneObjectsSelected = function( objects )
     {
         var object = objects[0];
         this.transformControls.attach( object );
-        this.setObjectTransformMode( this.editor.objectTransformMode );
 
+        this.setObjectTransformSpace( this.editor.objectTransformSpace );
+        this.setObjectTransformMode( this.editor.objectTransformMode );
+        
         this.transformControlsData.object = object;
     }
 
@@ -551,6 +554,13 @@ ViewWebGL.prototype.handleObjectTransformModeChanged = function( mode )
 }
 
 //////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.handleObjectTransformSpaceChanged = function( space )
+{
+    this.setObjectTransformSpace( space );
+    this.requestRender();
+}
+
+//////////////////////////////////////////////////////////////////////////////
 ViewWebGL.prototype.selectObjects = function()
 {
     if( this.selectionRectangle.width >= 0 && this.selectionRectangle.height >= 0 )
@@ -614,6 +624,20 @@ ViewWebGL.prototype.setObjectTransformMode = function()
     }
 
     this.transformControls.setMode( mode );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.setObjectTransformSpace = function()
+{
+    var space = "world";
+    
+    switch( this.editor.objectTransformSpace )
+    {
+        case ETransformSpace.GLOBAL:  space = "world"; break;
+        case ETransformSpace.LOCAL:   space = "local";  break;
+    }
+
+    this.transformControls.setSpace( space );
 }
 
 //////////////////////////////////////////////////////////////////////////////

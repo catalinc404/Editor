@@ -90,19 +90,27 @@
         </div>
         <div id="header-tabs" class="page_element background-color-dark border-bottom-page-element">
             <div class="tab">
-                <button class="tablinks" id="HeaderTabGeneral">General</button>
-                <button class="tablinks" id="HeaderTabObjects">Objects</button>
-                <button class="tablinks" id="HeaderTabMaterials">Materials</button>
+                <button class="tablinks" id="TabGeneral">General</button>
+                <button class="tablinks" id="TabObjects">Objects</button>
+                <button class="tablinks" id="TabMaterials">Materials</button>
             </div>
         </div>
         <div id="header-toolbar" class="page_element background-color-dark border-bottom-page-element">
-            <div id="HeaderToolbarGeneral" class="tabcontent toolbar">
-                <button id="HeaderToolbarGeneral-translate"><span class="icon18-translate" style="width: 24px; height: 24px;"></span></button>
-                <button id="HeaderToolbarGeneral-rotate"><span class="icon18-rotate" style="width: 24px; height: 24px;"></span></button>
-                <button id="HeaderToolbarGeneral-scale"><span class="icon18-scale" style="width: 24px; height: 24px;"></span></button>
+            <div id="ToolbarGeneral" class="tabcontent">
+                <div id="ToolbarGeneralTransformSpace" class="toolbar">
+                    <div class="separator" style="width: 2px; height: 22px;"></div>
+                    <button id="ToolbarGeneralTransformSpace-global" title="Transform in global space."><span class="icon18-global" style="width: 24px; height: 22px;"></span></button>
+                    <button id="ToolbarGeneralTransformSpace-local" title="Transform in local space."><span class="icon18-local" style="width: 24px; height: 22px;"></span></button>
+                </div>
+                <div id="ToolbarGeneralTransformMode" class="toolbar">
+                    <div class="separator" style="width: 2px; height: 22px;"></div>
+                    <button id="ToolbarGeneralTransformMode-translate" title="Translate"><span class="icon18-translate" style="width: 24px; height: 22px;"></span></button>
+                    <button id="ToolbarGeneralTransformMode-rotate" title="Rotate"><span class="icon18-rotate" style="width: 24px; height: 22px;"></span></button>
+                    <button id="ToolbarGeneralTransformMode-scale" title="Scale"><span class="icon18-scale" style="width: 24px; height: 22px;"></span></button>
+                </div>
             </div>
-            <div id="HeaderToolbarObjects" class="tabcontent"></div>
-            <div id="HeaderToolbarMaterials" class="tabcontent"></div>
+            <div id="ToolbarObjects" class="tabcontent"></div>
+            <div id="ToolbarMaterials" class="tabcontent"></div>
         </div>
         <div id="left" class="page_element">
             <div id="tree-view-header" class="noselect text13 background-color-dark border-bottom-page-element" style="padding-top: 8px; padding-left: 6px;">Scene Explorer</div>

@@ -29,7 +29,8 @@ function Editor( eventDispatcher, UIData )
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.selection = [];
-    this.objectTransformMode = ETransformMode.TRANSLATE;
+    this.objectTransformMode  = ETransformMode.TRANSLATE;
+    this.objectTransformSpace = ETransformSpace.GLOBAL;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.doUndoManager = new DoUndoManager( eventDispatcher );
@@ -436,21 +437,43 @@ Editor.prototype.onKeyDown = function( event )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.onToolbarButtonActivated = function( event )
 {
-    if( event.parent == "HeaderToolbarGeneral" )
+    if( event.parent === "ToolbarGeneralTransformSpace" )
     {
         switch( event.button )
         {
-            case "HeaderToolbarGeneral-translate":
+            case "ToolbarGeneralTransformSpace-global":
+            {
+                this.objectTransformSpace = ETransformSpace.GLOBAL;
+            }
+            break;
+            case "ToolbarGeneralTransformSpace-local":
+            {
+                this.objectTransformSpace = ETransformSpace.LOCAL;
+            }
+            break;
+            default:
+            {}
+            break;
+        }
+
+        this.eventDispatcher.dispatchEvent( "onObjectTransformSpaceChanged", this.objectTransformSpace );
+    }
+
+    if( event.parent === "ToolbarGeneralTransformMode" )
+    {
+        switch( event.button )
+        {
+            case "ToolbarGeneralTransformMode-translate":
             {
                 this.objectTransformMode = ETransformMode.TRANSLATE;
             }
             break;
-            case "HeaderToolbarGeneral-rotate":
+            case "ToolbarGeneralTransformMode-rotate":
             {
                 this.objectTransformMode = ETransformMode.ROTATE;
             }
             break;
-            case "HeaderToolbarGeneral-scale":
+            case "ToolbarGeneralTransformMode-scale":
             {
                 this.objectTransformMode = ETransformMode.SCALE;
             }
@@ -467,7 +490,7 @@ Editor.prototype.onToolbarButtonActivated = function( event )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.onToolbarButtonDeactivated = function( event )
 {
-    if( event.parent == "HeaderToolbarGeneral" )
+    if( event.parent == "ToolbarGeneralTranformMode" )
     {
         this.objectTransformMode = ETransformMode.NONE;
     }
