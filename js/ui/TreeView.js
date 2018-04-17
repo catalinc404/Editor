@@ -7,21 +7,43 @@ function TreeView( eventDispatcher, element )
     this.eventDispatcher = eventDispatcher;
     this.element = element;
 
+    var _this = this;
+
     if(  this.element !== undefined )
     {
         this.tree = new VanillaTree( this.element, 
             {
-              contextmenu: [{
-                  label: 'Menu 1',
-                  action: function(id) {
-                    alert('Menu 1 ' + id);
-                  }
-                }, {
-                  label: 'Menu 2',
-                  action: function(id) {
-                    alert('Menu 2 ' + id);
-                  }
-                }]
+                contextmenu: 
+                [
+                    {
+                        label: 'Add Group',
+                        action: function( id )
+                        {
+                            _this.onTreeConetxtMenuCreateObjectGroup( { id: id } );
+                        }
+                    },
+                    {
+                        label: 'Create Box',
+                        action: function( id )
+                        {
+                            _this.onTreeConetxtMenuCreateObjectBox( { id: id } );
+                        }
+                    },
+                    {
+                        label: 'Create Quad',
+                        action: function( id )
+                        {
+                            _this.onTreeConetxtMenuCreateObjectQuad( { id: id } );
+                        }
+                    },
+                    {
+                        label: 'Remove',
+                        action: function( id )
+                        {
+                            _this.onTreeConetxtMenuRemoveObject( { id: id } );
+                        }
+                    },
+                ]
             });
 
         this.element.addEventListener( "vtree-select", this.onTreeElementSelected.bind( this ) );
@@ -187,3 +209,32 @@ TreeView.prototype.onTreeElementDeselected = function( event )
     this.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", [object] );
     this.disableEvents = undefined;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TreeView.prototype.onTreeConetxtMenuCreateObjectGroup = function( event )
+{
+    var object = this.scene.getObjectById( parseInt( event.id ) );
+    this.eventDispatcher.dispatchEvent( "sceneCreateObjectGroup", { parent: object } );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TreeView.prototype.onTreeConetxtMenuCreateObjectBox = function( event )
+{
+    var object = this.scene.getObjectById( parseInt( event.id ) );
+    this.eventDispatcher.dispatchEvent( "sceneCreateObjectBox", { parent: object } );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TreeView.prototype.onTreeConetxtMenuCreateObjectQuad = function( event )
+{
+    var object = this.scene.getObjectById( parseInt( event.id ) );
+    this.eventDispatcher.dispatchEvent( "sceneCreateObjectQuad", { parent: object } );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TreeView.prototype.onTreeConetxtMenuRemoveObject = function( event )
+{
+    var object = this.scene.getObjectById( parseInt( event.id ) );
+    this.eventDispatcher.dispatchEvent( "sceneRemoveObject", { object: object } );
+}
+

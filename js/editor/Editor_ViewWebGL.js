@@ -150,6 +150,10 @@ ViewWebGL.prototype.render = function()
         this.renderer.render( editor.sceneGizmos, this.camera );
         this.renderer.render( this.sceneGizmos, this.camera );
     }
+    //if( this.renderHelpersMode & ERenderHelpersMode.PICKING )
+    {
+        this.renderer.render( editor.scenePicking, this.camera );
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

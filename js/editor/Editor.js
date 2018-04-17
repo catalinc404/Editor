@@ -25,6 +25,7 @@ function Editor( eventDispatcher, UIData )
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.sceneObjectsId = 0;
+    this.sceneObjectCreationId = 0;
     this.sceneObjects = [];
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +48,10 @@ function Editor( eventDispatcher, UIData )
     this.eventDispatcher.addEventListener( "onViewCameraTransformed",       this.onViewCameraTransformed.bind( this ) );
     this.eventDispatcher.addEventListener( "onToolbarButtonActivated",      this.onToolbarButtonActivated.bind( this ) );
     this.eventDispatcher.addEventListener( "onToolbarButtonDeactivated",    this.onToolbarButtonDeactivated.bind( this ) );
+    this.eventDispatcher.addEventListener( "sceneCreateObjectGroup",        this.sceneCreateObjectGroup.bind( this ) );
+    this.eventDispatcher.addEventListener( "sceneCreateObjectBox",          this.sceneCreateObjectBox.bind( this ) );
+    this.eventDispatcher.addEventListener( "sceneCreateObjectQuad",         this.sceneCreateObjectQuad.bind( this ) );
+    this.eventDispatcher.addEventListener( "sceneRemoveObject",             this.sceneRemoveObject.bind( this ) );
 
     editor = this;
 };
@@ -137,16 +142,26 @@ Editor.prototype.render = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.addSceneObject = function( object, dontAddToScene  )
+Editor.prototype.addSceneObject = function( object, parameters  )
 {
-    var editorObject = { id: ++this.sceneObjectsId };
+    var editorObject = {}
+    parameters = parameters || {};
+
+    editorObject.id = ( parameters.id !== undefined ) ?  parameters.id : ++this.sceneObjectsId;
+
+    if( parameters.dontAddToScene !== true )
+    {
+        if( parameters.parent !== undefined )
+        {
+            parameters.parent.add( object );
+        }
+        else
+        {
+            this.scene.add( object );
+        }
+    }
 
     object.updateMatrixWorld();
-
-    if( !dontAddToScene )
-    {
-        this.scene.add( object );
-    }
 
     editorObject.object = object;
     editorObject.helpers = [];
@@ -262,12 +277,12 @@ Editor.prototype.addSceneObject = function( object, dontAddToScene  )
   
     for( var i = 0; i < object.children.length; ++i )
     {
-        this.addSceneObject( object.children[i], true );
+        this.addSceneObject( object.children[i], { dontAddToScene : true } );
     }
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.getEditorObjectsfromEditorIds = function ( editorObjectsIds )
+Editor.prototype.getEditorObjectsfromEditorIds = function( editorObjectsIds )
 {
     var editorObjects = [];
     for( var i = 0; i < editorObjectsIds.length; ++i ) 
@@ -286,7 +301,7 @@ Editor.prototype.getEditorObjectsfromEditorIds = function ( editorObjectsIds )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.selectObjects = function ( editorObjects )
+Editor.prototype.selectObjects = function( editorObjects )
 {
     if( this.selection.length > 0 )
     {
@@ -302,7 +317,7 @@ Editor.prototype.selectObjects = function ( editorObjects )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.selectObjectsFromEditorIds = function ( editorObjectsIds )
+Editor.prototype.selectObjectsFromEditorIds = function( editorObjectsIds )
 {
     var editorObjects = this.getEditorObjectsfromEditorIds( editorObjectsIds )
     var filteredEditorObjects = [];
@@ -315,6 +330,70 @@ Editor.prototype.selectObjectsFromEditorIds = function ( editorObjectsIds )
         }
     }
     this.selectObjects( (filteredEditorObjects.length > 0) ? filteredEditorObjects : [] );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneCreateObjectGroup = function( data )
+{
+    var object = new THREE.Object();
+    object.name = "Group" + (++this.sceneObjectCreationId);
+    this.addSceneObject( object, { parent: data.parent } );
+
+    this.render();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneCreateObjectBox = function( data )
+{
+    var boxGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+    var boxMaterial = new THREE.MeshPhysicalMaterial( 
+        {
+            color: Math.random() * 0xffffff,
+            roughness: 0.7,
+            metalness: 0.5,
+            clearCoat: 0.0,
+            clearCoatRoughness: 0.0,
+            reflectivity: 0.2
+        } );
+
+    var box = new THREE.Mesh( boxGeometry, boxMaterial );
+    box.name = "Box" + (++this.sceneObjectCreationId);
+    box.castShadow = true;
+    box.receiveShadow = true;
+
+    this.addSceneObject( box, { parent: data.parent } );
+
+    this.render();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneCreateObjectQuad = function( data )
+{
+    var quadGeometry = new THREE.PlaneGeometry( 1.0, 1.0 );
+    var quadMaterial = new THREE.MeshPhysicalMaterial( 
+        {
+            color: Math.random() * 0xffffff,
+            roughness: 0.7,
+            metalness: 0.5,
+            clearCoat: 0.0,
+            clearCoatRoughness: 0.0,
+            reflectivity: 0.2
+        } );
+
+    var quad = new THREE.Mesh( quadGeometry, quadMaterial );
+    quad.name = "Quad" + (++this.sceneObjectCreationId);
+    quad.castShadow = true;
+    quad.receiveShadow = true;
+
+    this.addSceneObject( quad, { parent: data.parent } );
+
+    this.render();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneRemoveObject = function( data )
+{
 }
 
 //////////////////////////////////////////////////////////////////////////////
