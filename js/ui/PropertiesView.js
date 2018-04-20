@@ -76,9 +76,13 @@ PropertyView.prototype.onSceneObjectsSelected = function( selection )
         this.clearProperties();
     }
 
-    if( selection instanceof Array && selection.length > 0 )
+    if( ( selection instanceof Array ) && ( selection.length > 0 ) )
     {
-        this.setProperties( selection[0] )
+        var object = this.eventDispatcher.dispatchRequest( "getObjectFromEditorId", selection[0] );
+        if( object !== undefined )
+        {
+            this.setProperties( object );
+        }
     }
 }
 

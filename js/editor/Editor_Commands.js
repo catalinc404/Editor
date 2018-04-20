@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-function SelectObjectsCommand( editor, objects )
+function SelectObjectsCommand( editor, objectIds )
 {
     this.editor = editor;
-    this.objects = objects;
+    this.objectIds = objectIds;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -15,27 +15,27 @@ SelectObjectsCommand.prototype = Object.assign( Object.create( Object.prototype 
 //////////////////////////////////////////////////////////////////////////////
 SelectObjectsCommand.prototype.Do = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objects );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objectIds );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 SelectObjectsCommand.prototype.Undo = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objects );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objectIds );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 SelectObjectsCommand.prototype.Redo = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objects );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objectIds );
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
-function DeselectObjectsCommand( editor, objects )
+function DeselectObjectsCommand( editor, objectIds )
 {
     this.editor = editor;
-    this.objects = objects;
+    this.objectIds = objectIds;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -48,27 +48,26 @@ DeselectObjectsCommand.prototype = Object.assign( Object.create( Object.prototyp
 //////////////////////////////////////////////////////////////////////////////
 DeselectObjectsCommand.prototype.Do = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objects );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objectIds );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 DeselectObjectsCommand.prototype.Undo = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objects );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objectIds );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 DeselectObjectsCommand.prototype.Redo = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objects );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objectIds );
 }
 
-
 //////////////////////////////////////////////////////////////////////////////
-function TranslateObjectCommand( editor, object, oldPosition, newPosition )
+function TranslateObjectCommand( editor, objectId, oldPosition, newPosition )
 {
     this.editor = editor;
-    this.object = object;
+    this.objectId = objectId;
 
     this.oldPosition = new THREE.Vector3();
     this.oldPosition.x = oldPosition.x;
@@ -91,37 +90,41 @@ TranslateObjectCommand.prototype = Object.assign( Object.create( Object.prototyp
 //////////////////////////////////////////////////////////////////////////////
 TranslateObjectCommand.prototype.Do = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectTranslated", this.object );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectTranslated", this.objectId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 TranslateObjectCommand.prototype.Undo = function()
 {
-    this.object.position.x = this.oldPosition.x;
-    this.object.position.y = this.oldPosition.y;
-    this.object.position.z = this.oldPosition.z;
-    this.object.matrixWorldNeedsUpdate = true;
+    var object = this.editor.getObjectFromEditorId( this.objectId )
 
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectTranslated", this.object );
+    object.position.x = this.oldPosition.x;
+    object.position.y = this.oldPosition.y;
+    object.position.z = this.oldPosition.z;
+    object.matrixWorldNeedsUpdate = true;
+
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectTranslated", this.objectId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 TranslateObjectCommand.prototype.Redo = function()
 {
-    this.object.position.x = this.newPosition.x;
-    this.object.position.y = this.newPosition.y;
-    this.object.position.z = this.newPosition.z;
-    this.object.matrixWorldNeedsUpdate = true;
+    var object = this.editor.getObjectFromEditorId( this.objectId )
 
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectTranslated", this.object );
+    object.position.x = this.newPosition.x;
+    object.position.y = this.newPosition.y;
+    object.position.z = this.newPosition.z;
+    object.matrixWorldNeedsUpdate = true;
+
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectTranslated", this.objectId );
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
-function ScaleObjectCommand( editor, object, oldScale, newScale )
+function ScaleObjectCommand( editor, objectId, oldScale, newScale )
 {
     this.editor = editor;
-    this.object = object;
+    this.objectId = objectId;
 
     this.oldScale = new THREE.Vector3();
     this.oldScale.x = oldScale.x;
@@ -144,37 +147,41 @@ ScaleObjectCommand.prototype = Object.assign( Object.create( Object.prototype ),
 //////////////////////////////////////////////////////////////////////////////
 ScaleObjectCommand.prototype.Do = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.object );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.objectId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ScaleObjectCommand.prototype.Undo = function()
 {
-    this.object.scale.x = this.oldScale.x;
-    this.object.scale.y = this.oldScale.y;
-    this.object.scale.z = this.oldScale.z;
-    this.object.matrixWorldNeedsUpdate = true;
+    var object = this.editor.getObjectFromEditorId( this.objectId )
+    
+    object.scale.x = this.oldScale.x;
+    object.scale.y = this.oldScale.y;
+    object.scale.z = this.oldScale.z;
+    object.matrixWorldNeedsUpdate = true;
 
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.object );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.objectId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ScaleObjectCommand.prototype.Redo = function()
 {
+    var object = this.editor.getObjectFromEditorId( this.objectId )
+
     this.object.scale.x = this.newScale.x;
     this.object.scale.y = this.newScale.y;
     this.object.scale.z = this.newScale.z;
     this.object.matrixWorldNeedsUpdate = true;
 
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.object );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.objectId );
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
-function RotateObjectCommand( editor, object, oldRotation, newRotation )
+function RotateObjectCommand( editor, objectId, oldRotation, newRotation )
 {
     this.editor = editor;
-    this.object = object;
+    this.objectId = objectId;
 
     this.oldRotation = new THREE.Quaternion();
     this.oldRotation.x = oldRotation.x;
@@ -199,35 +206,36 @@ RotateObjectCommand.prototype = Object.assign( Object.create( Object.prototype )
 //////////////////////////////////////////////////////////////////////////////
 RotateObjectCommand.prototype.Do = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.object );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.objectId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 RotateObjectCommand.prototype.Undo = function()
 {
-    this.object.quaternion.x = this.oldRotation.x;
-    this.object.quaternion.y = this.oldRotation.y;
-    this.object.quaternion.z = this.oldRotation.z;
-    this.object.quaternion.w = this.oldRotation.w;
-    this.object.matrixWorldNeedsUpdate = true;
+    var object = this.editor.getObjectFromEditorId( this.objectId )
 
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.object );
+    object.quaternion.x = this.oldRotation.x;
+    object.quaternion.y = this.oldRotation.y;
+    object.quaternion.z = this.oldRotation.z;
+    object.quaternion.w = this.oldRotation.w;
+    object.matrixWorldNeedsUpdate = true;
+
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.objectId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 RotateObjectCommand.prototype.Redo = function()
 {
+    var object = this.editor.getObjectFromEditorId( this.objectId )
+
     this.object.quaternion.x = this.newRotation.x;
     this.object.quaternion.y = this.newRotation.y;
     this.object.quaternion.z = this.newRotation.z;
     this.object.quaternion.w = this.newRotation.w;
     this.object.matrixWorldNeedsUpdate = true;
 
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.object );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.objectId );
 }
-
-//////////////////////////////////////////////////////////////////////////////
-ViewCameraTransformedCommand
 
 //////////////////////////////////////////////////////////////////////////////
 function ViewCameraTransformedCommand( editor, viewId, oldPosition, oldRotation, newPosition, newRotation )
@@ -268,7 +276,7 @@ ViewCameraTransformedCommand.prototype = Object.assign( Object.create( Object.pr
 //////////////////////////////////////////////////////////////////////////////
 ViewCameraTransformedCommand.prototype.Do = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onViewCameraTransformed", this.object );
+    this.editor.eventDispatcher.dispatchEvent( "onViewCameraTransformed", this.viewId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -307,4 +315,154 @@ ViewCameraTransformedCommand.prototype.Redo = function()
     camera.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onViewCameraTransformed", this.viewId );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function CreateObjectCommand( editor, data )
+{
+    this.editor = editor;
+    this.data = data;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+CreateObjectCommand.prototype = Object.assign( Object.create( Object.prototype ), 
+{
+    //////////////////////////////////////////////////////////////////////////////
+    constructor: CreateObjectCommand
+} );
+
+//////////////////////////////////////////////////////////////////////////////
+CreateObjectCommand.prototype.Do = function()
+{
+    var object;
+
+    switch( this.data.type )
+    {
+        case "group":
+        {
+            object = new THREE.Object();
+            object.name = "Group" + (++this.editor.sceneObjectCreationId);
+        }
+        break;
+        case "box":
+        {
+            var boxGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+            var boxMaterial = new THREE.MeshPhysicalMaterial( 
+                {
+                    color: Math.random() * 0xffffff,
+                    roughness: 0.7,
+                    metalness: 0.5,
+                    clearCoat: 0.0,
+                    clearCoatRoughness: 0.0,
+                    reflectivity: 0.2
+                } );
+
+            object = new THREE.Mesh( boxGeometry, boxMaterial );
+            object.name = "Box" + (++this.editor.sceneObjectCreationId);
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+        break;
+        case "quad":
+        {
+            var quadGeometry = new THREE.PlaneGeometry( 1.0, 1.0 );
+            var quadMaterial = new THREE.MeshPhysicalMaterial( 
+                {
+                    color: Math.random() * 0xffffff,
+                    roughness: 0.7,
+                    metalness: 0.5,
+                    clearCoat: 0.0,
+                    clearCoatRoughness: 0.0,
+                    reflectivity: 0.2
+                } );
+
+            object = new THREE.Mesh( quadGeometry, quadMaterial );
+            object.name = "Quad" + (++this.editor.sceneObjectCreationId);
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+        break;
+
+        default:
+        {}
+        break;
+    }
+
+    if( object !== undefined )
+    {
+        this.objectId = ++this.editor.sceneObjectsId;
+        this.editor.addSceneObject( object, { parentId: this.data.parentId, objectId:  this.objectId } );
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectCreated", this.objectId );        
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+CreateObjectCommand.prototype.Undo = function()
+{
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsRemoved", this.objectId );
+    this.editor.removeSceneObject( this.editor.getObjectFromEditorId( this.objectId ) );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+CreateObjectCommand.prototype.Redo = function()
+{
+    var object;
+
+    switch( this.data.type )
+    {
+        case "group":
+        {
+            object = new THREE.Object();
+            object.name = "Group" + (++this.editor.sceneObjectCreationId);
+        }
+        break;
+        case "box":
+        {
+            var boxGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+            var boxMaterial = new THREE.MeshPhysicalMaterial( 
+                {
+                    color: Math.random() * 0xffffff,
+                    roughness: 0.7,
+                    metalness: 0.5,
+                    clearCoat: 0.0,
+                    clearCoatRoughness: 0.0,
+                    reflectivity: 0.2
+                } );
+
+            object = new THREE.Mesh( boxGeometry, boxMaterial );
+            object.name = "Box" + (++this.editor.sceneObjectCreationId);
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+        break;
+        case "quad":
+        {
+            var quadGeometry = new THREE.PlaneGeometry( 1.0, 1.0 );
+            var quadMaterial = new THREE.MeshPhysicalMaterial( 
+                {
+                    color: Math.random() * 0xffffff,
+                    roughness: 0.7,
+                    metalness: 0.5,
+                    clearCoat: 0.0,
+                    clearCoatRoughness: 0.0,
+                    reflectivity: 0.2
+                } );
+
+            object = new THREE.Mesh( quadGeometry, quadMaterial );
+            object.name = "Quad" + (++this.editor.sceneObjectCreationId);
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+        break;
+
+        default:
+        {}
+        break;
+    }
+
+    if( object !== undefined )
+    {
+        this.editor.addSceneObject( object, { parentId: data.parentId, id:  this.objectId } );
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectCreated", this.objectId );        
+    }
 }

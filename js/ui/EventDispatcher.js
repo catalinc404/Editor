@@ -75,7 +75,59 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
         {
             eventListeners[index]( data );
         }
+    },
+
+    addRequestListener : function( request, listener )
+    {
+        if( this.requestListeners === undefined )
+        {
+            this.requestListeners = {};
+        }
+
+        this.requestListeners[ request ] = listener;
+    },
+
+    removeRequestListener : function( request, listener )
+    {
+        if( this.requestListeners === undefined )
+        {
+            return;
+        }
+
+        var eventListeners = this.listeners[event];
+        if( eventListeners === undefined )
+        {
+            return;
+        }
+
+        var requestIndex = requestListeners.indexOf( listener );
+        if ( requestIndex !== - 1 ) 
+        {
+    		requestListeners.splice( requestIndex, 1 );
+		}
+    },
+
+    getRequestListeners : function()
+    {
+        return this.requestListeners;
+    },
+    
+    dispatchRequest : function( request, data )
+    {
+        if( this.requestListeners === undefined )
+        {
+            return;
+        }
+
+        var requestListener = this.requestListeners[request];
+        if( requestListener === undefined )
+        {
+            return;
+        }
+
+        return requestListener( data );
     }
+    
 } )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

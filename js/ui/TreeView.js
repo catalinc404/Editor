@@ -49,8 +49,8 @@ function TreeView( eventDispatcher, element )
         this.element.addEventListener( "vtree-select", this.onTreeElementSelected.bind( this ) );
         this.element.addEventListener( "vtree-deselect", this.onTreeElementDeselected.bind( this ) );
     }
-       
-    this.eventDispatcher.addEventListener( "onSceneCreated",           this.onSceneCreated.bind( this ) );
+    
+    this.eventDispatcher.addEventListener( "onEditorCreated",          this.onEditorCreated.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectAdded",       this.onSceneObjectAdded.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.onSceneObjectsSelected.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectsDeselected", this.onSceneObjectsDeselected.bind( this ) );
@@ -82,24 +82,17 @@ TreeView.prototype.onresize = function()
     setElementSize(  this.element, rectangle.left, rectangle.top, rectangle.width, rectangle.height );
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TreeView.prototype.onSceneCreated = function( scene )
+TreeView.prototype.onEditorCreated = function()
 {
     this.clearTree();
-
-    this.scene = scene;
-    this.createTree()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TreeView.prototype.onSceneObjectAdded = function( object )
+TreeView.prototype.onSceneObjectAdded = function( data )
 {
-    if( object === undefined )
-    {
-        return;
-    }
-
-    this.addObject( object, object.parent.id );
+    this.addObject( data.name, data.objectId, ( data.parentId !== undefined ) ? data.parentId : null );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,7 +106,7 @@ TreeView.prototype.onSceneObjectsSelected = function( selection )
     if( selection instanceof Array )
     {
         this.disableEvents = true;
-        this.setSelection( selection[0].id )
+        this.setSelection( selection[0] )
         this.disableEvents = undefined;
     }
 }
@@ -129,23 +122,8 @@ TreeView.prototype.onSceneObjectsDeselected = function( selection )
     if( selection instanceof Array )
     {
         this.disableEvents = true;
-        this.setSelection( (selection.length > 0) ? selection[0].id : -1 );
+        this.setSelection( selection[0] )
         this.disableEvents = undefined;
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TreeView.prototype.createTree = function()
-{
-    if( this.tree !== undefined && this.scene !== undefined )
-    {
-        var name = this.scene.name != "" ? this.scene.name : "untitled scene"; 
-        this.tree.add( { label: name, parent: null, id: this.scene.id, opened: (this.scene.children.length > 0) });
-        
-        for( var i = 0; i < this.scene.children.length; ++i )
-        {
-            this.addObject( this.scene.children[i], this.scene.id );
-        }
     }
 }
     
@@ -167,10 +145,9 @@ TreeView.prototype.resizeTree = function( rectangle )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TreeView.prototype.addObject = function( object, parentId )
+TreeView.prototype.addObject = function( name, objectId, parentId )
 {
-    var name = object.name != "" ? object.name : "untitled object"; 
-    this.tree.add( { label: name, parent: parentId, id: object.id, opened: (object.children.length > 0) });
+    this.tree.add( { label: name, parent: parentId, id: objectId, opened: true });
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,8 +168,10 @@ TreeView.prototype.onTreeElementSelected = function( event )
     }
 
     this.disableEvents = true;
-    var object = this.scene.getObjectById( parseInt( event.detail.id ) );
-    this.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", [object] );
+
+    var objectId = parseInt( event.detail.id );
+    this.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", [objectId] );
+    
     this.disableEvents = undefined;
 }
 
@@ -205,36 +184,38 @@ TreeView.prototype.onTreeElementDeselected = function( event )
     }
 
     this.disableEvents = true;
-    var object = this.scene.getObjectById( parseInt( event.detail.id ) );
-    this.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", [object] );
+
+    var objectId = parseInt( event.detail.id );
+    this.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", [objectId] );
+
     this.disableEvents = undefined;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TreeView.prototype.onTreeConetxtMenuCreateObjectGroup = function( event )
 {
-    var object = this.scene.getObjectById( parseInt( event.id ) );
-    this.eventDispatcher.dispatchEvent( "sceneCreateObjectGroup", { parent: object } );
+    var objectId = parseInt( event.id );
+    this.eventDispatcher.dispatchEvent( "sceneCreateObject", { parentId: objectId, type: "group" } );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TreeView.prototype.onTreeConetxtMenuCreateObjectBox = function( event )
 {
-    var object = this.scene.getObjectById( parseInt( event.id ) );
-    this.eventDispatcher.dispatchEvent( "sceneCreateObjectBox", { parent: object } );
+    var objectId = parseInt( event.id );
+    this.eventDispatcher.dispatchEvent( "sceneCreateObject", { parentId: objectId, type: "box" } );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TreeView.prototype.onTreeConetxtMenuCreateObjectQuad = function( event )
 {
-    var object = this.scene.getObjectById( parseInt( event.id ) );
-    this.eventDispatcher.dispatchEvent( "sceneCreateObjectQuad", { parent: object } );
+    var objectId = parseInt( event.id );
+    this.eventDispatcher.dispatchEvent( "sceneCreateObject", { parentId: objectId, type: "quad" } );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TreeView.prototype.onTreeConetxtMenuRemoveObject = function( event )
 {
-    var object = this.scene.getObjectById( parseInt( event.id ) );
-    this.eventDispatcher.dispatchEvent( "sceneRemoveObject", { object: object } );
+    var objectId = parseInt( event.detail.id );
+    this.eventDispatcher.dispatchEvent( "sceneRemoveObject", { objectId: objectId } );
 }
 

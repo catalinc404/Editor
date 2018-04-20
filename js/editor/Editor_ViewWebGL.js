@@ -152,7 +152,7 @@ ViewWebGL.prototype.render = function()
     }
     //if( this.renderHelpersMode & ERenderHelpersMode.PICKING )
     {
-        this.renderer.render( editor.scenePicking, this.camera );
+        //this.renderer.render( editor.scenePicking, this.camera );
     }
 }
 
@@ -476,17 +476,18 @@ ViewWebGL.prototype.handleMouseLeave = function( event )
 },
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleSceneObjectsSelected = function( objects )
+ViewWebGL.prototype.handleSceneObjectsSelected = function( objectIds )
 {
-    if( objects.length == 1 )
+    if( objectIds.length == 1 )
     {
-        var object = objects[0];
+        var object = this.editor.getObjectFromEditorId( objectIds[0] );
         this.transformControls.attach( object );
 
         this.setObjectTransformSpace( this.editor.objectTransformSpace );
         this.setObjectTransformMode( this.editor.objectTransformMode );
         
         this.transformControlsData.object = object;
+        this.transformControlsData.objectId = objectIds[0];
     }
 
     this.requestRender();
@@ -529,17 +530,17 @@ ViewWebGL.prototype.handleObjectTransformMouseUp = function( event )
 {
     if( event.mode == "translate" )
     {
-        editor.sceneObjectTranslated( this.transformControlsData.object, this.transformControlsData.position, this.transformControls.object.position );
+        editor.sceneObjectTranslated( this.transformControlsData.objectId, this.transformControlsData.position, this.transformControls.object.position );
     }
     else
     if( event.mode == "rotate" )    
     {
-        editor.sceneObjectRotated( this.transformControlsData.object, this.transformControlsData.quaternion, this.transformControls.object.quaternion );
+        editor.sceneObjectRotated( this.transformControlsData.objectId, this.transformControlsData.quaternion, this.transformControls.object.quaternion );
     }
     else
     if( event.mode == "scale" )    
     {
-        editor.sceneObjectScaled( this.transformControlsData.object, this.transformControlsData.scale, this.transformControls.object );
+        editor.sceneObjectScaled( this.transformControlsData.objectId, this.transformControlsData.scale, this.transformControls.object );
     }
 }
 
@@ -598,20 +599,20 @@ ViewWebGL.prototype.selectObjects = function()
             ids[id] = id;
         }
 
-        var editorObjectsIds = [];
+        var editorObjectIds = [];
         for( var idText in ids ) 
         { 
             var id = ids[idText];
-            editorObjectsIds.push( id );
+            editorObjectIds.push( id );
         }
-
-        this.editor.selectObjectsFromEditorIds( editorObjectsIds );
 
         this.renderer.physicallyCorrectLights = true;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
 
-        this.requestRender();
+        this.render();
+
+        this.editor.selectObjects( editorObjectIds );
     }
 }
 

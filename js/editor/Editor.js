@@ -38,7 +38,10 @@ function Editor( eventDispatcher, UIData )
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.eventDispatcher.addEventListener( "render",                        this.render.bind( this ) );
+    this.eventDispatcher.addEventListener( "sceneCreateObject",             this.sceneCreateObject.bind( this ) );
+    this.eventDispatcher.addEventListener( "sceneDeleteObject",             this.sceneDeleteObject.bind( this ) );
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.eventDispatcher.addEventListener( "onViewCreated",                 this.onViewCreated.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectsSelected",        this.onSceneObjectsSelected.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectsDeselected",      this.onSceneObjectsDeselected.bind( this ) );
@@ -48,11 +51,13 @@ function Editor( eventDispatcher, UIData )
     this.eventDispatcher.addEventListener( "onViewCameraTransformed",       this.onViewCameraTransformed.bind( this ) );
     this.eventDispatcher.addEventListener( "onToolbarButtonActivated",      this.onToolbarButtonActivated.bind( this ) );
     this.eventDispatcher.addEventListener( "onToolbarButtonDeactivated",    this.onToolbarButtonDeactivated.bind( this ) );
-    this.eventDispatcher.addEventListener( "sceneCreateObjectGroup",        this.sceneCreateObjectGroup.bind( this ) );
-    this.eventDispatcher.addEventListener( "sceneCreateObjectBox",          this.sceneCreateObjectBox.bind( this ) );
-    this.eventDispatcher.addEventListener( "sceneCreateObjectQuad",         this.sceneCreateObjectQuad.bind( this ) );
-    this.eventDispatcher.addEventListener( "sceneRemoveObject",             this.sceneRemoveObject.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneCreateObject",           this.onSceneCreateObject.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneDeleteObject",           this.onSceneDeleteObject.bind( this ) );
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.eventDispatcher.addRequestListener( "getObjectFromEditorId",       this.getObjectFromEditorId.bind( this ) );
+    this.eventDispatcher.addRequestListener( "getEditorIdFromObjectId",     this.getEditorIdFromObjectId.bind( this ) );
+    
     editor = this;
 };
 
@@ -67,9 +72,10 @@ Editor.prototype = Object.assign( Object.create( UI.prototype ),
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.init = function() 
 {
+    this.eventDispatcher.dispatchEvent( "onEditorCreated", this );
+
     this.defaultTexture = this.loadTexture( "textures/UV_Grid_Sm.jpg" );
 
-    this.scene = new THREE.Scene( { name: "Scene" } );
     this.sceneHelpers = new THREE.Scene();
     this.sceneGizmos  = new THREE.Scene();
     this.sceneGizmos.autoUpdate = false;
@@ -77,7 +83,10 @@ Editor.prototype.init = function()
     this.scenePicking.autoUpdate = false;
     this.sceneHUD     = new THREE.Scene();
 
+    this.scene = new THREE.Scene();
+    this.scene.name = "Scene";
     this.eventDispatcher.dispatchEvent( "onSceneCreated", this.scene );
+    this.addSceneObject( this.scene, { dontAddToScene: true } );
 
     this.initDefaultScene();
 }
@@ -147,13 +156,14 @@ Editor.prototype.addSceneObject = function( object, parameters  )
     var editorObject = {}
     parameters = parameters || {};
 
-    editorObject.id = ( parameters.id !== undefined ) ?  parameters.id : ++this.sceneObjectsId;
+    editorObject.id = ( parameters.objectId !== undefined ) ?  parameters.objectId : ++this.sceneObjectsId;
 
     if( parameters.dontAddToScene !== true )
     {
-        if( parameters.parent !== undefined )
+        if( parameters.parentId !== undefined )
         {
-            parameters.parent.add( object );
+            var parent = this.getObjectFromEditorId( parameters.parentId )
+            parent.add( object );
         }
         else
         {
@@ -171,7 +181,11 @@ Editor.prototype.addSceneObject = function( object, parameters  )
     position.copy( object.position );
     object.position.set( 0, 0, 0 );
     object.updateMatrixWorld();
-    
+
+    if( object instanceof THREE.Scene )
+    {
+    }
+    else
     if( object instanceof THREE.Mesh )
     {
         var selectionHelper = new THREE.BoxHelper( object );
@@ -191,6 +205,10 @@ Editor.prototype.addSceneObject = function( object, parameters  )
     if( object instanceof THREE.Camera )
     {
         editorObject.helpers.push( new THREE.CameraHelper( object ) );
+    }
+    else
+    if( object instanceof THREE.AmbientLight )
+    {
     }
     else
     if( object instanceof THREE.PointLight )
@@ -273,142 +291,68 @@ Editor.prototype.addSceneObject = function( object, parameters  )
      
     this.sceneObjects.push( editorObject );
 
-    this.eventDispatcher.dispatchEvent( "onSceneObjectAdded", object );
+    var parentId = ( object.parent !== undefined ) ? this.getEditorIdFromObject( object.parent ) : undefined;
+    this.eventDispatcher.dispatchEvent( "onSceneObjectAdded", { objectId: editorObject.id, parentId: parentId, name: editorObject.object.name } );
   
     for( var i = 0; i < object.children.length; ++i )
     {
         this.addSceneObject( object.children[i], { dontAddToScene : true } );
     }
+
+    return editorObject.id;
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.getEditorObjectsfromEditorIds = function( editorObjectsIds )
+Editor.prototype.removeSceneObject = function( object )
 {
-    var editorObjects = [];
-    for( var i = 0; i < editorObjectsIds.length; ++i ) 
+    for( var i = 0; i < this.editorObjects.length; ++i )
     {
-        for( var j = 0; j < this.sceneObjects.length; ++j ) 
+        if( this.editorObjects[i].object === object )
         {
-            if( this.sceneObjects[j].id == editorObjectsIds[i] )
+            for( var j = 0; j < this.selection.length; ++j )
             {
-                editorObjects.push( this.sceneObjects[j] );
-                break;
+                if( this.editorObjects[i] === this.selection[j] )
+                {
+                    this.deselectObjects( this.editorObjects[i].id );
+                    break;
+                }
             }
+
+            this.eventDispatcher.dispatchEvent( "onSceneObjectRemoved", this.editorObjects[i].id );
+            this.editorObjects[i].object.parent.remove( this.editorObjects[i].object );
+            this.editorObjects.splice( i, 1 );
         }
     }
-
-    return editorObjects;
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.selectObjects = function( editorObjects )
+Editor.prototype.selectObjects = function( editorObjectIds )
 {
     if( this.selection.length > 0 )
     {
-        this.doUndoManager.AddCommand( new DeselectObjectsCommand( this, [ this.selection[0].object ] ) );
+        this.doUndoManager.AddCommand( new DeselectObjectsCommand( this, [ this.selection[0].id ] ) );
         this.doUndoManager.Do();
     }
 
-    if( editorObjects.length > 0 )
+    if( editorObjectIds.length > 0 )
     {
-        this.doUndoManager.AddCommand( new SelectObjectsCommand( this, [ editorObjects[0].object ] ) );
-        this.doUndoManager.Do();
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-Editor.prototype.selectObjectsFromEditorIds = function( editorObjectsIds )
-{
-    var editorObjects = this.getEditorObjectsfromEditorIds( editorObjectsIds )
-    var filteredEditorObjects = [];
-
-    for( var i = 0; i < editorObjects.length; ++i )
-    {
-        if( editorObjects[i].object.visible !== false )
+        var editorObject = this.getEditorObjectFromEditorId( editorObjectIds[0] );
+        if( editorObject !== undefined )
         {
-            filteredEditorObjects.push( editorObjects[i] )
+            if( editorObject.object.visible !== false )
+            {
+                this.doUndoManager.AddCommand( new SelectObjectsCommand( this, [ editorObjectIds[0] ] ) );
+                this.doUndoManager.Do();
+            }
         }
     }
-    this.selectObjects( (filteredEditorObjects.length > 0) ? filteredEditorObjects : [] );
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.sceneCreateObjectGroup = function( data )
+Editor.prototype.onSceneObjectsSelected = function( objectIds )
 {
-    var object = new THREE.Object();
-    object.name = "Group" + (++this.sceneObjectCreationId);
-    this.addSceneObject( object, { parent: data.parent } );
-
-    this.render();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-Editor.prototype.sceneCreateObjectBox = function( data )
-{
-    var boxGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
-    var boxMaterial = new THREE.MeshPhysicalMaterial( 
-        {
-            color: Math.random() * 0xffffff,
-            roughness: 0.7,
-            metalness: 0.5,
-            clearCoat: 0.0,
-            clearCoatRoughness: 0.0,
-            reflectivity: 0.2
-        } );
-
-    var box = new THREE.Mesh( boxGeometry, boxMaterial );
-    box.name = "Box" + (++this.sceneObjectCreationId);
-    box.castShadow = true;
-    box.receiveShadow = true;
-
-    this.addSceneObject( box, { parent: data.parent } );
-
-    this.render();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-Editor.prototype.sceneCreateObjectQuad = function( data )
-{
-    var quadGeometry = new THREE.PlaneGeometry( 1.0, 1.0 );
-    var quadMaterial = new THREE.MeshPhysicalMaterial( 
-        {
-            color: Math.random() * 0xffffff,
-            roughness: 0.7,
-            metalness: 0.5,
-            clearCoat: 0.0,
-            clearCoatRoughness: 0.0,
-            reflectivity: 0.2
-        } );
-
-    var quad = new THREE.Mesh( quadGeometry, quadMaterial );
-    quad.name = "Quad" + (++this.sceneObjectCreationId);
-    quad.castShadow = true;
-    quad.receiveShadow = true;
-
-    this.addSceneObject( quad, { parent: data.parent } );
-
-    this.render();
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-Editor.prototype.sceneRemoveObject = function( data )
-{
-}
-
-//////////////////////////////////////////////////////////////////////////////
-Editor.prototype.onSceneObjectsSelected = function( objects )
-{
-    var selectedObject = objects[0];
-
-    for( var i = 0; i < this.sceneObjects.length; ++i ) 
-    {
-        if( this.sceneObjects[i].object == selectedObject )
-        {
-            this.selection.push( this.sceneObjects[i] );
-            break;
-        }
-    }
+    var selectedObject = this.getEditorObjectFromEditorId( objectIds[0] );
+    this.selection.push( selectedObject );
 
     for( var i = 0; i < this.selection.length; ++i )
     {
@@ -422,7 +366,17 @@ Editor.prototype.onSceneObjectsSelected = function( objects )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.onSceneObjectsDeselected = function( objects )
+Editor.prototype.deselectObjects = function( editorObjectIds )
+{
+    if( this.selection.length > 0 )
+    {
+        this.doUndoManager.AddCommand( new DeselectObjectsCommand( this, [ this.selection[0].id ] ) );
+        this.doUndoManager.Do();
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onSceneObjectsDeselected = function( objectIds )
 {
     for( var i = 0; i < this.selection.length; ++i )
     {
@@ -438,23 +392,67 @@ Editor.prototype.onSceneObjectsDeselected = function( objects )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.sceneObjectTranslated = function( object, oldPosition, newPosition )
+Editor.prototype.sceneCreateObject = function( data )
 {
-    this.doUndoManager.AddCommand( new TranslateObjectCommand( this, object, oldPosition, newPosition ) );
+    this.doUndoManager.AddCommand( new CreateObjectCommand( this, data ) );
     this.doUndoManager.Do();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.sceneObjectScaled = function( object, oldScale, newScale )
+Editor.prototype.onSceneCreateObject = function( data )
 {
-    this.doUndoManager.AddCommand( new ScaleObjectCommand( this, object, oldScale, newScale ) );
+    this.render();    
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneDeleteObject = function( data )
+{
+    this.doUndoManager.AddCommand( new DeleteObjectCommand( this, data ) );
     this.doUndoManager.Do();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.sceneObjectRotated = function( object, oldRotation, newRotation )
+Editor.prototype.onSceneDeleteObject = function( data )
 {
-    this.doUndoManager.AddCommand( new RotateObjectCommand( this, object, oldRotation, newRotation ) );
+    this.render();    
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneObjectTranslated = function( objectId, oldPosition, newPosition )
+{
+    this.doUndoManager.AddCommand( new TranslateObjectCommand( this, objectId, oldPosition, newPosition ) );
+    this.doUndoManager.Do();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onSceneObjectsTranslated = function( objectId )
+{
+    this.render();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneObjectScaled = function( objectId, oldScale, newScale )
+{
+    this.doUndoManager.AddCommand( new ScaleObjectCommand( this, objectId, oldScale, newScale ) );
+    this.doUndoManager.Do();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onSceneObjectsScaled = function( objectId )
+{
+    this.render();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onSceneObjectsRotated = function( objectId )
+{
+    this.render();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneObjectRotated = function( objectId, oldRotation, newRotation )
+{
+    this.doUndoManager.AddCommand( new RotateObjectCommand( this, objectId, oldRotation, newRotation ) );
     this.doUndoManager.Do();
 }
 
@@ -463,24 +461,6 @@ Editor.prototype.viewCameraTransformed = function( viewId, oldPosition, oldRotat
 {
     this.doUndoManager.AddCommand( new ViewCameraTransformedCommand( this, viewId, oldPosition, oldRotation, newPosition, newRotation ) );
     this.doUndoManager.Do();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-Editor.prototype.onSceneObjectsTranslated = function( object )
-{
-    this.render();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-Editor.prototype.onSceneObjectsScaled = function( object )
-{
-    this.render();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-Editor.prototype.onSceneObjectsRotated = function( object )
-{
-    this.render();
 }
 
 //////////////////////////////////////////////////////////////////////////////
