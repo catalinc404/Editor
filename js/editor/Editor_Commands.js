@@ -335,6 +335,7 @@ CreateObjectCommand.prototype = Object.assign( Object.create( Object.prototype )
 CreateObjectCommand.prototype.Do = function()
 {
     var object;
+    var color = Math.random() * 0xffffff;
 
     switch( this.data.type )
     {
@@ -349,7 +350,7 @@ CreateObjectCommand.prototype.Do = function()
             var boxGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
             var boxMaterial = new THREE.MeshPhysicalMaterial( 
                 {
-                    color: Math.random() * 0xffffff,
+                    color: color,
                     roughness: 0.7,
                     metalness: 0.5,
                     clearCoat: 0.0,
@@ -368,7 +369,7 @@ CreateObjectCommand.prototype.Do = function()
             var quadGeometry = new THREE.PlaneGeometry( 1.0, 1.0 );
             var quadMaterial = new THREE.MeshPhysicalMaterial( 
                 {
-                    color: Math.random() * 0xffffff,
+                    color: color,
                     roughness: 0.7,
                     metalness: 0.5,
                     clearCoat: 0.0,
@@ -378,6 +379,39 @@ CreateObjectCommand.prototype.Do = function()
 
             object = new THREE.Mesh( quadGeometry, quadMaterial );
             object.name = "Quad" + (++this.editor.sceneObjectCreationId);
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+        break;
+        case "sphere":
+        {
+            var sphereGeometry = new THREE.SphereGeometry( 1.0, 20, 20);
+            var spehereMaterial = new THREE.MeshPhysicalMaterial( 
+                {
+                    color: color,
+                    roughness: 0.7,
+                    metalness: 0.5,
+                    clearCoat: 0.0,
+                    clearCoatRoughness: 0.0,
+                    reflectivity: 0.2
+                } );
+
+            object = new THREE.Mesh( sphereGeometry, sphereMaterial );
+            object.name = "Sphere" + (++this.editor.sceneObjectCreationId);
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+        break;
+        case "mesh":
+        {
+            this.geometryId = ( this.data.geometryId !== undefined ) ? this.data.geometryId : this.editor.defaultGeometryId;
+            this.materialId = ( this.data.materialId !== undefined ) ? this.data.materialId : this.editor.defaultMaterialId;
+
+            var geometry = this.editor.getGeometry( this.geometryId );
+            var material = this.editor.getMaterial( this.materialId );
+
+            object = new THREE.Mesh( geometry, material );
+            object.name = "Mesh" + (++this.editor.sceneObjectCreationId);
             object.castShadow = true;
             object.receiveShadow = true;
         }
@@ -391,6 +425,8 @@ CreateObjectCommand.prototype.Do = function()
     if( object !== undefined )
     {
         this.objectId = ++this.editor.sceneObjectsId;
+        this.objectCreationId = this.editor.sceneObjectCreationId;
+        this.objectColor = color;
         this.editor.addSceneObject( object, { parentId: this.data.parentId, objectId:  this.objectId } );
         this.editor.eventDispatcher.dispatchEvent( "onSceneObjectCreated", this.objectId );        
     }
@@ -399,7 +435,7 @@ CreateObjectCommand.prototype.Do = function()
 //////////////////////////////////////////////////////////////////////////////
 CreateObjectCommand.prototype.Undo = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsRemoved", this.objectId );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectDeleted", this.objectId );
     this.editor.removeSceneObject( this.editor.getObjectFromEditorId( this.objectId ) );
 }
 
@@ -407,13 +443,12 @@ CreateObjectCommand.prototype.Undo = function()
 CreateObjectCommand.prototype.Redo = function()
 {
     var object;
-
     switch( this.data.type )
     {
         case "group":
         {
             object = new THREE.Object();
-            object.name = "Group" + (++this.editor.sceneObjectCreationId);
+            object.name = "Group" + this.objectCreationId;
         }
         break;
         case "box":
@@ -421,7 +456,7 @@ CreateObjectCommand.prototype.Redo = function()
             var boxGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
             var boxMaterial = new THREE.MeshPhysicalMaterial( 
                 {
-                    color: Math.random() * 0xffffff,
+                    color: this.objectColor,
                     roughness: 0.7,
                     metalness: 0.5,
                     clearCoat: 0.0,
@@ -430,7 +465,7 @@ CreateObjectCommand.prototype.Redo = function()
                 } );
 
             object = new THREE.Mesh( boxGeometry, boxMaterial );
-            object.name = "Box" + (++this.editor.sceneObjectCreationId);
+            object.name = "Box" + this.objectCreationId;
             object.castShadow = true;
             object.receiveShadow = true;
         }
@@ -440,7 +475,7 @@ CreateObjectCommand.prototype.Redo = function()
             var quadGeometry = new THREE.PlaneGeometry( 1.0, 1.0 );
             var quadMaterial = new THREE.MeshPhysicalMaterial( 
                 {
-                    color: Math.random() * 0xffffff,
+                    color: this.objectColor,
                     roughness: 0.7,
                     metalness: 0.5,
                     clearCoat: 0.0,
@@ -449,7 +484,37 @@ CreateObjectCommand.prototype.Redo = function()
                 } );
 
             object = new THREE.Mesh( quadGeometry, quadMaterial );
-            object.name = "Quad" + (++this.editor.sceneObjectCreationId);
+            object.name = "Quad" + this.objectCreationId;
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+        break;
+        case "sphere":
+        {
+            var sphereGeometry = new THREE.SphereGeometry( 1.0, 20, 20);
+            var spehereMaterial = new THREE.MeshPhysicalMaterial( 
+                {
+                    color: this.objectColor,
+                    roughness: 0.7,
+                    metalness: 0.5,
+                    clearCoat: 0.0,
+                    clearCoatRoughness: 0.0,
+                    reflectivity: 0.2
+                } );
+
+            object = new THREE.Mesh( sphereGeometry, sphereMaterial );
+            object.name = "Sphere" + this.objectCreationId;
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+        break;
+        case "mesh":
+        {
+            var geometry = this.editor.getGeometry( this.geometryId );
+            var material = this.editor.getMaterial( this.materialId );
+
+            object = new THREE.Mesh( geometry, material );
+            object.name = "Mesh" + this.objectCreationId;;
             object.castShadow = true;
             object.receiveShadow = true;
         }
@@ -462,7 +527,7 @@ CreateObjectCommand.prototype.Redo = function()
 
     if( object !== undefined )
     {
-        this.editor.addSceneObject( object, { parentId: data.parentId, id:  this.objectId } );
+        this.editor.addSceneObject( object, { parentId: this.data.parentId, objectId:  this.objectId } );
         this.editor.eventDispatcher.dispatchEvent( "onSceneObjectCreated", this.objectId );        
     }
 }

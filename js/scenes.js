@@ -6,7 +6,7 @@ function createInitialScene( editor )
     //createPBRTScene2( editor );
     //createUnrealArchDemoScene( editor );
     //createCornellBoxScene( editor );
-    createCornellBoxScene2( editor );
+    //createCornellBoxScene2( editor );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
