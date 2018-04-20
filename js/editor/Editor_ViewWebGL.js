@@ -505,7 +505,7 @@ ViewWebGL.prototype.handleSceneObjectsDeselected = function( objects )
 //////////////////////////////////////////////////////////////////////////////
 ViewWebGL.prototype.handleObjectTransformChange = function(  )
 {
-    this.eventDispatcher.dispatchEvent( "render" );
+    this.eventDispatcher.dispatchCommand( "render" );
 }
 
 //////////////////////////////////////////////////////////////////////////////

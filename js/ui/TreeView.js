@@ -199,13 +199,13 @@ TreeView.prototype.onTreeElementDeselected = function( event )
 TreeView.prototype.onTreeConetxtMenuCreateObject = function( event )
 {
     var objectId = parseInt( event.id );
-    this.eventDispatcher.dispatchEvent( "sceneObjectCreate", { parentId: objectId, type: event.type } );
+    this.eventDispatcher.dispatchCommand( "sceneObjectCreate", { parentId: objectId, type: event.type } );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TreeView.prototype.onTreeConetxtMenuRemoveObject = function( event )
 {
     var objectId = parseInt( event.detail.id );
-    this.eventDispatcher.dispatchEvent( "sceneObjectRemove", { objectId: objectId } );
+    this.eventDispatcher.dispatchCommand( "sceneObjectRemove", { objectId: objectId } );
 }
 

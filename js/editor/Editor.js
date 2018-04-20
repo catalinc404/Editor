@@ -45,11 +45,6 @@ function Editor( eventDispatcher, UIData )
     this.doUndoManager = new DoUndoManager( eventDispatcher );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.eventDispatcher.addEventListener( "render",                        this.render.bind( this ) );
-    this.eventDispatcher.addEventListener( "sceneObjectCreate",             this.sceneObjectCreate.bind( this ) );
-    this.eventDispatcher.addEventListener( "sceneObjectDelete",             this.sceneObjectDelete.bind( this ) );
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.eventDispatcher.addEventListener( "onViewCreated",                 this.onViewCreated.bind( this ) );
     this.eventDispatcher.addEventListener( "onViewCameraTransformed",       this.onViewCameraTransformed.bind( this ) );
 
@@ -67,11 +62,15 @@ function Editor( eventDispatcher, UIData )
     this.eventDispatcher.addEventListener( "onToolbarButtonDeactivated",    this.onToolbarButtonDeactivated.bind( this ) );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.eventDispatcher.addRequestListener( "getObjectFromEditorId",       this.getObjectFromEditorId.bind( this ) );
-    this.eventDispatcher.addRequestListener( "getEditorIdFromObjectId",     this.getEditorIdFromObjectId.bind( this ) );
-    
-    editor = this;
+    this.eventDispatcher.addCommandHandler( "render",                       this.render.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "sceneObjectCreate",            this.sceneObjectCreate.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "sceneObjectDelete",            this.sceneObjectDelete.bind( this ) );
 
+    this.eventDispatcher.addCommandHandler( "getObjectFromEditorId",        this.getObjectFromEditorId.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "getEditorIdFromObjectId",      this.getEditorIdFromObjectId.bind( this ) );
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    editor = this;
     this.eventDispatcher.dispatchEvent( "onEditorCreated", this );
 };
 

@@ -9,6 +9,7 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     constructor: EventDispatcher,
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     addEventListener : function( event, listener )
     {
         if( this.listeners === undefined )
@@ -77,57 +78,57 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
         }
     },
 
-    addRequestListener : function( request, listener )
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    addCommandHandler : function( command, handler )
     {
-        if( this.requestListeners === undefined )
+        if( this.commandHandlers === undefined )
         {
-            this.requestListeners = {};
+            this.commandHandlers = {};
         }
 
-        this.requestListeners[ request ] = listener;
+        this.commandHandlers[ command ] = handler;
     },
 
-    removeRequestListener : function( request, listener )
+    removeCommandHandler : function( command, handler )
     {
-        if( this.requestListeners === undefined )
+        if( this.commandHandlers === undefined )
         {
             return;
         }
 
-        var eventListeners = this.listeners[event];
-        if( eventListeners === undefined )
+        var commandHandler = this.commandHandlers[command];
+        if( commandHandler === undefined )
         {
             return;
         }
 
-        var requestIndex = requestListeners.indexOf( listener );
-        if ( requestIndex !== - 1 ) 
+        var commandIndex = commandHandlers.indexOf( handler );
+        if ( commandIndex !== - 1 ) 
         {
-    		requestListeners.splice( requestIndex, 1 );
+    		commandHandlers.splice( commandIndex, 1 );
 		}
     },
 
-    getRequestListeners : function()
+    getCommandHandlers : function()
     {
-        return this.requestListeners;
+        return this.commandHandlers;
     },
     
-    dispatchRequest : function( request, data )
+    dispatchCommand : function( command, data )
     {
-        if( this.requestListeners === undefined )
+        if( this.commandHandlers === undefined )
         {
             return;
         }
 
-        var requestListener = this.requestListeners[request];
-        if( requestListener === undefined )
+        var commandHandler = this.commandHandlers[command];
+        if( commandHandler === undefined )
         {
             return;
         }
 
-        return requestListener( data );
+        return commandHandler( data );
     }
-    
 } )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

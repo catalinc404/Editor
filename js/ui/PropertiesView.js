@@ -643,11 +643,11 @@ PropertyView.prototype.setProperties = function( object )
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.requestRender = function()
 {
-    this.eventDispatcher.dispatchEvent( "render" ); 
+    this.eventDispatcher.dispatchCommand( "render" ); 
 }
 
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.requestMaterialUpdate = function()
 {
-    this.eventDispatcher.dispatchEvent( "render" ); 
+    this.eventDispatcher.dispatchCommand( "render" ); 
 }
