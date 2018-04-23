@@ -78,7 +78,7 @@ PropertyView.prototype.onSceneObjectsSelected = function( selection )
 
     if( ( selection instanceof Array ) && ( selection.length > 0 ) )
     {
-        var object = this.eventDispatcher.dispatchRequest( "getObjectFromEditorId", selection[0] );
+        var object = this.eventDispatcher.runCommand( "getObjectFromEditorId", selection[0] );
         if( object !== undefined )
         {
             this.setProperties( object );
@@ -643,11 +643,11 @@ PropertyView.prototype.setProperties = function( object )
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.requestRender = function()
 {
-    this.eventDispatcher.dispatchCommand( "render" ); 
+    this.eventDispatcher.runCommand( "render" ); 
 }
 
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.requestMaterialUpdate = function()
 {
-    this.eventDispatcher.dispatchCommand( "render" ); 
+    this.eventDispatcher.runCommand( "render" ); 
 }

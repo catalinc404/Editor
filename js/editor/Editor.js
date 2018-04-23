@@ -67,7 +67,6 @@ function Editor( eventDispatcher, UIData )
     this.eventDispatcher.addCommandHandler( "sceneObjectDelete",            this.sceneObjectDelete.bind( this ) );
 
     this.eventDispatcher.addCommandHandler( "getObjectFromEditorId",        this.getObjectFromEditorId.bind( this ) );
-    this.eventDispatcher.addCommandHandler( "getEditorIdFromObjectId",      this.getEditorIdFromObjectId.bind( this ) );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     editor = this;
