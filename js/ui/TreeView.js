@@ -19,35 +19,35 @@ function TreeView( eventDispatcher, element )
                         label: 'Add Group',
                         action: function( id )
                         {
-                            _this.onTreeConetxtMenuCreateObject( { id: id, type: "group" } );
+                            _this.onTreeContextMenuCreateObject( { id: id, type: "group" } );
                         }
                     },
                     {
                         label: 'Create Box',
                         action: function( id )
                         {
-                            _this.onTreeConetxtMenuCreateObject( { id: id, type: "box" } );
+                            _this.onTreeContextMenuCreateObject( { id: id, type: "box" } );
                         }
                     },
                     {
                         label: 'Create Quad',
                         action: function( id )
                         {
-                            _this.onTreeConetxtMenuCreateObject( { id: id, type: "quad" } );
+                            _this.onTreeContextMenuCreateObject( { id: id, type: "quad" } );
                         }
                     },
                     {
                         label: 'Create Mesh',
                         action: function( id )
                         {
-                            _this.onTreeConetxtMenuCreateObject( { id: id, type: "mesh" } );
+                            _this.onTreeContextMenuCreateObject( { id: id, type: "mesh" } );
                         }
                     },
                     {
-                        label: 'Remove',
+                        label: 'Delete',
                         action: function( id )
                         {
-                            _this.onTreeConetxtMenuRemoveObject( { id: id } );
+                            _this.onTreeContextMenuDeleteObject( { id: id } );
                         }
                     },
                 ]
@@ -196,16 +196,16 @@ TreeView.prototype.onTreeElementDeselected = function( event )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TreeView.prototype.onTreeConetxtMenuCreateObject = function( event )
+TreeView.prototype.onTreeContextMenuCreateObject = function( event )
 {
     var objectId = parseInt( event.id );
     this.eventDispatcher.runCommand( "sceneObjectCreate", { parentId: objectId, type: event.type } );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TreeView.prototype.onTreeConetxtMenuRemoveObject = function( event )
+TreeView.prototype.onTreeContextMenuDeleteObject = function( event )
 {
-    var objectId = parseInt( event.detail.id );
+    var objectId = parseInt( event.id );
     this.eventDispatcher.runCommand( "sceneObjectDelete", { objectId: objectId } );
 }
 

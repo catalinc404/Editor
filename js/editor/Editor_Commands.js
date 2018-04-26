@@ -531,3 +531,50 @@ CreateObjectCommand.prototype.Redo = function()
         this.editor.eventDispatcher.dispatchEvent( "onSceneObjectCreated", this.objectId );        
     }
 }
+
+//////////////////////////////////////////////////////////////////////////////
+function DeleteObjectCommand( editor, data )
+{
+    this.editor = editor;
+    this.data = data;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+DeleteObjectCommand.prototype = Object.assign( Object.create( Object.prototype ), 
+{
+    //////////////////////////////////////////////////////////////////////////////
+    constructor: DeleteObjectCommand
+} );
+
+//////////////////////////////////////////////////////////////////////////////
+DeleteObjectCommand.prototype.Do = function()
+{
+    this.object = this.editor.getObjectFromEditorId( this.data.objectId );
+    if( this.object !== undefined )
+    {
+        this.objectParentId = this.editor.getEditorIdFromObject( this.object.parent );
+
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectDeleted", this.data.objectId );
+        this.editor.removeSceneObject( this.object );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+DeleteObjectCommand.prototype.Undo = function()
+{
+    if( this.object !== undefined )
+    {
+        this.editor.addSceneObject( this.object, { parentId: this.objectParentId, objectId:  this.data.objectId } );
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectCreated", this.data.objectId );        
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+DeleteObjectCommand.prototype.Redo = function()
+{
+    if( this.object !== undefined )
+    {
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectDeleted", this.data.objectId );
+        this.editor.removeSceneObject( this.object );
+    }
+}

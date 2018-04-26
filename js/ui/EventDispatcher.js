@@ -114,7 +114,7 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
         return this.commandHandlers;
     },
     
-    runCommand : function( command, data )
+    dispatchCommand : function( command, data )
     {
         if( this.commandHandlers === undefined )
         {
@@ -132,7 +132,7 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
 
     runCommand : function( command, data )
     {
-        this.runCommand( command, data );
+        this.dispatchCommand( command, data );
     }
 } )
 
