@@ -126,7 +126,7 @@ Editor.prototype.initDefaultScene = function()
     helper.material.transparent = true;
     this.sceneHelpers.add( helper );
 
-    var ambientLight = new THREE.AmbientLight( 0x222222 );
+    var ambientLight = new THREE.AmbientLight( 0xffffff, 1 );
     ambientLight.name = "ambientLight";
     this.addSceneObject( ambientLight );
 }
@@ -485,8 +485,11 @@ Editor.prototype.onSceneObjectCreated = function( data )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneObjectDelete = function( data )
 {
-    this.doUndoManager.AddCommand( new DeleteObjectCommand( this, data ) );
-    this.doUndoManager.Do();
+    if( data.objectId > 1 )
+    {
+        this.doUndoManager.AddCommand( new DeleteObjectCommand( this, data ) );
+        this.doUndoManager.Do();
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

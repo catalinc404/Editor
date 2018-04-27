@@ -15,6 +15,7 @@ function TreeView( eventDispatcher, element )
             {
                 contextmenu: 
                 [
+                    /*
                     {
                         label: 'Add Group',
                         action: function( id )
@@ -43,6 +44,7 @@ function TreeView( eventDispatcher, element )
                             _this.onTreeContextMenuCreateObject( { id: id, type: "mesh" } );
                         }
                     },
+                    */
                     {
                         label: 'Delete',
                         action: function( id )

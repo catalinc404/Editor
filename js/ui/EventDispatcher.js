@@ -132,7 +132,7 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
 
     runCommand : function( command, data )
     {
-        this.dispatchCommand( command, data );
+        return this.dispatchCommand( command, data );
     }
 } )
 

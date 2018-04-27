@@ -214,7 +214,7 @@ var editorPageLayout =
                         type: "tabs",
                         config:
                         {
-                            tabs: { TabGeneral: "ToolbarGeneral", TabObjects: "ToolbarObjects", TabMaterials: "ToolbarMaterials" },
+                            tabs: { TabGeneral: "ToolbarGeneral", TabObjects: "ToolbarObjects", TabLights: "ToolbarLights", TabGeometries: "ToolbarGeometries", TabMaterials: "ToolbarMaterials" },
                             default: "TabGeneral",
                         },
                     },
