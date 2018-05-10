@@ -427,7 +427,7 @@ CreateObjectCommand.prototype.Do = function()
         this.objectId = ++this.editor.sceneObjectsId;
         this.objectCreationId = this.editor.sceneObjectCreationId;
         this.objectColor = color;
-        this.editor.addSceneObject( object, { parentId: this.data.parentId, objectId:  this.objectId } );
+        this.editor.sceneObjectAdd( object, { objectId:  this.objectId, parentObjectId: this.data.parentId } );
         this.editor.eventDispatcher.dispatchEvent( "onSceneObjectCreated", this.objectId );        
     }
 }
@@ -436,7 +436,7 @@ CreateObjectCommand.prototype.Do = function()
 CreateObjectCommand.prototype.Undo = function()
 {
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectDeleted", this.objectId );
-    this.editor.removeSceneObject( this.editor.getObjectFromEditorId( this.objectId ) );
+    this.editor.sceneObjectRemove( this.editor.getObjectFromEditorId( this.objectId ) );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -527,7 +527,7 @@ CreateObjectCommand.prototype.Redo = function()
 
     if( object !== undefined )
     {
-        this.editor.addSceneObject( object, { parentId: this.data.parentId, objectId:  this.objectId } );
+        this.editor.sceneObjectAdd( object, { objectId:  this.objectId, parentId: this.data.parentId,  } );
         this.editor.eventDispatcher.dispatchEvent( "onSceneObjectCreated", this.objectId );        
     }
 }
@@ -564,7 +564,7 @@ DeleteObjectCommand.prototype.Undo = function()
 {
     if( this.object !== undefined )
     {
-        this.editor.addSceneObject( this.object, { parentId: this.objectParentId, objectId:  this.data.objectId } );
+        this.editor.sceneObjectAdd( this.object, { parentId: this.objectParentId, objectId:  this.data.objectId } );
         this.editor.eventDispatcher.dispatchEvent( "onSceneObjectCreated", this.data.objectId );        
     }
 }
@@ -575,6 +575,6 @@ DeleteObjectCommand.prototype.Redo = function()
     if( this.object !== undefined )
     {
         this.editor.eventDispatcher.dispatchEvent( "onSceneObjectDeleted", this.data.objectId );
-        this.editor.removeSceneObject( this.object );
+        this.editor.sceneObjectRemove( this.object );
     }
 }

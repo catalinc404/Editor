@@ -63,6 +63,10 @@ function TreeView( eventDispatcher, element )
     this.eventDispatcher.addEventListener( "onSceneObjectRemoved",     this.onSceneObjectRemoved.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.onSceneObjectsSelected.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectsDeselected", this.onSceneObjectsDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneGeometryAdded",     this.onSceneGeometryAdded.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneGeometryRemoved",   this.onSceneGeometryRemoved.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneMaterialAdded",     this.onSceneMaterialAdded.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneMaterialRemoved",   this.onSceneMaterialRemoved.bind( this ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,6 +140,27 @@ TreeView.prototype.onSceneObjectsDeselected = function( selection )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TreeView.prototype.onSceneGeometryAdded = function( data )
+{
+    this.addObject( data.name, data.geometryId, ( data.parentId !== undefined ) ? data.parentId : null );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TreeView.prototype.onSceneGeometryRemoved = function( data )
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TreeView.prototype.onSceneMaterialAdded = function( data )
+{
+    this.addObject( data.name, data.materialId, ( data.parentId !== undefined ) ? data.parentId : null );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TreeView.prototype.onSceneMaterialRemoved = function( data )
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TreeView.prototype.resizeTree = function( rectangle )
 {
     if( this.tree !== undefined )
@@ -175,9 +200,30 @@ TreeView.prototype.onTreeElementSelected = function( event )
 
     this.disableEvents = true;
 
-    var objectId = parseInt( event.detail.id );
-    this.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", [objectId] );
-    
+    var id = parseInt( event.detail.id );
+    var type = this.eventDispatcher.runCommand( "getTypeFromId", { id: id } );
+    switch( type )
+    {
+        case "object":
+        case "scene":
+        {
+            this.eventDispatcher.dispatchCommand( "sceneObjectSelect", [ id ] );
+        }
+        break;
+        case "material":
+        {
+            this.eventDispatcher.dispatchCommand( "sceneMaterialSelect", id );
+        }
+        break;
+        case "geometry":
+        {
+            this.eventDispatcher.dispatchCommand( "sceneGeometrySelect", id );
+        }
+        break;
+        default:
+        break;
+    }
+
     this.disableEvents = undefined;
 }
 

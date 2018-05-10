@@ -39,7 +39,7 @@ Editor.prototype.loadTDS = function ( path, normalMapPath )
 
                                 object.name = object.name || name;
 
-                                editor.addSceneObject( object );
+                                editor.sceneObjectAdd( object );
                             }
                   );
 }
@@ -56,7 +56,7 @@ Editor.prototype.loadDAE = function ( path, objectName )
                             {
                                 var object = collada.scene 
                                 object.name = object.name || objectName;
-                                editor.addSceneObject( object );
+                                editor.sceneObjectAdd( object );
                             } );
 }
 
@@ -85,7 +85,7 @@ Editor.prototype.loadOBJ = function ( path, objectName, callback )
                 callback( object );
             }
 
-            editor.addSceneObject( object );
+            editor.sceneObjectAdd( object );
         } );
 	} );
 }
@@ -111,7 +111,7 @@ function sceneOpen()
                                                     {
                                                         var tmpPath = URL.createObjectURL( file );
                                                         var loader = new THREE.ObjectLoader();
-                                                        loader.load( tmpPath, function ( obj ) { editor.addSceneObject( obj ); } );
+                                                        loader.load( tmpPath, function ( obj ) { editor.sceneObjectAdd( obj ); } );
                                                     }
                                                     else
                                                     if( file.name.match(/\.dae$/) ) 
@@ -158,7 +158,7 @@ function sceneImport()
                                                     {
                                                         var tmpPath = URL.createObjectURL( file );
                                                         var loader = new THREE.ObjectLoader();
-                                                        loader.load(  tmpPath, function ( obj ) { editor.addSceneObject( obj ); } );
+                                                        loader.load(  tmpPath, function ( obj ) { editor.sceneObjectAdd( obj ); } );
                                                     }
                                                     else
                                                     if( file.name.match(/\.dae$/) ) 

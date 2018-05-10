@@ -2,7 +2,7 @@
 function createInitialScene( editor )
 {
     //createDemoScene( editor );
-    //createPBRTScene( editor );
+    createPBRTScene( editor );
     //createPBRTScene2( editor );
     //createUnrealArchDemoScene( editor );
     //createCornellBoxScene( editor );
@@ -25,7 +25,7 @@ function createDemoScene( editor )
     spotLight.shadow.camera.near = 1;
     spotLight.shadow.camera.far = 200;
     spotLight.castShadow = true;    
-    editor.addSceneObject( spotLight );
+    editor.sceneObjectAdd( spotLight );
 
     var cubeGeometry = new THREE.BoxGeometry( 4, 4, 4 )
     var cubeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: editor.defaultTexture } );
@@ -36,7 +36,7 @@ function createDemoScene( editor )
     cube.position.z = 0;
     cube.castShadow = true;
     cube.receiveShadow = true;
-    editor.addSceneObject( cube );
+    editor.sceneObjectAdd( cube );
 
     var groupSpeheres = new THREE.Group();
     groupSpeheres.name = "spheres";
@@ -55,7 +55,7 @@ function createDemoScene( editor )
     }
     groupSpeheres.castShadow = true;
     groupSpeheres.receiveShadow = true;
-    editor.addSceneObject( groupSpeheres );    
+    editor.sceneObjectAdd( groupSpeheres );    
 
     var planeGeometry = new THREE.PlaneGeometry( 60, 20 );
     var planeMaterial = new THREE.MeshPhongMaterial( {  color:0xffffff, map: editor.loadTexture( "textures/grid.png") } );
@@ -67,7 +67,7 @@ function createDemoScene( editor )
     plane.position.z = 0;
     plane.castShadow = true;
     plane.receiveShadow = true;
-    editor.addSceneObject( plane );
+    editor.sceneObjectAdd( plane );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,11 +93,11 @@ function createPBRTScene( editor )
     lightMesh.name = "light geometry";
     light.add( lightMesh );
     light.name = "light";
-    editor.addSceneObject( light );
+    editor.sceneObjectAdd( light );
 
     var hemisphereLight = new THREE.HemisphereLight(0x303F9F, 0x000000, 1);
     hemisphereLight.name = "hemisphereLight";
-    editor.addSceneObject( hemisphereLight );
+    editor.sceneObjectAdd( hemisphereLight );
 
     editor.loadPLYMesh( "data/lucy.ply", undefined, function( geometry )
     {
@@ -118,7 +118,7 @@ function createPBRTScene( editor )
         mesh.castShadow = true;
         mesh.updateMatrix();
 
-        editor.addSceneObject( mesh );
+        editor.sceneObjectAdd( mesh );
     });
 
     editor.loadPLYMesh( "data/dragon.ply", undefined, function( geometry )
@@ -140,7 +140,7 @@ function createPBRTScene( editor )
         mesh.castShadow = true;
         mesh.updateMatrix();
 
-        editor.addSceneObject( mesh );
+        editor.sceneObjectAdd( mesh );
     });
 
     editor.loadPLYMesh( "data/bunny.ply", undefined, function( geometry )
@@ -162,7 +162,7 @@ function createPBRTScene( editor )
         mesh.castShadow = true;
         mesh.updateMatrix();
 
-        editor.addSceneObject( mesh );
+        editor.sceneObjectAdd( mesh );
     });
 
     editor.loadTexture( "textures/marble.jpg", function( texture )
@@ -186,7 +186,7 @@ function createPBRTScene( editor )
         mesh.position.y = 0;
         mesh.updateMatrix();
 
-        editor.addSceneObject( mesh );
+        editor.sceneObjectAdd( mesh );
     });
 }
 
@@ -213,11 +213,11 @@ function createPBRTScene2( editor )
     lightMesh.name = "light geometry";
     light.add( lightMesh );
     light.name = "light";
-    editor.addSceneObject( light );
+    editor.sceneObjectAdd( light );
 
     var hemisphereLight = new THREE.HemisphereLight(0x303F9F, 0x000000, 1);
     hemisphereLight.name = "hemisphereLight";
-    editor.addSceneObject( hemisphereLight );
+    editor.sceneObjectAdd( hemisphereLight );
 
     var groupSpheres = new THREE.Group();
     groupSpheres.name = "spheres";
@@ -249,7 +249,7 @@ function createPBRTScene2( editor )
     }
     groupSpheres.castShadow = true;
     groupSpheres.receiveShadow = true;
-    editor.addSceneObject( groupSpheres );    
+    editor.sceneObjectAdd( groupSpheres );    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -313,7 +313,7 @@ function createCornellBoxScene( editor )
     sphere.position.z = 0;
     sphere.castShadow = true;
     sphere.receiveShadow = true;
-    editor.addSceneObject( sphere );
+    editor.sceneObjectAdd( sphere );
 
 
     var rectLight = new THREE.RectAreaLight( 0xffffff, 1, 1, 1 );
@@ -341,7 +341,7 @@ function createCornellBoxScene( editor )
     rectLightMeshBack.rotation.y = Math.PI;
     rectLightMesh.add( rectLightMeshBack );
 
-    editor.addSceneObject( rectLight );
+    editor.sceneObjectAdd( rectLight );
 
     /*
     var lightMaterial = new THREE.MeshStandardMaterial(
@@ -364,7 +364,7 @@ function createCornellBoxScene( editor )
     lightMesh.name = "light geometry";
     light.add( lightMesh );
     light.name = "light";
-    editor.addSceneObject( light );
+    editor.sceneObjectAdd( light );
     */
 }
 
@@ -396,7 +396,7 @@ function createCornellBoxScene2( editor )
     sphere.position.z = 0.2;
     sphere.castShadow = true;
     sphere.receiveShadow = true;
-    editor.addSceneObject( sphere );
+    editor.sceneObjectAdd( sphere );
 
     var sphereGeometry2 = new THREE.SphereGeometry( 0.4, 20, 20 );
     var sphereMaterial2 = new THREE.MeshPhysicalMaterial( 
@@ -417,7 +417,7 @@ function createCornellBoxScene2( editor )
     sphere2.position.z = 0.2;
     sphere2.castShadow = true;
     sphere2.receiveShadow = true;
-    editor.addSceneObject( sphere2 );
+    editor.sceneObjectAdd( sphere2 );
               
 
     editor.loadOBJ( "../Data/CornellBox/CornellBox-Original.obj", "CornellBox", function( object )
@@ -472,11 +472,11 @@ function createCornellBoxScene2( editor )
     lightMesh.name = "light geometry";
     light.add( lightMesh );
     light.name = "light";
-    editor.addSceneObject( light );
+    editor.sceneObjectAdd( light );
 
     var hemisphereLight = new THREE.HemisphereLight(0x303F9F, 0x000000, 1);
     hemisphereLight.name = "hemisphereLight";
-    editor.addSceneObject( hemisphereLight );
+    editor.sceneObjectAdd( hemisphereLight );
 
     editor.render();
 

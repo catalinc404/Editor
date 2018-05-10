@@ -530,17 +530,17 @@ ViewWebGL.prototype.handleObjectTransformMouseUp = function( event )
 {
     if( event.mode == "translate" )
     {
-        editor.sceneObjectTranslated( this.transformControlsData.objectId, this.transformControlsData.position, this.transformControls.object.position );
+        editor.sceneObjectTranslate( this.transformControlsData.objectId, this.transformControlsData.position, this.transformControls.object.position );
     }
     else
     if( event.mode == "rotate" )    
     {
-        editor.sceneObjectRotated( this.transformControlsData.objectId, this.transformControlsData.quaternion, this.transformControls.object.quaternion );
+        editor.sceneObjectRotate( this.transformControlsData.objectId, this.transformControlsData.quaternion, this.transformControls.object.quaternion );
     }
     else
     if( event.mode == "scale" )    
     {
-        editor.sceneObjectScaled( this.transformControlsData.objectId, this.transformControlsData.scale, this.transformControls.object );
+        editor.sceneObjectScale( this.transformControlsData.objectId, this.transformControlsData.scale, this.transformControls.object );
     }
 }
 
@@ -612,7 +612,7 @@ ViewWebGL.prototype.selectObjects = function()
 
         this.render();
 
-        this.editor.selectObjects( editorObjectIds );
+        this.editor.sceneObjectSelect( editorObjectIds );
     }
 }
 
@@ -661,11 +661,11 @@ ViewWebGL.prototype.beginCameraTransform = function()
 //////////////////////////////////////////////////////////////////////////////
 ViewWebGL.prototype.endCameraTransform = function()
 {
-    editor.viewCameraTransformed( this.viewId, 
-                                  this.transformCameraData.position, 
-                                  this.transformCameraData.quaternion,
-                                  this.camera.position, 
-                                  this.camera.quaternion );
+    editor.viewCameraTransform( this.viewId, 
+                                this.transformCameraData.position, 
+                                this.transformCameraData.quaternion,
+                                this.camera.position, 
+                                this.camera.quaternion );
 
 }
 
