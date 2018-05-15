@@ -3,6 +3,7 @@ function SelectObjectsCommand( editor, objectIds )
 {
     this.editor = editor;
     this.objectIds = objectIds;
+    this.oldObjectIds = this.editor.getEditorIdsFromEditorObjects( this.editor.selection );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -15,52 +16,49 @@ SelectObjectsCommand.prototype = Object.assign( Object.create( Object.prototype 
 //////////////////////////////////////////////////////////////////////////////
 SelectObjectsCommand.prototype.Do = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objectIds );
+    if( this.oldObjectIds.length > 0 )
+    {
+        this.editor.selection = []
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.oldObjectIds );
+    }
+
+    if( this.objectIds.length > 0 )
+    {
+        this.editor.selection = this.editor.getEditorObjectsFromEditorIds( this.objectIds )   
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objectIds );
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
 SelectObjectsCommand.prototype.Undo = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objectIds );
+    if( this.objectIds.length > 0 )
+    {
+        this.editor.selection = []
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objectIds );
+    }
+
+    if( this.oldObjectIds.length > 0 )
+    {
+        this.editor.selection = this.editor.getEditorObjectsFromEditorIds( this.oldObjectIds )   
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.oldObjectIds );
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
 SelectObjectsCommand.prototype.Redo = function()
 {
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objectIds );
-}
+    if( this.oldObjectIds.length > 0 )
+    {
+        this.editor.selection = []
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.oldObjectIds );
+    }
 
-
-//////////////////////////////////////////////////////////////////////////////
-function DeselectObjectsCommand( editor, objectIds )
-{
-    this.editor = editor;
-    this.objectIds = objectIds;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-DeselectObjectsCommand.prototype = Object.assign( Object.create( Object.prototype ), 
-{
-    //////////////////////////////////////////////////////////////////////////////
-    constructor: DeselectObjectsCommand
-} );
-
-//////////////////////////////////////////////////////////////////////////////
-DeselectObjectsCommand.prototype.Do = function()
-{
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objectIds );
-}
-
-//////////////////////////////////////////////////////////////////////////////
-DeselectObjectsCommand.prototype.Undo = function()
-{
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objectIds );
-}
-
-//////////////////////////////////////////////////////////////////////////////
-DeselectObjectsCommand.prototype.Redo = function()
-{
-    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objectIds );
+    if( this.objectIds.length > 0 )
+    {
+        this.editor.selection = this.editor.getEditorObjectsFromEditorIds( this.objectIds );
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objectIds );
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

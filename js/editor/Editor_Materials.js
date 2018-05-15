@@ -1,6 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.addMaterial = function( material )
 {
+    for( var materialId in this.materials )
+    {
+        if( this.materials[materialId].uuid == material.uuid )
+        {
+            return materialId;
+        }
+    }
+
     var materialId = ++this.materialsId; 
     this.materials[ materialId ] = material;
 
@@ -23,4 +31,12 @@ Editor.prototype.getMaterial = function( materialId )
 {
     return this.materials[ materialId ];
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.getMaterial = function( materialId )
+{
+    return this.materials[ materialId ];
+}
+
+sceneMaterialSelect
 

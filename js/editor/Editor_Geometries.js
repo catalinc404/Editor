@@ -1,6 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.addGeometry = function( geometry )
 {
+    for( var geometryId in this.geometries )
+    {
+        if( this.geometries[geometryId].uuid == geometry.uuid )
+        {
+            return geometryId;
+        }
+    }
+    
     var geometryId = ++this.geometriesId;
     this.geometries[ geometryId ] = geometry;
 

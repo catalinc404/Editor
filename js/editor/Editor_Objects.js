@@ -48,6 +48,20 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
         objectPicking.matrixAutoUpdate = false;
         this.scenePicking.add( objectPicking );
         editorObject.objectPicking = objectPicking;
+
+        var material = object.material;
+        if( material.name == '' )
+        {
+            material.name = object.name + "_material";
+        } 
+        this.addMaterial( material );
+
+        var geometry = object.geometry;
+        if( geometry.name == '' )
+        {
+            geometry.name = object.name + "_geometry";
+        } 
+        this.addGeometry( geometry );
     }
     else
     if( object instanceof THREE.Camera )
@@ -184,22 +198,24 @@ Editor.prototype.onSceneObjectRemoved = function( objectId )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.sceneObjectSelect = function( editorObjectIds )
+Editor.prototype.sceneObjectSelect = function( objectIds )
 {
+    /*
     if( this.selection.length > 0 )
     {
         this.doUndoManager.AddCommand( new DeselectObjectsCommand( this, [ this.selection[0].id ] ) );
         this.doUndoManager.Do();
     }
+    */
 
-    if( editorObjectIds.length > 0 )
+    if( objectIds.length > 0 )
     {
-        var editorObject = this.getEditorObjectFromEditorId( editorObjectIds[0] );
-        if( editorObject !== undefined )
+        var object = this.getEditorObjectFromEditorId( objectIds[0] );
+        if( object !== undefined )
         {
-            if( editorObject.object.visible !== false )
+            if( object.object.visible !== false )
             {
-                this.doUndoManager.AddCommand( new SelectObjectsCommand( this, [ editorObjectIds[0] ] ) );
+                this.doUndoManager.AddCommand( new SelectObjectsCommand( this, [ objectIds[0] ] ) );
                 this.doUndoManager.Do();
             }
         }

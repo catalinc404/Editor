@@ -153,3 +153,15 @@ Editor.prototype.getEditorObjectFromObject = function( object )
 
     return editorObject;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.getEditorIdsFromEditorObjects = function( objects )
+{
+    var editorObjectIds = [];
+    for( var i = 0; i < objects.length; ++i ) 
+    {
+        editorObjectIds.push( objects[i].id );
+    }
+
+    return editorObjectIds;
+}
