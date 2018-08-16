@@ -39,8 +39,8 @@ function ViewWebGL( eventDispatcher, element, configuration )
     this.fnRequestRender = this.requestRender.bind( this );
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.eventDispatcher.addEventListener( "onSceneObjectsSelected",        this.handleSceneObjectsSelected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectsDeselected",      this.handleSceneObjectsDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectSelected",         this.handleSceneObjectSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectDeselected",       this.handleSceneObjectDeselected.bind( this ) );
     this.eventDispatcher.addEventListener( "onObjectTransformModeChanged",  this.handleObjectTransformModeChanged.bind( this ) );
     this.eventDispatcher.addEventListener( "onObjectTransformSpaceChanged", this.handleObjectTransformSpaceChanged.bind( this ) );
     this.eventDispatcher.addEventListener( "themeChanged",                  this.handleThemeChanged.bind( this ) );
@@ -476,28 +476,32 @@ ViewWebGL.prototype.handleMouseLeave = function( event )
 },
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleSceneObjectsSelected = function( objectIds )
+ViewWebGL.prototype.handleSceneObjectSelected = function( objectId )
 {
-    if( objectIds.length == 1 )
+    if( objectId != null )
     {
-        var object = this.editor.getObjectFromEditorId( objectIds[0] );
-        this.transformControls.attach( object );
+        var object = this.editor.getObjectFromEditorId( objectId );
+        if( object != null )
+        {
+            this.transformControls.attach( object );
 
-        this.setObjectTransformSpace( this.editor.objectTransformSpace );
-        this.setObjectTransformMode( this.editor.objectTransformMode );
-        
-        this.transformControlsData.object = object;
-        this.transformControlsData.objectId = objectIds[0];
+            this.setObjectTransformSpace( this.editor.objectTransformSpace );
+            this.setObjectTransformMode( this.editor.objectTransformMode );
+            
+            this.transformControlsData.object = object;
+            this.transformControlsData.objectId = objectId;
+        }
     }
 
     this.requestRender();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleSceneObjectsDeselected = function( objects )
+ViewWebGL.prototype.handleSceneObjectDeselected = function( object )
 {
     this.transformControls.detach();
-    this.transformControlsData.object = undefined;
+    this.transformControlsData.object = null;
+    this.transformControlsData.objectId = null;
 
     this.requestRender();
 }
@@ -599,11 +603,11 @@ ViewWebGL.prototype.selectObjects = function()
             ids[id] = id;
         }
 
-        var editorObjectIds = [];
+        var editorObjectId = null;
         for( var idText in ids ) 
         { 
-            var id = ids[idText];
-            editorObjectIds.push( id );
+            editorObjectId = ids[idText];
+            //console.log( "ViewWebGL2.prototype.selectObjects, viewId = " + this.viewId + " detected id:" + editorObjectId );
         }
 
         this.renderer.physicallyCorrectLights = true;
@@ -612,7 +616,7 @@ ViewWebGL.prototype.selectObjects = function()
 
         this.render();
 
-        this.editor.sceneObjectSelect( editorObjectIds );
+        this.editor.sceneObjectSelect( editorObjectId );
     }
 }
 

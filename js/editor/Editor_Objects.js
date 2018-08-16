@@ -176,11 +176,11 @@ Editor.prototype.sceneObjectRemove = function( object )
     {
         if( this.sceneObjects[i].object === object )
         {
-            for( var j = 0; j < this.selection.length; ++j )
+            if( this.selection.object != null )
             {
-                if( this.sceneObjects[i] === this.selection[j] )
+                if( this.sceneObjects[i] === this.selection.object )
                 {
-                    this.deselectObjects( this.sceneObjects[i].id );
+                    this.deselectObject( this.sceneObjects[i].id );
                     break;
                 }
             }
@@ -198,24 +198,24 @@ Editor.prototype.onSceneObjectRemoved = function( objectId )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.sceneObjectSelect = function( objectIds )
+Editor.prototype.sceneObjectSelect = function( objectId )
 {
     /*
-    if( this.selection.length > 0 )
+    if( this.selection.object != null )
     {
-        this.doUndoManager.AddCommand( new DeselectObjectsCommand( this, [ this.selection[0].id ] ) );
+        this.doUndoManager.AddCommand( new DeselectObjectCommand( this, this.selection.object.id ) );
         this.doUndoManager.Do();
     }
     */
 
-    if( objectIds.length > 0 )
+    if( objectId != null )
     {
-        var object = this.getEditorObjectFromEditorId( objectIds[0] );
+        var object = this.getEditorObjectFromEditorId( objectId );
         if( object !== undefined )
         {
             if( object.object.visible !== false )
             {
-                this.doUndoManager.AddCommand( new SelectObjectsCommand( this, [ objectIds[0] ] ) );
+                this.doUndoManager.AddCommand( new SelectObjectCommand( this, objectId ) );
                 this.doUndoManager.Do();
             }
         }
@@ -223,11 +223,11 @@ Editor.prototype.sceneObjectSelect = function( objectIds )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.onSceneObjectSelected = function( objectIds )
+Editor.prototype.onSceneObjectSelected = function( objectId )
 {
-    for( var i = 0; i < objectIds.length; ++i )
+    if( objectId != null )
     {
-        var editorObject = this.getEditorObjectFromEditorId( objectIds[i] );
+        var editorObject = this.getEditorObjectFromEditorId( objectId );
         if( editorObject !== undefined )
         {
             if( editorObject.gizmos.length > 0 )
@@ -241,26 +241,26 @@ Editor.prototype.onSceneObjectSelected = function( objectIds )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.sceneObjectDeselect = function( editorObjectIds )
+Editor.prototype.sceneObjectDeselect = function( editorObjectId )
 {
-    if( this.selection.length > 0 )
+    if( this.selection.object != null )
     {
-        this.doUndoManager.AddCommand( new DeselectObjectsCommand( this, [ this.selection[0].id ] ) );
+        this.doUndoManager.AddCommand( new DeselectObjectCommand( this, this.selection.object.id ) );
         this.doUndoManager.Do();
     }
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.onSceneObjectDeselected = function( objectIds )
+Editor.prototype.onSceneObjectDeselected = function( objectId )
 {
-    for( var i = 0; i < objectIds.length; ++i )
+    if( objectId != null )
     {
-        var editorObject = this.getEditorObjectFromEditorId( objectIds[i] );
-        if( editorObject !== undefined )
+        var editorObject = this.getEditorObjectFromEditorId( objectId );
+        if( editorObject != null )
         {
             if( editorObject.gizmos.length > 0 )
             {
-                editorObject.gizmos[0].visible = true;
+                editorObject.gizmos[0].visible = false;
             }
         }
     }

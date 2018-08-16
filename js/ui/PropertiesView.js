@@ -8,8 +8,12 @@ function PropertyView( eventDispatcher, element )
     this.scrollbarVVisible = false;
    
     //////////////////////////////////////////////////////////////////////////////
-    this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.onSceneObjectsSelected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectsDeselected", this.onSceneObjectsDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectSelected",     this.onSceneObjectSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectDeselected",   this.onSceneObjectDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneMaterialSelected",   this.onSceneMaterialSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneMaterialDeselected", this.onSceneMaterialDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneGeometrySelected",   this.onSceneGeometrySelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneGeometryDeselected", this.onSceneGeometryDeselected.bind( this ) );
 
     //////////////////////////////////////////////////////////////////////////////
     this.fnRequestRender = this.requestRender.bind( this );
@@ -69,25 +73,76 @@ PropertyView.prototype.onPropertiesPanelResize = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.onSceneObjectsSelected = function( selection )
+PropertyView.prototype.onSceneObjectSelected = function( objectId )
 {
-    if( selection === undefined )
+    var propertiesSet = false;    
+    if( objectId != null )
     {
-        this.clearProperties();
+        var object = this.eventDispatcher.runCommand( "getObjectFromEditorId", objectId );
+        if( object != null )
+        {
+            propertiesSet = this.setObjectProperties( object );
+        }
     }
 
-    if( ( selection instanceof Array ) && ( selection.length > 0 ) )
+    if( propertiesSet == false )
     {
-        var object = this.eventDispatcher.runCommand( "getObjectFromEditorId", selection[0] );
-        if( object !== undefined )
-        {
-            this.setProperties( object );
-        }
+        this.clearProperties();
     }
 }
 
 //////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.onSceneObjectsDeselected = function( selection )
+PropertyView.prototype.onSceneObjectDeselected = function( objectId )
+{
+    this.clearProperties();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.onSceneMaterialSelected = function( materialId )
+{
+    var propertiesSet = false;
+    if( materialId != null )
+    {
+        var material = this.eventDispatcher.runCommand( "getMaterialFromEditorId", materialId );
+        if( material != null )
+        {
+            propertiesSet = this.setMaterialProperties( material );
+        }
+    }
+
+    if( propertiesSet == false )
+    {
+        this.clearProperties();
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.onSceneMaterialDeselected = function( objectId )
+{
+    this.clearProperties();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.onSceneGeometrySelected = function( geometryId )
+{
+    var propertiesSet = false;
+    if( geometryId != null )
+    {
+        var geometry = this.eventDispatcher.runCommand( "getGeometryFromEditorId", geometryId );
+        if( geometry != null )
+        {
+            propertiesSet = this.setGeometryProperties( geometry );
+        }
+    }
+
+    if( propertiesSet == false )
+    {
+        this.clearProperties();
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.onSceneGeometryDeselected = function( objectId )
 {
     this.clearProperties();
 }
@@ -95,7 +150,7 @@ PropertyView.prototype.onSceneObjectsDeselected = function( selection )
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.clearProperties = function()
 {
-    if( this.gui !== undefined )
+    if( this.gui != null )
     {
         for( var i = 0; i < this.element.childNodes.length; ++i )
         {
@@ -110,10 +165,10 @@ PropertyView.prototype.clearProperties = function()
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.createMapGUI = function( gui, map, callback )
 {
-    if( map !== undefined && map != null )
+    if( map != null )
     {
         gui.add( map, "name" );
-        if( map.image !== undefined )
+        if( map.image != null )
         {
             gui.add( map.image, "src" ).onChange( callback );
         }
@@ -270,7 +325,7 @@ PropertyView.prototype.createMaterialDefinesGUI = function( gui, material, callb
 }
 
 //////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.createMaterialGUI = function( gui, material )
+PropertyView.prototype.createMaterialGUI = function( gui, material, createChildGUI )
 {
     if( material !== undefined )
     {
@@ -281,7 +336,7 @@ PropertyView.prototype.createMaterialGUI = function( gui, material )
             renderFunction();
         }
 
-        var materialGUI = gui.addFolder( "Material" );
+        var materialGUI = ( createChildGUI === false ) ? gui : gui.addFolder( "Material" );
         materialGUI.add( material, "name" );
         
         if( material instanceof THREE.LineBasicMaterial )
@@ -512,11 +567,11 @@ PropertyView.prototype.createMaterialGUI = function( gui, material )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.createGeometryGUI = function( gui, geometry )
+PropertyView.prototype.createGeometryGUI = function( gui, geometry, createChildGUI )
 {
     if( geometry !== undefined )
     {
-        var geometryGUI = gui.addFolder( "Geometry" );
+        var geometryGUI = ( createChildGUI === false ) ? gui : gui.addFolder( "Geometry" );
         geometryGUI.add( geometry, "name" );
 
         if( geometry instanceof THREE.Mesh )
@@ -583,7 +638,7 @@ PropertyView.prototype.createLightGUI = function( gui, object )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.setProperties = function( object )
+PropertyView.prototype.setObjectProperties = function( object )
 {
     var width = parseInt( this.element.style.width, 10 ) - 1;
     gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width, resizeCallback: this.onPropertiesPanelResize.bind(this) } );
@@ -638,16 +693,38 @@ PropertyView.prototype.setProperties = function( object )
             this.createLightGUI( gui, object );
         }
     }
+
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.setMaterialProperties = function( material )
+{
+    var width = parseInt( this.element.style.width, 10 ) - 1;
+    gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width, resizeCallback: this.onPropertiesPanelResize.bind(this) } );
+    this.element.appendChild( gui.domElement );
+    this.gui = gui;
+
+    this.createMaterialGUI( gui, material, false );
+
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.setGeometryProperties = function( geometry )
+{
+    var width = parseInt( this.element.style.width, 10 ) - 1;
+    gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width, resizeCallback: this.onPropertiesPanelResize.bind(this) } );
+    this.element.appendChild( gui.domElement );
+    this.gui = gui;
+
+    this.createGeometryGUI( gui, geometry, false );
+
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.requestRender = function()
-{
-    this.eventDispatcher.runCommand( "render" ); 
-}
-
-//////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.requestMaterialUpdate = function()
 {
     this.eventDispatcher.runCommand( "render" ); 
 }

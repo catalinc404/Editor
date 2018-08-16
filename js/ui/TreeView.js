@@ -61,8 +61,8 @@ function TreeView( eventDispatcher, element )
     
     this.eventDispatcher.addEventListener( "onSceneObjectAdded",       this.onSceneObjectAdded.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectRemoved",     this.onSceneObjectRemoved.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectsSelected",   this.onSceneObjectsSelected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectsDeselected", this.onSceneObjectsDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectSelected",    this.onSceneObjectSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectDeselected",  this.onSceneObjectDeselected.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneGeometryAdded",     this.onSceneGeometryAdded.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneGeometryRemoved",   this.onSceneGeometryRemoved.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneMaterialAdded",     this.onSceneMaterialAdded.bind( this ) );
@@ -108,35 +108,29 @@ TreeView.prototype.onSceneObjectRemoved = function( objectId )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TreeView.prototype.onSceneObjectsSelected = function( selection )
+TreeView.prototype.onSceneObjectSelected = function( objectId )
 {
-    if( this.disableEvents !== undefined  )
+    if( this.disableEvents != null )
     {
         return;
     }
 
-    if( selection instanceof Array )
-    {
-        this.disableEvents = true;
-        this.setSelection( selection[0] )
-        this.disableEvents = undefined;
-    }
+    this.disableEvents = true;
+    this.setSelection( objectId )
+    this.disableEvents = undefined;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TreeView.prototype.onSceneObjectsDeselected = function( selection )
+TreeView.prototype.onSceneObjectDeselected = function( objectId )
 {
-    if( this.disableEvents !== undefined  )
+    if( this.disableEvents != null  )
     {
         return;
     }
 
-    if( selection instanceof Array )
-    {
-        this.disableEvents = true;
-        this.setSelection( selection[0] )
-        this.disableEvents = undefined;
-    }
+    this.disableEvents = true;
+    this.setSelection( objectId )
+    this.disableEvents = undefined;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,13 +206,13 @@ TreeView.prototype.onTreeElementSelected = function( event )
     this.disableEvents = true;
 
     var id = parseInt( event.detail.id );
-    var type = this.eventDispatcher.runCommand( "getTypeFromId", { id: id } );
+    var type = this.eventDispatcher.runCommand( "getTypeFromId", id );
     switch( type )
     {
         case "object":
         case "scene":
         {
-            this.eventDispatcher.dispatchCommand( "sceneObjectSelect", [ id ] );
+            this.eventDispatcher.dispatchCommand( "sceneObjectSelect", id );
         }
         break;
         case "material":

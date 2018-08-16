@@ -38,5 +38,34 @@ Editor.prototype.getMaterial = function( materialId )
     return this.materials[ materialId ];
 }
 
-sceneMaterialSelect
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.getMaterialFromEditorId = function( materialId )
+{
+    return this.getMaterial( materialId );
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneMaterialSelect = function( materialId )
+{
+    this.doUndoManager.AddCommand( new SelectMaterialCommand( this, materialId ) );
+    this.doUndoManager.Do();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneMaterialDeselect = function( materialId )
+{
+    this.doUndoManager.AddCommand( new DeselectMaterialCommand( this, materialId ) );
+    this.doUndoManager.Do();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onSceneMaterialSelected = function( materialId )
+{
+    //Nothing to do...
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onSceneMaterialDeselected = function( materialId )
+{
+    //Nothing to do...
+}

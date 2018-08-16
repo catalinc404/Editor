@@ -39,7 +39,7 @@ function Editor( eventDispatcher, UIData )
     this.materialsParentId = 200000;
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.selection = [];
+    this.selection = {  object: null, material: null, geometry: null };
     this.objectTransformMode  = ETransformMode.TRANSLATE;
     this.objectTransformSpace = ETransformSpace.GLOBAL;
 
@@ -71,8 +71,13 @@ function Editor( eventDispatcher, UIData )
     this.eventDispatcher.addCommandHandler( "sceneObjectDelete",            this.sceneObjectDelete.bind( this ) );
     this.eventDispatcher.addCommandHandler( "sceneObjectSelect",            this.sceneObjectSelect.bind( this ) );
     this.eventDispatcher.addCommandHandler( "sceneObjectDeselect",          this.sceneObjectDeselect.bind( this ) );
-
+    this.eventDispatcher.addCommandHandler( "sceneMaterialSelect",          this.sceneMaterialSelect.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "sceneMaterialDeselect",        this.sceneMaterialDeselect.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "sceneGeometrySelect",          this.sceneGeometrySelect.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "sceneGeometryDeselect",        this.sceneGeometryDeselect.bind( this ) );
     this.eventDispatcher.addCommandHandler( "getObjectFromEditorId",        this.getObjectFromEditorId.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "getMaterialFromEditorId",      this.getMaterialFromEditorId.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "getGeometryFromEditorId",      this.getGeometryFromEditorId.bind( this ) );    
     this.eventDispatcher.addCommandHandler( "getTypeFromId",                this.getTypeFromId.bind( this ) );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +112,7 @@ Editor.prototype.init = function()
     this.defaultTexture = this.loadTexture( "textures/UV_Grid_Sm.jpg" );
 
     this.eventDispatcher.dispatchEvent( "onSceneMaterialAdded", { materialId: this.materialsParentId, parentMaterialId: -1, name: "Materials" } );
-    this.eventDispatcher.dispatchEvent( "onSceneGeometryAdded", { geometryId: this.geometriesParentId, parentMaterialId: -1, name: "Geoemtries" } );
+    this.eventDispatcher.dispatchEvent( "onSceneGeometryAdded", { geometryId: this.geometriesParentId, parentMaterialId: -1, name: "Geometries" } );
 
     var defaultGeoemtry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
     defaultGeoemtry.name = "default geometry";
@@ -164,11 +169,11 @@ Editor.prototype.getView = function( viewId )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.render = function()
 {
-    for( var i = 0; i < this.selection.length; ++i )
+    if( this.selection.object != null )
     {
-        for( var j = 0; j < this.selection[i].helpers.length; ++j )
+        for( var i = 0; i < this.selection.object.helpers.length; ++i )
         {
-            var helper = this.selection[i].helpers[j];
+            var helper = this.selection.object.helpers[i];
             if( helper instanceof THREE.BoxHelper )
             {
                 helper.update();

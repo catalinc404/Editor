@@ -116,13 +116,13 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
     
     dispatchCommand : function( command, data )
     {
-        if( this.commandHandlers === undefined )
+        if( this.commandHandlers == null )
         {
             return;
         }
 
         var commandHandler = this.commandHandlers[command];
-        if( commandHandler === undefined )
+        if( commandHandler == null )
         {
             return;
         }

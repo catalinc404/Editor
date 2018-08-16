@@ -1,63 +1,109 @@
 //////////////////////////////////////////////////////////////////////////////
-function SelectObjectsCommand( editor, objectIds )
+function GetCurrentSelection( editor )
+{   
+    var selection = {};
+    selection.objectId = editor.getEditorIdFromEditorObject( editor.selection.object );
+    selection.materialId = editor.selection.materialId;
+    selection.geometryId = editor.selection.geometryId;
+
+    return selection;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+function SelectSceneComponent( editor, componentData )
 {
-    this.editor = editor;
-    this.objectIds = objectIds;
-    this.oldObjectIds = this.editor.getEditorIdsFromEditorObjects( this.editor.selection );
+    if( componentData.objectId != null )
+    {
+        editor.selection.object = editor.getEditorObjectFromEditorId( componentData.objectId )
+        editor.eventDispatcher.dispatchEvent( "onSceneObjectDeselected", componentData.objectId );
+    }
+    if( componentData.materialId != null )
+    {
+        editor.selection.materialId = materialId;
+        editor.eventDispatcher.dispatchEvent( "onSceneMaterialDeselected", componentData.materialId );
+    }
+    if( componentData.geometryId != null )
+    {
+        editor.selection.geometryId = geometryId;
+        editor.eventDispatcher.dispatchEvent( "onSceneGeometryDeselected", componentData.geometryId );
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
-SelectObjectsCommand.prototype = Object.assign( Object.create( Object.prototype ), 
+function DeselectSceneComponent( editor, componentData )
+{
+    if( componentData.objectId != null )
+    {
+        editor.selection.object = null;
+        editor.eventDispatcher.dispatchEvent( "onSceneObjectDeselected", componentData.objectId );
+    }
+    if( componentData.materialId != null )
+    {
+        editor.selection.materialId = null;
+        editor.eventDispatcher.dispatchEvent( "onSceneMaterialDeselected", componentData.materialId );
+    }
+    if( componentData.geometryId != null )
+    {
+        editor.selection.geometryId = null;
+        editor.eventDispatcher.dispatchEvent( "onSceneGeometryDeselected", componentData.geometryId );
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+function SelectObjectCommand( editor, objectId )
+{
+    this.editor = editor;
+    this.objectId = objectId;
+    this.oldSelection = GetCurrentSelection( editor );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+SelectObjectCommand.prototype = Object.assign( Object.create( Object.prototype ), 
 {
     //////////////////////////////////////////////////////////////////////////////
-    constructor: SelectObjectsCommand
+    constructor: SelectObjectCommand
 } );
 
 //////////////////////////////////////////////////////////////////////////////
-SelectObjectsCommand.prototype.Do = function()
+SelectObjectCommand.prototype.Do = function()
 {
-    if( this.oldObjectIds.length > 0 )
-    {
-        this.editor.selection = []
-        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.oldObjectIds );
-    }
+    //Deselect old stuff
+    DeselectSceneComponent( this.editor, this.oldSelection );
 
-    if( this.objectIds.length > 0 )
+    //Select new stuff
+    if( this.objectId != null )
     {
-        this.editor.selection = this.editor.getEditorObjectsFromEditorIds( this.objectIds )   
-        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objectIds );
+        this.editor.selection.object = this.editor.getEditorObjectFromEditorId( this.objectId )   
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectSelected", this.objectId );
     }
 }
 
 //////////////////////////////////////////////////////////////////////////////
-SelectObjectsCommand.prototype.Undo = function()
+SelectObjectCommand.prototype.Undo = function()
 {
-    if( this.objectIds.length > 0 )
+    //Deselect new stuff
+    if( this.objectId != null )
     {
-        this.editor.selection = []
-        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.objectIds );
+        this.editor.selection.object = null;
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectDeselected", this.objectId );
     }
 
-    if( this.oldObjectIds.length > 0 )
-    {
-        this.editor.selection = this.editor.getEditorObjectsFromEditorIds( this.oldObjectIds )   
-        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.oldObjectIds );
-    }
+    //Select old stuff
+    SelectSceneComponent( this.editor, this.oldSelection );
 }
 
 //////////////////////////////////////////////////////////////////////////////
-SelectObjectsCommand.prototype.Redo = function()
+SelectObjectCommand.prototype.Redo = function()
 {
-    if( this.oldObjectIds.length > 0 )
-    {
-        this.editor.selection = []
-        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsDeselected", this.oldObjectIds );
-    }
+    //Deselect old stuff
+    DeselectSceneComponent( this.editor, this.oldSelection );
 
-    if( this.objectIds.length > 0 )
+    //Select new stuff
+    if( this.objectId != null )
     {
-        this.editor.selection = this.editor.getEditorObjectsFromEditorIds( this.objectIds );
-        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectsSelected", this.objectIds );
+        this.editor.selection.object = this.editor.getEditorObjectFromEditorId( this.objectId );
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectSelected", this.objectId );
     }
 }
 
@@ -574,5 +620,117 @@ DeleteObjectCommand.prototype.Redo = function()
     {
         this.editor.eventDispatcher.dispatchEvent( "onSceneObjectDeleted", this.data.objectId );
         this.editor.sceneObjectRemove( this.object );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function SelectMaterialCommand( editor, materialId )
+{
+    this.editor = editor;
+    this.materialId = materialId;
+    this.oldSelection = GetCurrentSelection( editor );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+SelectMaterialCommand.prototype = Object.assign( Object.create( Object.prototype ), 
+{
+    //////////////////////////////////////////////////////////////////////////////
+    constructor: SelectMaterialCommand
+} );
+
+//////////////////////////////////////////////////////////////////////////////
+SelectMaterialCommand.prototype.Do = function()
+{
+    //Deselect old stuff
+    DeselectSceneComponent( this.editor, this.oldSelection );
+
+    //Select new stuff
+    if( this.materialId != null )
+    {
+        this.editor.selection.materialId = this.materialId;
+        this.editor.eventDispatcher.dispatchEvent( "onSceneMaterialSelected", this.materialId );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+SelectMaterialCommand.prototype.Undo = function()
+{
+    //Deselect new stuff
+    if( this.objectId != null )
+    {
+        this.editor.selection.object = null;
+        this.editor.eventDispatcher.dispatchEvent( "onSceneObjectDeselected", this.objectId );
+    }
+
+    //Select old stuff
+    SelectSceneComponent( this.editor, this.oldSelection );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+SelectMaterialCommand.prototype.Redo = function()
+{
+    //Deselect old stuff
+    DeslectSceneComponent( this.editor, this.oldSelection );
+
+    if( this.materialId != null )
+    {
+        this.editor.selection,materialId = this.materialId;
+        this.editor.eventDispatcher.dispatchEvent( "onSceneMaterialSelected", this.materialId );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function SelectGeometryCommand( editor, geometryId )
+{
+    this.editor = editor;
+    this.geometryId = geometryId;
+    this.oldSelection = GetCurrentSelection( editor );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+SelectGeometryCommand.prototype = Object.assign( Object.create( Object.prototype ), 
+{
+    //////////////////////////////////////////////////////////////////////////////
+    constructor: SelectGeometryCommand
+} );
+
+//////////////////////////////////////////////////////////////////////////////
+SelectGeometryCommand.prototype.Do = function()
+{
+    //Deselect old stuff
+    DeselectSceneComponent( this.editor, this.oldSelection );
+
+    //Select new stuff
+    if( this.geometryId != null )
+    {
+        this.editor.selection.geometryId = this.geometryId;
+        this.editor.eventDispatcher.dispatchEvent( "onSceneGeometrySelected", this.geometryId );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+SelectGeometryCommand.prototype.Undo = function()
+{
+    //Deselect new stuff
+    if( this.geometryId != null )
+    {
+        this.editor.selection.geometryId = null;
+        this.editor.eventDispatcher.dispatchEvent( "onSceneGeometryDeselected", this.geometryId );
+    }
+
+    //Select old stuff
+    SelectSceneComponent( this.editor, this.oldSelection );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+SelectGeometryCommand.prototype.Redo = function()
+{
+    //Deselect old stuff
+    DeslectSceneComponent( this.editor, this.oldSelection );
+
+    if( this.geometryId != null )
+    {
+        this.editor.selection.geometryId = this.geometryId;
+        this.editor.eventDispatcher.dispatchEvent( "onSceneGeometrySelected", this.geometryId );
     }
 }

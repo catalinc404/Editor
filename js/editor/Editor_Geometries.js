@@ -32,3 +32,34 @@ Editor.prototype.getGeometry = function( geometryId )
     return this.geometries[ geometryId ];
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.getGeometryFromEditorId = function( geometryId )
+{
+    return this.getGeometry( geometryId );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneGeometrySelect = function( geometryId )
+{
+    this.doUndoManager.AddCommand( new SelectGeometryCommand( this, geometryId ) );
+    this.doUndoManager.Do();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneGeometryDeselect = function( geometryId )
+{
+    this.doUndoManager.AddCommand( new DeselectGeometryCommand( this, geometryId ) );
+    this.doUndoManager.Do();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onSceneGeometrySelected = function( geometryId )
+{
+    //Nothing to do...
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onSceneGeometryDeselected = function( geometryId )
+{
+    //Nothing to do...
+}

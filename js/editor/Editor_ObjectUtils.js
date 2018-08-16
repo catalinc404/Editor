@@ -155,6 +155,18 @@ Editor.prototype.getEditorObjectFromObject = function( object )
 }
 
 //////////////////////////////////////////////////////////////////////////////
+Editor.prototype.getEditorIdFromEditorObject = function( object )
+{
+    var editorObjectId = null;
+    if( object != null )
+    { 
+        editorObjectId = object.id;
+    }
+
+    return editorObjectId;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getEditorIdsFromEditorObjects = function( objects )
 {
     var editorObjectIds = [];
