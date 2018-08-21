@@ -4,9 +4,12 @@ function ThemeManager( eventDispatcher )
     this.currentTheme = "default";
     this.eventDispatcher = eventDispatcher;
 
-    this.eventDispatcher.addEventListener( "themeChange",  this.handleThemeChange.bind( this )  );
-    this.eventDispatcher.addEventListener( "themeUpdated", this.handleThemeUpdated.bind( this ) );
-    this.eventDispatcher.addEventListener( "onUISetup",    this.handleThemeUpdated.bind( this ) );
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.eventDispatcher.addCommandHandler( "themeChange",   this.themeChange.bind( this ) );
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.eventDispatcher.addEventListener( "onThemeUpdated", this.onThemeUpdated.bind( this ) );
+    this.eventDispatcher.addEventListener( "onUISetup",      this.onThemeUpdated.bind( this ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,7 +27,7 @@ ThemeManager.prototype.parseRGBColor = function( color )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ThemeManager.prototype.handleThemeChange = function( theme )
+ThemeManager.prototype.themeChange = function( theme )
 {
     if( theme === undefined || theme === this.currentTheme )
     {
@@ -55,11 +58,11 @@ ThemeManager.prototype.handleThemeChange = function( theme )
         "@editor-view-background":        "@" + this.currentTheme + "-color-editor-view-color-background"
     }
 
-    less.refresh( false, lessModifiers ).then( function() { this.eventDispatcher.dispatchEvent( "themeUpdated" ); } );
+    less.refresh( false, lessModifiers ).then( function() { this.eventDispatcher.dispatchEvent( "onThemeUpdated" ); } );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ThemeManager.prototype.handleThemeUpdated = function()
+ThemeManager.prototype.onThemeUpdated = function()
 {
     var colors = {};
 
@@ -90,7 +93,7 @@ ThemeManager.prototype.handleThemeUpdated = function()
         }
     }
 
-    this.eventDispatcher.dispatchEvent( "themeChanged", colors );
+    this.eventDispatcher.dispatchEvent( "onThemeChanged", colors );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

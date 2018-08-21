@@ -329,8 +329,8 @@ var editorPageLayout =
                     class:
                     {
                         type: "editorContainer",
-                        layout: editorLayout4Views,
-                        //layout: editorLayout1View,
+                        //layout: editorLayout4Views,
+                        layout: editorLayout1View,
                     },
                     size_min: 200
                 },

@@ -61,33 +61,33 @@ View.prototype.resize = function( width, height )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-View.prototype.handleMouseDown = function( event ) 
+View.prototype.onMouseDown = function( event ) 
 {
-    //console.log( "View.prototype.handleMouseDown, viewId = " + this.viewId );
+    //console.log( "View.prototype.onMouseDown, viewId = " + this.viewId );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-View.prototype.handleMouseMove = function( event ) 
+View.prototype.onMouseMove = function( event ) 
 {
-    //console.log( "View.prototype.handleMouseMove, viewId = " + this.viewId );
+    //console.log( "View.prototype.onMouseMove, viewId = " + this.viewId );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-View.prototype.handleMouseUp = function( event ) 
+View.prototype.onMouseUp = function( event ) 
 {
-    //console.log( "View.prototype.handleMouseUp, viewId = " + this.viewId );
+    //console.log( "View.prototype.onMouseUp, viewId = " + this.viewId );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-View.prototype.handleMouseLeave = function( event ) 
+View.prototype.onMouseLeave = function( event ) 
 {
-    //console.log( "View.prototype.handleMouseLeave, viewId = " + this.viewId );
+    //console.log( "View.prototype.onMouseLeave, viewId = " + this.viewId );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-View.prototype.handleParentResize = function()
+View.prototype.onParentResize = function()
 {
-    //console.log( "View.prototype.handleResize, viewId = " + this.viewId );
+    //console.log( "View.prototype.onResize, viewId = " + this.viewId );
     
     var width  = parseInt( this.canvas.style.width,  10 ) || 0;
     var height = parseInt( this.canvas.style.height, 10 ) || 0;
@@ -109,6 +109,6 @@ View.prototype.handleParentResize = function()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 View.prototype.onResize = function()
 {
-    this.handleParentResize();
+    this.onParentResize();
 }
 

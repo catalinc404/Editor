@@ -1,6 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getEditorObjectFromEditorId = function( editorObjectId )
 {
+    console.log( "Editor.getEditorObjectFromEditorId: editorObjectId: " + editorObjectId );
+
     var editorObject;
     for( var j = 0; j < this.sceneObjects.length; ++j ) 
     {
@@ -17,6 +19,8 @@ Editor.prototype.getEditorObjectFromEditorId = function( editorObjectId )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getEditorObjectsFromEditorIds = function( editorObjectsIds )
 {
+    console.log( "Editor.getEditorObjectsFromEditorIds: editorObjectsIds: " + editorObjectsIds );
+
     var editorObjects = [];
     for( var i = 0; i < editorObjectsIds.length; ++i ) 
     {
@@ -36,6 +40,8 @@ Editor.prototype.getEditorObjectsFromEditorIds = function( editorObjectsIds )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getObjectFromEditorId = function( editorObjectId )
 {
+    console.log( "Editor.getObjectFromEditorId: editorObjectId: " + editorObjectId );
+
     var object;
     for( var i = 0; i < this.sceneObjects.length; ++i ) 
     {
@@ -52,6 +58,8 @@ Editor.prototype.getObjectFromEditorId = function( editorObjectId )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getObjectsFromEditorIds = function( editorObjectsIds )
 {
+    console.log( "Editor.getObjectsFromEditorIds: editorObjectsIds: " + editorObjectsIds );
+
     var objects = [];
     for( var i = 0; i < editorObjectsIds.length; ++i ) 
     {
@@ -71,6 +79,8 @@ Editor.prototype.getObjectsFromEditorIds = function( editorObjectsIds )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getEditorIdFromObject = function( object )
 {
+    console.log( "Editor.getEditorIdFromObject: object: " + object );
+
     var objectId = undefined;
     for( var i = 0; i < this.sceneObjects.length; ++i ) 
     {
@@ -87,6 +97,8 @@ Editor.prototype.getEditorIdFromObject = function( object )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getEditorIdsFromObjects = function( objects )
 {
+    console.log( "Editor.getEditorIdsFromObjects: objects: " + objects );    
+
     var objectIds = [];
     for( var i = 0; i < objects.length; ++i ) 
     {
@@ -106,6 +118,8 @@ Editor.prototype.getEditorIdsFromObjects = function( objects )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getEditorIdFromObjectId = function( objectId )
 {
+    console.log( "Editor.getEditorIdFromObjectId: objectId: " + objectId );    
+
     var editorObjectId = -1;
     for( var i = 0; i < this.sceneObjects.length; ++i ) 
     {
@@ -122,6 +136,8 @@ Editor.prototype.getEditorIdFromObjectId = function( objectId )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getEditorIdsFromObjectIds = function( objectIds )
 {
+    console.log( "Editor.getEditorIdsFromObjectIds: objectIds: " + objectIds );    
+
     var editorObjectIds = [];
     for( var i = 0; i < objectIds.length; ++i ) 
     {
@@ -141,6 +157,8 @@ Editor.prototype.getEditorIdsFromObjectIds = function( objectIds )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getEditorObjectFromObject = function( object )
 {
+    console.log( "Editor.getEditorObjectFromObject: object: " + object );    
+
     var editorObject;
     for( var j = 0; j < this.sceneObjects.length; ++j ) 
     {
@@ -157,6 +175,8 @@ Editor.prototype.getEditorObjectFromObject = function( object )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getEditorIdFromEditorObject = function( object )
 {
+    console.log( "Editor.getEditorIdFromEditorObject: object: " + object );    
+
     var editorObjectId = null;
     if( object != null )
     { 
@@ -169,6 +189,8 @@ Editor.prototype.getEditorIdFromEditorObject = function( object )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.getEditorIdsFromEditorObjects = function( objects )
 {
+    console.log( "Editor.getEditorIdsFromEditorObjects: objects: " + objects );    
+
     var editorObjectIds = [];
     for( var i = 0; i < objects.length; ++i ) 
     {

@@ -1,4 +1,77 @@
 //////////////////////////////////////////////////////////////////////////////
+Editor.prototype.getSelection = function()
+{   
+    var selection = {};
+    selection.objectId = this.getEditorIdFromEditorObject( editor.selection.object );
+    selection.materialId = this.selection.materialId;
+    selection.geometryId = this.selection.geometryId;
+
+    console.log( "Editor.GetCurrentSelection: objectId:" + selection.objectId + ", materialId: " + selection.materialId + ", geometryId: " + selection.geometryId );
+
+    return selection;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.select = function( componentData )
+{
+    console.log( "Editor.Select: objectId:" + componentData.objectId + ", materialId: " + componentData.materialId + ", geometryId: " + componentData.geometryId );
+
+    if( componentData.objectId != null )
+    {
+        var object = this.getEditorObjectFromEditorId( componentData.objectId );
+        if( object != null )
+        {
+            this.selection.object = this.getEditorObjectFromEditorId( componentData.objectId )
+            this.eventDispatcher.dispatchEvent( "onSceneObjectSelected", componentData.objectId );
+        }
+    }
+    else
+    if( componentData.materialId != null )
+    {
+        var material = this.getMaterial( componentData.materialId );
+        if( material != null )
+        {
+            this.selection.materialId = componentData.materialId;
+            this.eventDispatcher.dispatchEvent( "onSceneMaterialSelected", componentData.materialId );
+        }
+    }
+    else
+    if( componentData.geometryId != null )
+    {
+        var geometry = this.getGeometry( componentData.geometryId );
+        if( geometry != null )
+        {
+            this.selection.geometryId = componentData.geometryId;
+            this.eventDispatcher.dispatchEvent( "onSceneGeometrySelected", componentData.geometryId );
+        }
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.deselect = function( componentData )
+{
+    console.log( "Editor.Deselect: objectId:" + componentData.objectId + ", materialId: " + componentData.materialId + ", geometryId: " + componentData.geometryId );
+
+    if( componentData.objectId != null )
+    {
+        this.selection.object = null;
+        this.eventDispatcher.dispatchEvent( "onSceneObjectDeselected", componentData.objectId );
+    }
+    else
+    if( componentData.materialId != null )
+    {
+        this.selection.materialId = null;
+        this.eventDispatcher.dispatchEvent( "onSceneMaterialDeselected", componentData.materialId );
+    }
+    else
+    if( componentData.geometryId != null )
+    {
+        this.selection.geometryId = null;
+        this.eventDispatcher.dispatchEvent( "onSceneGeometryDeselected", componentData.geometryId );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneObjectAdd = function( object, parameters  )
 {
     var editorObject = {}
@@ -172,22 +245,23 @@ Editor.prototype.onSceneObjectAdded = function( objectId )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneObjectRemove = function( object )
 {
-    for( var i = 0; i < this.sceneObjects.length; ++i )
+    if( object != null )
     {
-        if( this.sceneObjects[i].object === object )
+        for( var i = 0; i < this.sceneObjects.length; ++i )
         {
-            if( this.selection.object != null )
+            if( this.sceneObjects[i].object === object )
             {
-                if( this.sceneObjects[i] === this.selection.object )
+                if( this.sceneObjects[i].id === this.selection.objectId )
                 {
-                    this.deselectObject( this.sceneObjects[i].id );
+                    this.deselect( { objectId: this.sceneObjects[i].id } );
+
                     break;
                 }
-            }
 
-            this.eventDispatcher.dispatchEvent( "onSceneObjectRemoved", this.sceneObjects[i].id );
-            this.sceneObjects[i].object.parent.remove( this.sceneObjects[i].object );
-            this.sceneObjects.splice( i, 1 );
+                this.eventDispatcher.dispatchEvent( "onSceneObjectRemoved", this.sceneObjects[i].id );
+                this.sceneObjects[i].object.parent.remove( this.sceneObjects[i].object );
+                this.sceneObjects.splice( i, 1 );
+            }
         }
     }
 }
@@ -208,17 +282,24 @@ Editor.prototype.sceneObjectSelect = function( objectId )
     }
     */
 
+    var select = true;
+
     if( objectId != null )
     {
         var object = this.getEditorObjectFromEditorId( objectId );
         if( object !== undefined )
         {
-            if( object.object.visible !== false )
+            if( object.object.visible === false )
             {
-                this.doUndoManager.AddCommand( new SelectObjectCommand( this, objectId ) );
-                this.doUndoManager.Do();
+                select = false;
             }
         }
+    }
+
+    if( select == true )
+    {
+        this.doUndoManager.AddCommand( new SelectObjectCommand( this, objectId ) );
+        this.doUndoManager.Do();
     }
 }
 

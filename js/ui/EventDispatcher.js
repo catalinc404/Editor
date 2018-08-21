@@ -130,6 +130,7 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
         return commandHandler( data );
     },
 
+    //alias for dispatchCommand
     runCommand : function( command, data )
     {
         return this.dispatchCommand( command, data );

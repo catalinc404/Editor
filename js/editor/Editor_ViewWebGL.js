@@ -39,11 +39,11 @@ function ViewWebGL( eventDispatcher, element, configuration )
     this.fnRequestRender = this.requestRender.bind( this );
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.eventDispatcher.addEventListener( "onSceneObjectSelected",         this.handleSceneObjectSelected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectDeselected",       this.handleSceneObjectDeselected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onObjectTransformModeChanged",  this.handleObjectTransformModeChanged.bind( this ) );
-    this.eventDispatcher.addEventListener( "onObjectTransformSpaceChanged", this.handleObjectTransformSpaceChanged.bind( this ) );
-    this.eventDispatcher.addEventListener( "themeChanged",                  this.handleThemeChanged.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectSelected",         this.onSceneObjectSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectDeselected",       this.onSceneObjectDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onObjectTransformModeChanged",  this.onObjectTransformModeChanged.bind( this ) );
+    this.eventDispatcher.addEventListener( "onObjectTransformSpaceChanged", this.onObjectTransformSpaceChanged.bind( this ) );
+    this.eventDispatcher.addEventListener( "onThemeChanged",                this.onThemeChanged.bind( this ) );
 
     this.eventDispatcher.dispatchEvent( "onViewCreated", this );
 }
@@ -107,18 +107,18 @@ ViewWebGL.prototype.init = function( editor )
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
     this.transformControls = new THREE.TransformControls( this.camera, this.canvas );
-    this.transformControls.addEventListener( "change",      this.handleObjectTransformChange.bind( this )    );
-    this.transformControls.addEventListener( "mouseDown",   this.handleObjectTransformMouseDown.bind( this ) );
-    this.transformControls.addEventListener( "mouseUp",     this.handleObjectTransformMouseUp.bind( this )   );
+    this.transformControls.addEventListener( "change",      this.onObjectTransformChange.bind( this )    );
+    this.transformControls.addEventListener( "mouseDown",   this.onObjectTransformMouseDown.bind( this ) );
+    this.transformControls.addEventListener( "mouseUp",     this.onObjectTransformMouseUp.bind( this )   );
     this.sceneGizmos.add( this.transformControls );
 
     this.transformControlsData = { position : new THREE.Vector3(), scale : new THREE.Vector3(), quaternion : new THREE.Quaternion() };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.canvas.addEventListener( "mousedown",  this.handleMouseDown.bind( this ),  false );
-    this.canvas.addEventListener( "mousemove",  this.handleMouseMove.bind( this ),  false );    
-    this.canvas.addEventListener( "mouseup",    this.handleMouseUp.bind( this ),    false );
-    this.canvas.addEventListener( "mouseleave", this.handleMouseLeave.bind( this ), false );
+    this.canvas.addEventListener( "mousedown",  this.onMouseDown.bind( this ),  false );
+    this.canvas.addEventListener( "mousemove",  this.onMouseMove.bind( this ),  false );    
+    this.canvas.addEventListener( "mouseup",    this.onMouseUp.bind( this ),    false );
+    this.canvas.addEventListener( "mouseleave", this.onMouseLeave.bind( this ), false );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -343,11 +343,11 @@ ViewWebGL.prototype.setRenderHelpersMode = function( renderHelpersMode )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleMouseDown = function( event ) 
+ViewWebGL.prototype.onMouseDown = function( event ) 
 {
-    View.prototype.handleMouseDown.call( this, event );
+    View.prototype.onMouseDown.call( this, event );
 
-    //console.log( "ViewWebGL2.prototype.handleMouseDown, viewId = " + this.viewId );
+    //console.log( "ViewWebGL2.prototype.onMouseDown, viewId = " + this.viewId );
 
     if( event.cancelBubble )
     {
@@ -412,11 +412,11 @@ ViewWebGL.prototype.handleMouseDown = function( event )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleMouseMove = function( event ) 
+ViewWebGL.prototype.onMouseMove = function( event ) 
 {
-    View.prototype.handleMouseMove.call( this, event );
+    View.prototype.onMouseMove.call( this, event );
 
-    //console.log( "ViewWebGL2.prototype.handleMouseMove, viewId = " + this.viewId );
+    //console.log( "ViewWebGL2.prototype.onMouseMove, viewId = " + this.viewId );
 
     if( this.currentControlMode != EControlMode.NONE )
     {
@@ -430,11 +430,11 @@ ViewWebGL.prototype.handleMouseMove = function( event )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleMouseUp = function( event ) 
+ViewWebGL.prototype.onMouseUp = function( event ) 
 {
-    View.prototype.handleMouseUp.call( this, event );
+    View.prototype.onMouseUp.call( this, event );
 
-    //console.log( "ViewWebGL2.prototype.handleMouseUp, viewId = " + this.viewId );
+    //console.log( "ViewWebGL2.prototype.onMouseUp, viewId = " + this.viewId );
 
     if( this.currentControlMode != EControlMode.NONE )
     {
@@ -466,18 +466,20 @@ ViewWebGL.prototype.handleMouseUp = function( event )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleMouseLeave = function( event ) 
+ViewWebGL.prototype.onMouseLeave = function( event ) 
 {
-    View.prototype.handleMouseLeave.call( this, event );
+    View.prototype.onMouseLeave.call( this, event );
 
-    //console.log( "ViewWebGL2.prototype.handleMouseLeave, viewId = " + this.viewId );
+    //console.log( "ViewWebGL2.prototype.onMouseLeave, viewId = " + this.viewId );
 
-    ViewWebGL.prototype.handleMouseUp.call( this, event );
+    ViewWebGL.prototype.onMouseUp.call( this, event );
 },
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleSceneObjectSelected = function( objectId )
+ViewWebGL.prototype.onSceneObjectSelected = function( objectId )
 {
+    console.log( "ViewWebGL2.prototype.onMouseLeave, viewId = " + this.viewId + ", objectId: " + objectId );
+
     if( objectId != null )
     {
         var object = this.editor.getObjectFromEditorId( objectId );
@@ -497,8 +499,10 @@ ViewWebGL.prototype.handleSceneObjectSelected = function( objectId )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleSceneObjectDeselected = function( object )
+ViewWebGL.prototype.onSceneObjectDeselected = function( object )
 {
+    console.log( "ViewWebGL2.prototype.onSceneObjectDeselected, viewId = " + this.viewId + ", object: " + object );
+
     this.transformControls.detach();
     this.transformControlsData.object = null;
     this.transformControlsData.objectId = null;
@@ -507,13 +511,13 @@ ViewWebGL.prototype.handleSceneObjectDeselected = function( object )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleObjectTransformChange = function(  )
+ViewWebGL.prototype.onObjectTransformChange = function(  )
 {
     this.eventDispatcher.runCommand( "render" );
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleObjectTransformMouseDown = function( event )
+ViewWebGL.prototype.onObjectTransformMouseDown = function( event )
 {
     this.transformControlsData.position.x = this.transformControls.object.position.x;
     this.transformControlsData.position.y = this.transformControls.object.position.y;
@@ -530,7 +534,7 @@ ViewWebGL.prototype.handleObjectTransformMouseDown = function( event )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleObjectTransformMouseUp = function( event )
+ViewWebGL.prototype.onObjectTransformMouseUp = function( event )
 {
     if( event.mode == "translate" )
     {
@@ -549,21 +553,21 @@ ViewWebGL.prototype.handleObjectTransformMouseUp = function( event )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleThemeChanged = function( colors )
+ViewWebGL.prototype.onThemeChanged = function( colors )
 {
     this.clearColor = colors.editor_view_background;
     this.requestRender();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleObjectTransformModeChanged = function( mode )
+ViewWebGL.prototype.onObjectTransformModeChanged = function( mode )
 {
     this.setObjectTransformMode( mode );
     this.requestRender();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ViewWebGL.prototype.handleObjectTransformSpaceChanged = function( space )
+ViewWebGL.prototype.onObjectTransformSpaceChanged = function( space )
 {
     this.setObjectTransformSpace( space );
     this.requestRender();
