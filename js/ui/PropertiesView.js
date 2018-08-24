@@ -325,7 +325,7 @@ PropertyView.prototype.createMaterialDefinesGUI = function( gui, material, callb
 }
 
 //////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.createMaterialGUI = function( gui, material, createChildGUI )
+PropertyView.prototype.createMaterialGUI = function( gui, material )
 {
     if( material !== undefined )
     {
@@ -336,7 +336,7 @@ PropertyView.prototype.createMaterialGUI = function( gui, material, createChildG
             renderFunction();
         }
 
-        var materialGUI = ( createChildGUI === false ) ? gui : gui.addFolder( "Material" );
+        var materialGUI = gui;
         materialGUI.add( material, "name" );
         
         if( material instanceof THREE.LineBasicMaterial )
@@ -566,6 +566,34 @@ PropertyView.prototype.createMaterialGUI = function( gui, material, createChildG
     }
 }
 
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createMaterialsGUI = function( gui, materials )
+{
+    if( materials instanceof Array )
+    {
+        var materialsGUI = gui.addFolder( "Materials" );
+
+        var length = materials.length
+        for( var i = 0; i < length; ++i ) 
+        {
+            var materialGUI = materialsGUI.addFolder( "Material" + ( i + 1 ) );
+            this.createMaterialGUI( materialGUI, materials[i] );
+        }
+    }
+    else
+    if( materials instanceof THREE.Material )
+    {
+        var materialGUI = gui.addFolder( "Material" );
+
+        this.createMaterialGUI( materialGUI, materials );
+    }
+    else
+    {
+        gui.addFolder( "Materials" );
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.createGeometryGUI = function( gui, geometry, createChildGUI )
 {
@@ -684,7 +712,7 @@ PropertyView.prototype.setObjectProperties = function( object )
 
         if( object instanceof THREE.Mesh )
         {
-            this.createMaterialGUI( gui, object.material );
+            this.createMaterialsGUI( gui, object.material );
             this.createGeometryGUI( gui, object.geometry );
         }
         else
@@ -705,7 +733,7 @@ PropertyView.prototype.setMaterialProperties = function( material )
     this.element.appendChild( gui.domElement );
     this.gui = gui;
 
-    this.createMaterialGUI( gui, material, false );
+    this.createMaterialGUI( gui, material );
 
     return true;
 }

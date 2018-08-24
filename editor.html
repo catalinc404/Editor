@@ -8,6 +8,7 @@
         <link rel="stylesheet/less" type="text/css" href="css/styles.less"/>
         <script>less = { env: 'development' };</script>
         <script src="js/libs/less.js" data-env="development" type="text/javascript"></script>
+        <script src="js/libs/inflate.min.js"></script>
         
 
         <!-- THREE.js--------------------------------------------------------------------- -->
@@ -22,6 +23,7 @@
         <script src="js/libs/three.js/loaders/ColladaLoader.js"></script>
         <script src="js/libs/three.js/loaders/TDSLoader.js"></script>
         <script src="js/libs/three.js/loaders/PLYLoader.js"></script>
+        <script src="js/libs/three.js/loaders/FBXLoader.js"></script>
 
         <!-- UI -------------------------------------------------------------------------- -->
         <script src="js/libs/vanillatree.js"></script>
@@ -65,7 +67,7 @@
                 <ul style="border:none;">
                     <li><a href="#" class="text13">File</a>
                         <ul>
-                            <li><a href="#">Open scene</a></li>
+                            <li><a href="#" onclick="sceneOpen();">Open scene</a></li>
                             <li><a href="#">Save scene</a></li>
                             <li><a href="#">Save scene as...</a></li>
                             <li class="divider"></li>

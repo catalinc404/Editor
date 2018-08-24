@@ -1,12 +1,45 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function createInitialScene( editor )
 {
+    createDefaultScene( editor );
     //createDemoScene( editor );
-    createPBRTScene( editor );
+    //createPBRTScene( editor );
     //createPBRTScene2( editor );
     //createUnrealArchDemoScene( editor );
     //createCornellBoxScene( editor );
     //createCornellBoxScene2( editor );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function createDefaultScene( editor )
+{
+    var lightMaterial = new THREE.MeshStandardMaterial(
+        {
+            emissive: 0xffffee,
+            emissiveIntensity: 1,
+            color: 0x000000
+        });
+
+    var light = new THREE.PointLight(0xffffff, 1, 20, 2);
+    light.power = 1700;
+    light.castShadow = true;
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.heigth = 1024;
+    light.shadow.radius = 1.5;
+    light.position.set(0, 5, 0);
+
+    var lightGeometry = new THREE.SphereGeometry(0);
+    var lightMesh = new THREE.Mesh(lightGeometry, lightMaterial);
+    lightMesh.name = "light geometry";
+    light.add( lightMesh );
+    light.name = "light";
+    editor.sceneObjectAdd( light );
+
+    var hemisphereLight = new THREE.HemisphereLight(0x303F9F, 0x000000, 1);
+    hemisphereLight.name = "hemisphereLight";
+    hemisphereLight.position.set(0, 8, 0);
+    editor.sceneObjectAdd( hemisphereLight );
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

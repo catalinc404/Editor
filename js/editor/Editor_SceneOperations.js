@@ -64,31 +64,55 @@ Editor.prototype.loadDAE = function ( path, objectName )
 Editor.prototype.loadOBJ = function ( path, objectName, callback )
 {
     var basePath = path.substr(0, path.lastIndexOf( "/" ) + 1 );
-    var name = path.substr( path.lastIndexOf( "/" ) + 1 )
+    var fileName = path.substr( path.lastIndexOf( "/" ) + 1 );
+
+    var name = objectName.substr( objectName.lastIndexOf( "/" ) + 1 )
     name = name.substr(0, name.lastIndexOf( "." ));
 
     var mtlLoader = new THREE.MTLLoader();
     mtlLoader.setPath( basePath );
     mtlLoader.load( name + ".mtl", function( materials ) 
     {
-		materials.preload();
+        materials.preload();
+    } );
 
-        var objLoader = new THREE.OBJLoader();
-		objLoader.setMaterials( materials );
-		objLoader.setPath( basePath );
-        objLoader.load( name + ".obj", function ( object ) 
+    var objLoader = new THREE.OBJLoader();
+    //objLoader.setMaterials( materials );
+    objLoader.setPath( basePath );
+    objLoader.load( fileName, function ( object ) 
+    {
+        object.name = objectName || name;
+
+        if( callback !== undefined )
         {
-            object.name = ( objectName !== undefined ) ? objectName : name;
+            callback( object );
+        }
 
-            if( callback !== undefined )
-            {
-                callback( object );
-            }
+        editor.sceneObjectAdd( object );
+    } );
 
-            editor.sceneObjectAdd( object );
-        } );
-	} );
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.loadFBX = function ( path, objectName, callback )
+{
+    var name = objectName.substr( objectName.lastIndexOf( "/" ) + 1 )
+    name = name.substr(0, name.lastIndexOf( "." ));
+
+    var objLoader = new THREE.FBXLoader();
+    objLoader.load( path,   function ( object ) 
+                            {
+                                object.name = object.name || name;
+
+                                if( callback !== undefined )
+                                {
+                                    callback( object );
+                                }
+
+                                editor.sceneObjectAdd( object );
+                            } );
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.loadPLYMesh = function ( path, objectName, callback )
@@ -102,22 +126,39 @@ function sceneOpen()
 {
     var fileSelector = document.createElement( "input" );
     fileSelector.type = 'file';
+    fileSelector.multiple = true;
     fileSelector.addEventListener('change', function( event ) 
                                             {
                                                 if( event.target.files.length > 0 )
                                                 {
-                                                    var file = event.target.files[0];
-                                                    if( file.name.match(/\.(json|js)$/) ) 
+                                                    var length = event.target.files.length;
+                                                    for( var i = 0; i < length; ++i )
                                                     {
-                                                        var tmpPath = URL.createObjectURL( file );
-                                                        var loader = new THREE.ObjectLoader();
-                                                        loader.load( tmpPath, function ( obj ) { editor.sceneObjectAdd( obj ); } );
-                                                    }
-                                                    else
-                                                    if( file.name.match(/\.dae$/) ) 
-                                                    {
-                                                        var tmpPath = URL.createObjectURL( file );
-                                                        editor.loadDAE( tmpPath, file.name );
+                                                        var file = event.target.files[i];
+                                                        if( file.name.match(/\.(json|js)$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            var loader = new THREE.ObjectLoader();
+                                                            loader.load( tmpPath, function ( obj ) { editor.sceneObjectAdd( obj ); } );
+                                                        }
+                                                        else
+                                                        if( file.name.match(/\.dae$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            editor.loadDAE( tmpPath, file.name );
+                                                        }
+                                                        else
+                                                        if( file.name.match(/\.fbx$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            editor.loadFBX( tmpPath, file.name,  );
+                                                        }
+                                                        else
+                                                        if( file.name.match(/\.obj$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            editor.loadOBJ( tmpPath, file.name,  );
+                                                        }
                                                     }
                                                 }
                                             } );

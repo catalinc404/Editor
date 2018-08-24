@@ -92,6 +92,7 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
         }
     }
 
+    object.scale.set( 1.0, 1.0, 1.0 );
     object.updateMatrixWorld();
 
     editorObject.object = object;
@@ -122,18 +123,27 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
         this.scenePicking.add( objectPicking );
         editorObject.objectPicking = objectPicking;
 
-        var material = object.material;
-        if( material.name == '' )
+        if( object.material instanceof Array )
         {
-            material.name = object.name + "_material";
-        } 
-        this.addMaterial( material );
+            var materials = object.material;
+            var length = materials.length;
+            for( var i = 0; i < length; ++i )
+            {
+                var material = materials[i];
+                material.name = material.name || object.name + "_material";
+                this.addMaterial( material );
+            }
+        }
+        else
+        if( object.material instanceof THREE.Material )
+        {
+            var material = object.material;
+            material.name = material.name || object.name + "_material";
+            this.addMaterial( material );
+        }
 
         var geometry = object.geometry;
-        if( geometry.name == '' )
-        {
-            geometry.name = object.name + "_geometry";
-        } 
+        geometry.name = geometry.name || object.name + "_geometry";
         this.addGeometry( geometry );
     }
     else
@@ -251,11 +261,9 @@ Editor.prototype.sceneObjectRemove = function( object )
         {
             if( this.sceneObjects[i].object === object )
             {
-                if( this.sceneObjects[i].id === this.selection.objectId )
+                if( this.sceneObjects[i].id == this.selection.object.id )
                 {
                     this.deselect( { objectId: this.sceneObjects[i].id } );
-
-                    break;
                 }
 
                 this.eventDispatcher.dispatchEvent( "onSceneObjectRemoved", this.sceneObjects[i].id );
@@ -375,7 +383,7 @@ Editor.prototype.sceneObjectDelete = function( data )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.onSceneObjectDeleted = function( data )
 {
-    this.render();    
+    //this.render();    
 }
 
 //////////////////////////////////////////////////////////////////////////////
