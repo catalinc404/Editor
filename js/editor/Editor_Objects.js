@@ -72,12 +72,28 @@ Editor.prototype.deselect = function( componentData )
 }
 
 //////////////////////////////////////////////////////////////////////////////
+Editor.prototype.resetObjectXForm = function( object )
+{
+    object.scale.set( 1.0, 1.0, 1.0 );
+    object.rotation.set( 0.0, 0.0, 0.0 );
+    object.updateMatrixWorld();
+
+    var length = object.children.length;
+    for( var i = 0; i < length; ++i )
+    {
+        this.resetObjectXForm( object.children[i] );
+    }
+
+    object.updateMatrixWorld();
+}
+
+//////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneObjectAdd = function( object, parameters  )
 {
     var editorObject = {}
     parameters = parameters || {};
 
-    editorObject.id = ( parameters.objectId !== undefined ) ?  parameters.objectId : ++this.sceneObjectsId;
+    editorObject.id = parameters.objectId || ++this.sceneObjectsId;
 
     if( parameters.dontAddToScene !== true )
     {
@@ -92,8 +108,7 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
         }
     }
 
-    object.scale.set( 1.0, 1.0, 1.0 );
-    object.updateMatrixWorld();
+    //this.resetObjectXForm( object );
 
     editorObject.object = object;
     editorObject.helpers = [];
@@ -218,9 +233,6 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
         editorObject.objectPicking = objectPicking;
     }
 
-    object.position.set( position.x, position.y, position.z );
-    object.updateMatrixWorld();
-
     if( editorObject.helpers.length > 0 )
     {
         for( var i = 0; i < editorObject.helpers.length; ++i )
@@ -243,6 +255,9 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
     {
         this.sceneObjectAdd( object.children[i], { dontAddToScene : true } );
     }
+
+    object.position.set( position.x, position.y, position.z );
+    object.updateMatrixWorld();
 
     return editorObject.id;
 }
@@ -409,6 +424,12 @@ Editor.prototype.sceneObjectScale = function( objectId, oldScale, newScale )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.onSceneObjectsScaled = function( objectId )
 {
+    var editorObject = this.getEditorObjectFromEditorId( objectId );
+    var object = editorObject.object;
+
+    object.updateMatrixWorld();
+
+
     this.render();
 }
 

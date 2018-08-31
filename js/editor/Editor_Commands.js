@@ -530,7 +530,7 @@ RotateObjectCommand.prototype.Redo = function()
 //////////////////////////////////////////////////////////////////////////////
 function ViewCameraTransformedCommand( editor, viewId, oldPosition, oldRotation, newPosition, newRotation )
 {
-    console.log( "ViewCameraTransformedCommand: viewId:" + viewId );
+    console.log( "ViewCameraTransformedCommand: viewId:" + viewId + " position: (x=" +  newPosition.x + ", y=" + newPosition.y + ", z=" + newPosition.z );
 
     this.editor = editor;
     this.viewId = viewId;

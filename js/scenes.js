@@ -20,24 +20,24 @@ function createDefaultScene( editor )
             color: 0x000000
         });
 
-    var light = new THREE.PointLight(0xffffff, 1, 20, 2);
+    var light = new THREE.PointLight( 0xffffff, 1, 20, 2 );
     light.power = 1700;
     light.castShadow = true;
     light.shadow.mapSize.width = 1024;
     light.shadow.mapSize.heigth = 1024;
     light.shadow.radius = 1.5;
-    light.position.set(0, 5, 0);
+    light.position.set( 0, 5, 0 );
 
-    var lightGeometry = new THREE.SphereGeometry(0);
-    var lightMesh = new THREE.Mesh(lightGeometry, lightMaterial);
+    var lightGeometry = new THREE.SphereGeometry( 0 );
+    var lightMesh = new THREE.Mesh( lightGeometry, lightMaterial );
     lightMesh.name = "light geometry";
     light.add( lightMesh );
     light.name = "light";
     editor.sceneObjectAdd( light );
 
-    var hemisphereLight = new THREE.HemisphereLight(0x303F9F, 0x000000, 1);
+    var hemisphereLight = new THREE.HemisphereLight( 0x303F9F, 0x000000, 1 );
     hemisphereLight.name = "hemisphereLight";
-    hemisphereLight.position.set(0, 8, 0);
+    hemisphereLight.position.set( 0, 8, 0 );
     editor.sceneObjectAdd( hemisphereLight );
 
 }
@@ -77,7 +77,7 @@ function createDemoScene( editor )
     var sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: editor.defaultTexture } );
     for( var i = 1; i < 100; ++i )
     {
-        var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
         sphere.name = "sphere" + i;
         sphere.position.x = (Math.random() * 40);
         sphere.position.y = (Math.random() * 40) - 20;
