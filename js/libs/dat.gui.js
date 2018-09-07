@@ -1825,8 +1825,7 @@ var GUI = function GUI(pars) {
     dom.addClass(titleRow, 'title');
     if (params.buttons !== undefined) {
       var length = params.buttons.length;
-      for (var i = 0; i < length; ++i) 
-      {
+      for (var i = 0; i < length; ++i) {
         var button = document.createElement("A");
         dom.addClass(button, params.buttons[i].class);
         button.setAttribute("style", params.buttons[i].style);
@@ -1835,20 +1834,15 @@ var GUI = function GUI(pars) {
         dom.addClass(button_span, params.buttons[i].span.class);
         button_span.setAttribute("style", params.buttons[i].span.style);
         button.appendChild(button_span);
-        var onClickButton = function onClickButton(e)
-        {
+        var onClickButton = function onClickButton(e) {
           e.preventDefault();
           e.stopPropagation();
-
           if (_this.closed == true) {
             _this.closed = false;
           }
-
-          if (this.callback !== undefined) 
-          {
+          if (this.callback !== undefined) {
             this.callback();
           }
-
           return false;
         };
         dom.bind(button, 'click', onClickButton);
@@ -1957,7 +1951,7 @@ Common.extend(GUI.prototype,
     dom.unbind(window, 'keydown', GUI._keydownHandler, false);
     removeListeners(this);
   },
-  addFolder: function addFolder(name, buttons) {
+  addFolder: function addFolder(name, buttons, beforeElement) {
     if (this.__folders[name] !== undefined) {
       throw new Error('You already have a folder in this GUI by the' + ' name "' + name + '"');
     }
@@ -1971,7 +1965,7 @@ Common.extend(GUI.prototype,
     }
     var gui = new GUI(newGuiParams);
     this.__folders[name] = gui;
-    var li = addRow(this, gui.domElement);
+    var li = addRow(this, gui.domElement, beforeElement);
     dom.addClass(li, 'folder');
     return gui;
   },

@@ -184,6 +184,160 @@ PropertyView.prototype.createMapGUI = function( gui, map, callback )
 }
 
 //////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createTextureGUI = function( gui, material, textureName, callback )
+{
+    var _this = this;
+    var textureGUIButtons =
+    [ 
+        { 
+            name : "Remove",
+            class : "",
+            style: "float: right; margin-right: 16px; margin-top: 3px;",
+            span: 
+            { 
+                class: "icon-trash icon-hover",
+                style: "width: 24px; height: 24px; zorder:10; padding-top: 6px;",
+            },
+            
+            callback: function() 
+            { 
+                console.log( "PropertyView.createTextureGUI.remove" );
+                return true;
+            }
+        },
+        { 
+            name : "Open",
+            class : "",
+            style: "float: right; margin-right: 6px; margin-top: 3px;",
+            span: 
+            { 
+                class: "icon-file-directory icon-hover",
+                style: "width: 24px; height: 24px; zorder:10; padding-top: 6px;",
+            },
+            
+            callback: function() 
+            { 
+                console.log( "PropertyView.createTextureGUI.open" );
+
+                var fileSelector = document.createElement( "input" );
+                fileSelector.type = 'file';
+                fileSelector.addEventListener('change', function( event ) 
+                                                        {
+                                                            if( event.target.files.length > 0 )
+                                                            {
+                                                                var file = event.target.files[0];
+                                                                if( file.name.match(/\.png$/) ) 
+                                                                {
+                                                                    var name = file.name.substr( file.name.lastIndexOf( "/" ) + 1 )
+                                                                    name = name.substr(0, name.lastIndexOf( "." ));
+
+                                                                    var tmpPath = URL.createObjectURL( file );
+                                                                    var texture = new THREE.TextureLoader().load( tmpPath, function()
+                                                                                                                            {
+                                                                                                                                texture.name = name;
+                                                                                                                                material[ textureName ] = texture;
+                                                                                                                                _this.createTextureGUI( gui, material, textureName, callback );
+                                                                                                                                callback();
+                                                                                                                            } );
+                                                                }
+                                                            }
+                                                        } );
+                fileSelector.click();
+
+                return true;
+            }
+        },
+    ]
+
+    var beforeElement = null;
+    if( gui.__folders[ "Texture" ] != null )
+    {
+        var folder = gui.__folders[ "Texture" ];
+
+        var length = gui.domElement.children[0].children.length;
+        for( var i = 0; i < length; ++i )
+        {
+            if( gui.domElement.children[ 0 ].children[ i ] === folder.domElement.parentElement )
+            {
+                beforeElement = ( i + 1 < length ) ? gui.domElement.children[ 0 ].children[ i + 1 ] : null;
+            }
+        }
+
+        gui.removeFolder( folder );
+    }
+
+    var textureGUI = gui.addFolder( "Texture", textureGUIButtons, beforeElement );
+    var texture = material[ textureName ];
+
+    if( texture != null )
+    {
+        textureGUI.add( texture, "name" );
+        if( texture.image != null )
+        {
+            textureGUI.add( texture.image, "src" ).onChange( callback );
+        }
+        else
+        {
+            textureGUI.add( { image: "none" }, "image" );
+        }
+
+        textureGUI.add( texture, "mapping",  { UVMapping: 300, CubeReflectionMapping: 301, CubeRefractionMapping: 302, 
+                                               EquirectangularReflectionMapping: 303, EquirectangularRefractionMapping: 304, 
+                                               SphericalReflectionMapping: 305, CubeUVReflectionMapping: 306, 
+                                               CubeUVRefractionMapping: 307
+                                             } ).onChange( callback );
+
+        textureGUI.add( texture, "wrapS",  {  RepeatWrapping: 1000 ,ClampToEdgeWrapping: 1001, MirroredRepeatWrapping: 1002 } ).onChange( callback );
+        textureGUI.add( texture, "wrapT",  {  RepeatWrapping: 1000 ,ClampToEdgeWrapping: 1001, MirroredRepeatWrapping: 1002 } ).onChange( callback );
+        textureGUI.add( texture, "magFilter",  { NearestFilter: 1003, LinearFilter: 1006 } ).onChange( callback );
+        textureGUI.add( texture, "minFilter",  { NearestFilter: 1003, NearestMipMapNearestFilter: 1004, NearestMipMapLinearFilter: 1005, LinearFilter: 1006, 
+                                                LinearMipMapNearestFilter: 1007, LinearMipMapLinearFilterNearestFilter: 1008 } ).onChange( callback );
+        textureGUI.add( texture, "anisotropy" ).min( 1 ).onChange( callback ); 
+        textureGUI.add( texture, "format", { AlphaFormat: 1021, RGBFormat: 1022, RGBAFormat: 1023, 
+                                             LuminanceFormat: 1024, LuminanceAlphaFormat: 1025, 
+                                             RGBEFormat: 1026, DepthFormat: 1027, DepthStencilFormat: 1028 } ).onChange( callback );
+        textureGUI.add( texture, "type", { UnsignedByteType: 1009, ByteType: 1009, ShortType: 1009, UnsignedShortType: 1009, IntType: 1009,
+                                           UnsignedIntType: 1009, FloatType: 1009, HalfFloatType: 1009, UnsignedShort4444Type: 1009,
+                                           UnsignedShort5551Type: 1009, UnsignedShort565Type: 1009, UnsignedInt248Type: 1009 } ).onChange( callback );
+
+        var offsetGUI = textureGUI.addFolder( "Offset" );
+        offsetGUI.add( texture.offset, "x" ).onChange( callback );
+        offsetGUI.add( texture.offset, "y" ).onChange( callback );
+
+        var repeatGUI = textureGUI.addFolder( "Repeat" );
+        repeatGUI.add( texture.repeat, "x" ).onChange( callback );
+        repeatGUI.add( texture.repeat, "y" ).onChange( callback );
+
+        textureGUI.add( texture, "rotation" ).min( -3.1417 ).max( 3.1417 ).onChange( callback );
+
+        var centerGUI = textureGUI.addFolder( "Center" );
+        centerGUI.add( texture.center, "x" ).min( 0 ).max( 1.0 ).onChange( callback );
+        centerGUI.add( texture.center, "y" ).min( 0 ).max( 1.0 ).onChange( callback );
+
+        textureGUI.add( texture, "matrixAutoUpdate" ).onChange( callback );
+        textureGUI.add( texture, "generateMipmaps" ).onChange( callback );
+        textureGUI.add( texture, "premultiplyAlpha" ).onChange( callback );
+        textureGUI.add( texture, "flipY" ).onChange( callback );
+        textureGUI.add( texture, "unpackAlignment" ).min( 1 ).onChange( callback );
+
+        textureGUI.add( texture, "encoding", { LinearEncoding: 3000, sRGBEncoding: 3001, GammaEncoding: 3002, RGBEEncoding: 3003,
+                                               LogLuvEncoding: 3004, RGBM7Encoding: 3005, RGBM16Encoding: 3006, RGBDEncoding: 3007,
+                                               BasicDepthPacking: 3008, RGBADepthPacking: 3009 } ).onChange( function() 
+                                                                                                             { 
+                                                                                                                material.needsUpdate = true; 
+                                                                                                                callback();
+                                                                                                             } );
+        textureGUI.add( { refresh : function() { texture.needsUpdate = true; callback(); } }, "refresh" );
+    }
+    else
+    {
+        textureGUI.add( { image: "none" }, "image" );
+    }
+
+    return textureGUI;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.addMaterialDefine = function( gui, material, key, callback )
 {
     if( key == "DIFFUSE_MODEL" )
@@ -445,11 +599,11 @@ PropertyView.prototype.createMaterialGUI = function( gui, material )
 
             var standardMaterialGUI = materialGUI.addFolder( "Standard Material" );
 
-            var mapGUI = standardMaterialGUI.addFolder( "diffuse" );
-            mapGUI.addColor( material, "color" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( mapGUI, material.lightMap, requestMateriaUpdate );
+            var diffuseMapGUI = standardMaterialGUI.addFolder( "diffuse" );
+            this.createTextureGUI( diffuseMapGUI, material, "map", requestMateriaUpdate );
+            diffuseMapGUI.addColor( material, "color" ).onChange( requestMateriaUpdate );
 
-            var alphaMapGUI = standardMaterialGUI.addFolder( "alphaMap" )
+            var alphaMapGUI = standardMaterialGUI.addFolder( "alphaMap" );
             this.createMapGUI( alphaMapGUI, material.alphaMap, requestMateriaUpdate );
 
             var aoMapGUI = standardMaterialGUI.addFolder( "aoMap" );
@@ -487,10 +641,10 @@ PropertyView.prototype.createMaterialGUI = function( gui, material )
             this.createMapGUI( roughnessMapGUI, material.roughnessMap, requestMateriaUpdate );
 
             var normalMapGUI = standardMaterialGUI.addFolder( "normalMap" );
+            this.createTextureGUI( normalMapGUI, material, "normalMap", requestMateriaUpdate );
             var normalScaleGUI = normalMapGUI.addFolder( "normalScale" );
             normalScaleGUI.add( material.normalScale, "x" ).onChange( requestMateriaUpdate );
             normalScaleGUI.add( material.normalScale, "y" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( normalMapGUI, material.normalMap, requestMateriaUpdate );
 
             standardMaterialGUI.add( material, "refractionRatio" ).max( 1 ).onChange( requestMateriaUpdate );
 

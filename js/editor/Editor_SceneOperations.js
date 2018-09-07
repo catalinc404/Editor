@@ -104,22 +104,24 @@ Editor.prototype.loadFBX = function ( path, objectName, callback )
                             {
                                 object.name = object.name || name;
 
+                                editor.resetObjectXForm( object );
+
                                 if( callback !== undefined )
                                 {
                                     callback( object );
                                 }
 
                                 object.children[0].material = new THREE.MeshPhysicalMaterial( 
-                                    {
-                                        color: 0x3F51B5,
-                                        roughness: 0.5,
-                                        metalness: 0.7,
-                                        clearCoat: 0.5,
-                                        clearCoatRoughness: 0.5,
-                                        reflectivity: 0.7
-                                    } );
+                                                                                                {
+                                                                                                    color: 0xFFFFFF,
+                                                                                                    roughness: 0.5,
+                                                                                                    metalness: 0.7,
+                                                                                                    clearCoat: 0.5,
+                                                                                                    clearCoatRoughness: 0.5,
+                                                                                                    reflectivity: 0.7
+                                                                                                } );
 
-                                    object.children[0].material.name = object.children[0].name + "_PhysicalMaterial";
+                                object.children[0].material.name = object.children[0].name + "_PhysicalMaterial";
 
                                 editor.sceneObjectAdd( object );
                             } );
