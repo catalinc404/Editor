@@ -272,7 +272,8 @@ Editor.prototype.sceneObjectRemove = function( object )
 {
     if( object != null )
     {
-        for( var i = 0; i < this.sceneObjects.length; ++i )
+        var length = this.sceneObjects.length;
+        for( var i = 0; i < length; ++i )
         {
             if( this.sceneObjects[i].object === object )
             {

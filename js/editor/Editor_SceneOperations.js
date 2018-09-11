@@ -111,28 +111,81 @@ Editor.prototype.loadFBX = function ( path, objectName, callback )
                                     callback( object );
                                 }
 
-                                object.children[0].material = new THREE.MeshPhysicalMaterial( 
+                                object.children[0].material = new THREE.MeshStandardMaterial( 
                                                                                                 {
                                                                                                     color: 0xFFFFFF,
                                                                                                     roughness: 0.5,
                                                                                                     metalness: 0.7,
-                                                                                                    clearCoat: 0.5,
-                                                                                                    clearCoatRoughness: 0.5,
-                                                                                                    reflectivity: 0.7
                                                                                                 } );
 
-                                object.children[0].material.name = object.children[0].name + "_PhysicalMaterial";
+                                object.children[0].material.name = object.children[0].name + "_StandardMaterial";
 
                                 editor.sceneObjectAdd( object );
                             } );
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.loadPLYMesh = function ( path, objectName, callback )
 {
     var plyLoader = new THREE.PLYLoader();
     plyLoader.load( path, callback );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneNew = function ()
+{
+    //TODO
+    messageBox( { title: "New scene", contents: "<br>TODO<br><br>", type: EMessageBox.OK });
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //this.sceneObjects = [];
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //this.geometries = {};
+   
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //this.materials = {};
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneNewDefault = function ()
+{
+    this.sceneNew();
+    //createDefaultScene( this );
+}
+
+function downloadObjectAsJson( object, name )
+{
+    var output = JSON.stringify( object, null, 2 );
+    console.log( output );
+
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( output );
+    var downloadAnchorNode = document.createElement( "a" );
+    downloadAnchorNode.setAttribute( "href", dataStr);
+    downloadAnchorNode.setAttribute( "download", name );
+    document.body.appendChild( downloadAnchorNode ); // required for firefox
+
+    downloadAnchorNode.click( );
+    
+    downloadAnchorNode.remove( );
+  }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.exportSelected = function()
+{
+    if( this.selection.object != null )
+    {
+        var name = this.selection.object.object.name + ".gltf";
+        var GLTFExporter = new THREE.GLTFExporter();
+        GLTFExporter.parse( this.selection.object.object,  function( result )
+                                                    {
+                                                        downloadObjectAsJson( result, name );
+                                                    } );
+    }
+    else
+    {
+        messageBox( { title: "Export object", contents: "<br>ERROR: No object selected<br><br>", type: EMessageBox.OK });
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -215,7 +268,13 @@ function sceneSave()
 //////////////////////////////////////////////////////////////////////////////
 function sceneNew() 
 {
+    editor.sceneNew();
+}
 
+//////////////////////////////////////////////////////////////////////////////
+function sceneNewDefault() 
+{
+    editor.sceneNewDefault();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -227,20 +286,61 @@ function sceneImport()
                                             {
                                                 if( event.target.files.length > 0 )
                                                 {
-                                                    var file = event.target.files[0];
-                                                    if( file.name.match(/\.(json|js)$/) ) 
+                                                    var length = event.target.files.length;
+                                                    for( var i = 0; i < length; ++i )
                                                     {
-                                                        var tmpPath = URL.createObjectURL( file );
-                                                        var loader = new THREE.ObjectLoader();
-                                                        loader.load(  tmpPath, function ( obj ) { editor.sceneObjectAdd( obj ); } );
-                                                    }
-                                                    else
-                                                    if( file.name.match(/\.dae$/) ) 
-                                                    {
-                                                        var tmpPath = URL.createObjectURL( file );
-                                                        editor.loadDAE( tmpPath, file.name );
+                                                        var file = event.target.files[i];
+                                                        
+                                                        if( file.name.match(/\.(json|js)$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            var loader = new THREE.ObjectLoader();
+                                                            loader.load( tmpPath, function ( obj ) { editor.sceneObjectAdd( obj ); } );
+                                                        }
+                                                        else
+                                                        if( file.name.match(/\.dae$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            editor.loadDAE( tmpPath, file.name );
+                                                        }
+                                                        else
+                                                        if( file.name.match(/\.fbx$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            editor.loadFBX( tmpPath, file.name,  );
+                                                        }
+                                                        else
+                                                        if( file.name.match(/\.obj$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            editor.loadOBJ( tmpPath, file.name,  );
+                                                        }
+                                                        else
+                                                        if( file.name.match(/\.mtl$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            editor.loadMTL( tmpPath, file.name,  );
+                                                        }
+                                                        else
+                                                        if( file.name.match(/\.png$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            editor.loadPNG( tmpPath, file.name,  );
+                                                        }
+                                                        else
+                                                        if( file.name.match(/\.bmp$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            editor.loadBMP( tmpPath, file.name,  );
+                                                        }
                                                     }
                                                 }
                                             } );
     fileSelector.click();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+function sceneExportSelected()
+{
+    editor.exportSelected();
 }

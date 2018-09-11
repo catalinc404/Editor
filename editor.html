@@ -3,20 +3,22 @@
     <!-- ----------------------------------------------------------------------------- -->
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- DEBUG------------------------------------------------------------------------ -->
         <script src="http://benvanik.github.com/WebGL-Inspector/core/embed.js"></script>
+
         <!-- LESS ------------------------------------------------------------------------ -->
         <link rel="stylesheet/less" type="text/css" href="css/styles.less"/>
         <script>less = { env: 'development' };</script>
-        <script src="js/libs/less.js" data-env="development" type="text/javascript"></script>
+        <script src="js/libs/less.min.js" data-env="development" type="text/javascript"></script>
         <script src="js/libs/inflate.min.js"></script>
+        <script src="js/libs/FileSaver.min.js"></script>
         
-
         <!-- THREE.js--------------------------------------------------------------------- -->
-
         <script src="js/libs/three.js/three.js"></script>
         <script src="js/libs/three.js/TransformControls.js"></script>
 
-        <script src="js/libs/three.js/loaders/LoaderUtils.js"></script>
+        <!--<script src="js/libs/three.js/loaders/LoaderUtils.js"></script>-->
         <script src="js/libs/three.js/loaders/DDSLoader.js"></script>
 		<script src="js/libs/three.js/loaders/MTLLoader.js"></script>
         <script src="js/libs/three.js/loaders/OBJLoader.js"></script>
@@ -24,10 +26,11 @@
         <script src="js/libs/three.js/loaders/TDSLoader.js"></script>
         <script src="js/libs/three.js/loaders/PLYLoader.js"></script>
         <script src="js/libs/three.js/loaders/FBXLoader.js"></script>
+        <script src="js/libs/three.js/exporters/GLTFExporter.js"></script>
 
         <!-- UI -------------------------------------------------------------------------- -->
         <script src="js/libs/vanillatree.js"></script>
-        <script src="js/libs/dat.gui.js"></script>
+        <script src="js/libs/dat.gui.min.js"></script>
         
         <script src="js/ui/EventDispatcher.js"></script>
         <script src="js/ui/Theme.js"></script>
@@ -67,11 +70,14 @@
                 <ul style="border:none;">
                     <li><a href="#" class="text13">File</a>
                         <ul>
-                            <li><a href="#" onclick="sceneOpen();">Open scene</a></li>
+                            <li><a href="#" onclick="sceneNew();">New empty scene</a></li>
+                            <li><a href="#" onclick="sceneNewDefault();">Load default scene</a></li>
+                            <li><a href="#" onclick="sceneOpen();">Load scene</a></li>
                             <li><a href="#">Save scene</a></li>
                             <li><a href="#">Save scene as...</a></li>
                             <li class="divider"></li>
-                            <li><a href="#">Export selected</a></li>
+                            <li><a href="#" onclick="sceneImport();">Import object</a></li>
+                            <li><a href="#" onclick="sceneExportSelected();">Export selected object</a></li>
                         </ul>
                     </li>
                     <li><a href="#" class="text13">Edit</a></li>
