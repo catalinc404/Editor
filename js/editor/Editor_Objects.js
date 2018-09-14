@@ -94,6 +94,7 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
     parameters = parameters || {};
 
     editorObject.id = parameters.objectId || ++this.sceneObjectsId;
+    object.name = object.name || "object_" + editorObject.id;
 
     if( parameters.dontAddToScene !== true )
     {
@@ -277,13 +278,16 @@ Editor.prototype.sceneObjectRemove = function( object )
         {
             if( this.sceneObjects[i].object === object )
             {
-                if( this.sceneObjects[i].id == this.selection.object.id )
+                if( ( this.selection.object != null ) && ( this.sceneObjects[i].id == this.selection.object.id ) )
                 {
                     this.deselect( { objectId: this.sceneObjects[i].id } );
                 }
 
                 this.eventDispatcher.dispatchEvent( "onSceneObjectRemoved", this.sceneObjects[i].id );
-                this.sceneObjects[i].object.parent.remove( this.sceneObjects[i].object );
+                if( this.sceneObjects[i].object.parent != null )
+                {
+                    this.sceneObjects[i].object.parent.remove( this.sceneObjects[i].object );
+                }
                 this.sceneObjects.splice( i, 1 );
             }
         }
@@ -301,8 +305,8 @@ Editor.prototype.sceneObjectSelect = function( objectId )
     /*
     if( this.selection.object != null )
     {
-        this.doUndoManager.AddCommand( new DeselectObjectCommand( this, this.selection.object.id ) );
-        this.doUndoManager.Do();
+        this.doUndoManager.addCommand( new DeselectObjectCommand( this, this.selection.object.id ) );
+        this.doUndoManager.do();
     }
     */
 
@@ -322,8 +326,8 @@ Editor.prototype.sceneObjectSelect = function( objectId )
 
     if( select == true )
     {
-        this.doUndoManager.AddCommand( new SelectObjectCommand( this, objectId ) );
-        this.doUndoManager.Do();
+        this.doUndoManager.addCommand( new SelectObjectCommand( this, objectId ) );
+        this.doUndoManager.do();
     }
 }
 
@@ -350,8 +354,8 @@ Editor.prototype.sceneObjectDeselect = function( editorObjectId )
 {
     if( this.selection.object != null )
     {
-        this.doUndoManager.AddCommand( new DeselectObjectCommand( this, this.selection.object.id ) );
-        this.doUndoManager.Do();
+        this.doUndoManager.addCommand( new DeselectObjectCommand( this, this.selection.object.id ) );
+        this.doUndoManager.do();
     }
 }
 
@@ -376,8 +380,8 @@ Editor.prototype.onSceneObjectDeselected = function( objectId )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneObjectCreate = function( data )
 {
-    this.doUndoManager.AddCommand( new CreateObjectCommand( this, data ) );
-    this.doUndoManager.Do();
+    this.doUndoManager.addCommand( new CreateObjectCommand( this, data ) );
+    this.doUndoManager.do();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -391,8 +395,8 @@ Editor.prototype.sceneObjectDelete = function( data )
 {
     if( data.objectId > 1 )
     {
-        this.doUndoManager.AddCommand( new DeleteObjectCommand( this, data ) );
-        this.doUndoManager.Do();
+        this.doUndoManager.addCommand( new DeleteObjectCommand( this, data ) );
+        this.doUndoManager.do();
     }
 }
 
@@ -405,8 +409,8 @@ Editor.prototype.onSceneObjectDeleted = function( data )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneObjectTranslate = function( objectId, oldPosition, newPosition )
 {
-    this.doUndoManager.AddCommand( new TranslateObjectCommand( this, objectId, oldPosition, newPosition ) );
-    this.doUndoManager.Do();
+    this.doUndoManager.addCommand( new TranslateObjectCommand( this, objectId, oldPosition, newPosition ) );
+    this.doUndoManager.do();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -418,8 +422,8 @@ Editor.prototype.onSceneObjectsTranslated = function( objectId )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneObjectScale = function( objectId, oldScale, newScale )
 {
-    this.doUndoManager.AddCommand( new ScaleObjectCommand( this, objectId, oldScale, newScale ) );
-    this.doUndoManager.Do();
+    this.doUndoManager.addCommand( new ScaleObjectCommand( this, objectId, oldScale, newScale ) );
+    this.doUndoManager.do();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -437,8 +441,8 @@ Editor.prototype.onSceneObjectsScaled = function( objectId )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneObjectRotate = function( objectId, oldRotation, newRotation )
 {
-    this.doUndoManager.AddCommand( new RotateObjectCommand( this, objectId, oldRotation, newRotation ) );
-    this.doUndoManager.Do();
+    this.doUndoManager.addCommand( new RotateObjectCommand( this, objectId, oldRotation, newRotation ) );
+    this.doUndoManager.do();
 }
 
 //////////////////////////////////////////////////////////////////////////////

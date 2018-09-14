@@ -16,7 +16,14 @@ DoUndoManager.prototype = Object.assign( Object.create( Object.prototype ),
 } );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-DoUndoManager.prototype.AddCommand = function( command )
+DoUndoManager.prototype.clearCommands = function( command )
+{
+    this.operations = [];
+    this.currentOperationIndex = -1;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+DoUndoManager.prototype.addCommand = function( command )
 {
     this.operations.splice( this.currentOperationIndex );
     this.operations.push( command );
@@ -24,31 +31,31 @@ DoUndoManager.prototype.AddCommand = function( command )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-DoUndoManager.prototype.Do = function()
+DoUndoManager.prototype.do = function()
 {
     if ( this.currentOperationIndex < this.operations.length )
     {
-        this.operations[ this.currentOperationIndex ].Do();
+        this.operations[ this.currentOperationIndex ].do();
         this.currentOperationIndex++;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-DoUndoManager.prototype.Undo = function()
+DoUndoManager.prototype.undo = function()
 {
     if ( (this.currentOperationIndex > 0) && (this.currentOperationIndex <= this.operations.length) )
     {
         this.currentOperationIndex--;
-        this.operations[ this.currentOperationIndex ].Undo();
+        this.operations[ this.currentOperationIndex ].undo();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-DoUndoManager.prototype.Redo = function()
+DoUndoManager.prototype.redo = function()
 {
     if ( this.currentOperationIndex < this.operations.length )
     {
-        this.operations[ this.currentOperationIndex ].Redo();
+        this.operations[ this.currentOperationIndex ].redo();
         this.currentOperationIndex++;
     }
 }

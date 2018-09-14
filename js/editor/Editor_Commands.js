@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 function CreateObjectCommand( editor, data )
 {
-    console.log( "CreateObjectCommand" );
+    //console.log( "CreateObjectCommand" );
     
     this.editor = editor;
     this.data = data;
@@ -15,9 +15,9 @@ CreateObjectCommand.prototype = Object.assign( Object.create( Object.prototype )
 } );
 
 //////////////////////////////////////////////////////////////////////////////
-CreateObjectCommand.prototype.Do = function()
+CreateObjectCommand.prototype.do = function()
 {
-    console.log( "CreateObjectCommand.Do" );
+    //console.log( "CreateObjectCommand.do" );
 
     var object;
     var color = Math.random() * 0xffffff;
@@ -118,18 +118,18 @@ CreateObjectCommand.prototype.Do = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-CreateObjectCommand.prototype.Undo = function()
+CreateObjectCommand.prototype.undo = function()
 {
-    console.log( "CreateObjectCommand.Undo" );
+    //console.log( "CreateObjectCommand.undo" );
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectDeleted", this.objectId );
     this.editor.sceneObjectRemove( this.editor.getObjectFromEditorId( this.objectId ) );
 }
 
 //////////////////////////////////////////////////////////////////////////////
-CreateObjectCommand.prototype.Redo = function()
+CreateObjectCommand.prototype.redo = function()
 {
-    console.log( "CreateObjectCommand.Redo" );
+    //console.log( "CreateObjectCommand.redo" );
 
     var object;
     switch( this.data.type )
@@ -224,7 +224,7 @@ CreateObjectCommand.prototype.Redo = function()
 //////////////////////////////////////////////////////////////////////////////
 function DeleteObjectCommand( editor, data )
 {
-    console.log( "DeleteObjectCommand: objectId: " + data.objectId );
+    //console.log( "DeleteObjectCommand: objectId: " + data.objectId );
 
     this.editor = editor;
     this.data = data;
@@ -238,9 +238,9 @@ DeleteObjectCommand.prototype = Object.assign( Object.create( Object.prototype )
 } );
 
 //////////////////////////////////////////////////////////////////////////////
-DeleteObjectCommand.prototype.Do = function()
+DeleteObjectCommand.prototype.do = function()
 {
-    console.log( "DeleteObjectCommand.Do: objectId: " + this.data.objectId );
+    //console.log( "DeleteObjectCommand.do: objectId: " + this.data.objectId );
 
     this.object = this.editor.getObjectFromEditorId( this.data.objectId );
     if( this.object != null )
@@ -253,9 +253,9 @@ DeleteObjectCommand.prototype.Do = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-DeleteObjectCommand.prototype.Undo = function()
+DeleteObjectCommand.prototype.undo = function()
 {
-    console.log( "DeleteObjectCommand.Do: objectId: " + this.data.objectId );
+    //console.log( "DeleteObjectCommand.undo: objectId: " + this.data.objectId );
 
     if( this.object != null )
     {
@@ -265,9 +265,9 @@ DeleteObjectCommand.prototype.Undo = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-DeleteObjectCommand.prototype.Redo = function()
+DeleteObjectCommand.prototype.redo = function()
 {
-    console.log( "DeleteObjectCommand.Redo: objectId: " + this.data.objectId );
+    //console.log( "DeleteObjectCommand.redo: objectId: " + this.data.objectId );
 
     if( this.object != null )
     {
@@ -279,7 +279,7 @@ DeleteObjectCommand.prototype.Redo = function()
 //////////////////////////////////////////////////////////////////////////////
 function SelectObjectCommand( editor, objectId )
 {
-    console.log( "SelectObjectCommand: objectId:" + objectId );
+    //console.log( "SelectObjectCommand: objectId:" + objectId );
     
     this.editor = editor;
     this.objectId = objectId;
@@ -295,9 +295,9 @@ SelectObjectCommand.prototype = Object.assign( Object.create( Object.prototype )
 } );
 
 //////////////////////////////////////////////////////////////////////////////
-SelectObjectCommand.prototype.Do = function()
+SelectObjectCommand.prototype.do = function()
 {
-    console.log( "SelectObjectCommand.Do: objectId:" + this.objectId );
+    //console.log( "SelectObjectCommand.do: objectId:" + this.objectId );
 
     //Deselect old stuff
     this.editor.deselect( this.oldSelection );
@@ -307,9 +307,9 @@ SelectObjectCommand.prototype.Do = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-SelectObjectCommand.prototype.Undo = function()
+SelectObjectCommand.prototype.undo = function()
 {
-    console.log( "SelectObjectCommand.Undo: objectId:" + this.objectId );
+    //console.log( "SelectObjectCommand.undo: objectId:" + this.objectId );
 
     //Deselect new stuff
     this.editor.deselect( { objectId: this.objectId } );
@@ -319,9 +319,9 @@ SelectObjectCommand.prototype.Undo = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-SelectObjectCommand.prototype.Redo = function()
+SelectObjectCommand.prototype.redo = function()
 {
-    console.log( "SelectObjectCommand.Redo: objectId:" + this.objectId );
+    //console.log( "SelectObjectCommand.redo: objectId:" + this.objectId );
 
     //Deselect old stuff
     this.editor.deselect( this.oldSelection );
@@ -333,7 +333,7 @@ SelectObjectCommand.prototype.Redo = function()
 //////////////////////////////////////////////////////////////////////////////
 function TranslateObjectCommand( editor, objectId, oldPosition, newPosition )
 {
-    console.log( "TranslateObjectCommand: objectId:" + objectId );
+    //console.log( "TranslateObjectCommand: objectId:" + objectId );
 
     this.editor = editor;
     this.objectId = objectId;
@@ -357,17 +357,17 @@ TranslateObjectCommand.prototype = Object.assign( Object.create( Object.prototyp
 } );
 
 //////////////////////////////////////////////////////////////////////////////
-TranslateObjectCommand.prototype.Do = function()
+TranslateObjectCommand.prototype.do = function()
 {
-    console.log( "TranslateObjectCommand.Do: objectId:" + this.objectId );
+    //console.log( "TranslateObjectCommand.do: objectId:" + this.objectId );
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectTranslated", this.objectId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
-TranslateObjectCommand.prototype.Undo = function()
+TranslateObjectCommand.prototype.undo = function()
 {
-    console.log( "TranslateObjectCommand.Undo: objectId:" + this.objectId );
+    //console.log( "TranslateObjectCommand.undo: objectId:" + this.objectId );
 
     var object = this.editor.getObjectFromEditorId( this.objectId )
 
@@ -380,9 +380,9 @@ TranslateObjectCommand.prototype.Undo = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-TranslateObjectCommand.prototype.Redo = function()
+TranslateObjectCommand.prototype.redo = function()
 {
-    console.log( "TranslateObjectCommand.Redo: objectId:" + this.objectId );
+    //console.log( "TranslateObjectCommand.redo: objectId:" + this.objectId );
 
     var object = this.editor.getObjectFromEditorId( this.objectId )
 
@@ -421,17 +421,17 @@ ScaleObjectCommand.prototype = Object.assign( Object.create( Object.prototype ),
 } );
 
 //////////////////////////////////////////////////////////////////////////////
-ScaleObjectCommand.prototype.Do = function()
+ScaleObjectCommand.prototype.do = function()
 {
-    console.log( "ScaleObjectCommand.Do: objectId:" + this.objectId );
+    //console.log( "ScaleObjectCommand.do: objectId:" + this.objectId );
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.objectId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ScaleObjectCommand.prototype.Undo = function()
+ScaleObjectCommand.prototype.undo = function()
 {
-    console.log( "ScaleObjectCommand.Undo: objectId:" + this.objectId );
+    //console.log( "ScaleObjectCommand.undo: objectId:" + this.objectId );
 
     var object = this.editor.getObjectFromEditorId( this.objectId )
     
@@ -444,9 +444,9 @@ ScaleObjectCommand.prototype.Undo = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ScaleObjectCommand.prototype.Redo = function()
+ScaleObjectCommand.prototype.redo = function()
 {
-    console.log( "ScaleObjectCommand.Redo: objectId:" + this.objectId );
+    //console.log( "ScaleObjectCommand.redo: objectId:" + this.objectId );
 
     var object = this.editor.getObjectFromEditorId( this.objectId )
 
@@ -458,11 +458,10 @@ ScaleObjectCommand.prototype.Redo = function()
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.objectId );
 }
 
-
 //////////////////////////////////////////////////////////////////////////////
 function RotateObjectCommand( editor, objectId, oldRotation, newRotation )
 {
-    console.log( "RotateObjectCommand: objectId:" + objectId );
+    //console.log( "RotateObjectCommand: objectId:" + objectId );
 
     this.editor = editor;
     this.objectId = objectId;
@@ -488,17 +487,17 @@ RotateObjectCommand.prototype = Object.assign( Object.create( Object.prototype )
 } );
 
 //////////////////////////////////////////////////////////////////////////////
-RotateObjectCommand.prototype.Do = function()
+RotateObjectCommand.prototype.do = function()
 {
-    console.log( "RotateObjectCommand.Do: objectId:" + this.objectId );
+    //console.log( "RotateObjectCommand.do: objectId:" + this.objectId );
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.objectId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
-RotateObjectCommand.prototype.Undo = function()
+RotateObjectCommand.prototype.undo = function()
 {
-    console.log( "RotateObjectCommand.Undo: objectId:" + this.objectId );
+    //console.log( "RotateObjectCommand.undo: objectId:" + this.objectId );
 
     var object = this.editor.getObjectFromEditorId( this.objectId )
 
@@ -512,9 +511,9 @@ RotateObjectCommand.prototype.Undo = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-RotateObjectCommand.prototype.Redo = function()
+RotateObjectCommand.prototype.redo = function()
 {
-    console.log( "RotateObjectCommand.Redo: objectId:" + this.objectId );
+    //console.log( "RotateObjectCommand.redo: objectId:" + this.objectId );
 
     var object = this.editor.getObjectFromEditorId( this.objectId )
 
@@ -530,7 +529,7 @@ RotateObjectCommand.prototype.Redo = function()
 //////////////////////////////////////////////////////////////////////////////
 function ViewCameraTransformedCommand( editor, viewId, oldPosition, oldRotation, newPosition, newRotation )
 {
-    console.log( "ViewCameraTransformedCommand: viewId:" + viewId + " position: (x=" +  newPosition.x + ", y=" + newPosition.y + ", z=" + newPosition.z );
+    //console.log( "ViewCameraTransformedCommand: viewId:" + viewId + " position: (x=" +  newPosition.x + ", y=" + newPosition.y + ", z=" + newPosition.z );
 
     this.editor = editor;
     this.viewId = viewId;
@@ -566,17 +565,17 @@ ViewCameraTransformedCommand.prototype = Object.assign( Object.create( Object.pr
 } );
 
 //////////////////////////////////////////////////////////////////////////////
-ViewCameraTransformedCommand.prototype.Do = function()
+ViewCameraTransformedCommand.prototype.do = function()
 {
-    console.log( "ViewCameraTransformedCommand.Do: viewId:" + this.viewId );
+    //console.log( "ViewCameraTransformedCommand.do: viewId:" + this.viewId );
 
     this.editor.eventDispatcher.dispatchEvent( "onViewCameraTransformed", this.viewId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ViewCameraTransformedCommand.prototype.Undo = function()
+ViewCameraTransformedCommand.prototype.undo = function()
 {
-    console.log( "ViewCameraTransformedCommand.Undo: viewId:" + this.viewId );
+    //console.log( "ViewCameraTransformedCommand.undo: viewId:" + this.viewId );
 
     var camera = this.editor.getView( this.viewId ).camera;
     
@@ -595,9 +594,9 @@ ViewCameraTransformedCommand.prototype.Undo = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-ViewCameraTransformedCommand.prototype.Redo = function()
+ViewCameraTransformedCommand.prototype.redo = function()
 {
-    console.log( "ViewCameraTransformedCommand.Redo: viewId:" + this.viewId );
+    //console.log( "ViewCameraTransformedCommand.redo: viewId:" + this.viewId );
 
     var camera = this.editor.getView( this.viewId ).camera;
 
@@ -618,7 +617,7 @@ ViewCameraTransformedCommand.prototype.Redo = function()
 //////////////////////////////////////////////////////////////////////////////
 function SelectMaterialCommand( editor, materialId )
 {
-    console.log( "SelectMaterialCommand: materialId: " + materialId );
+    //console.log( "SelectMaterialCommand: materialId: " + materialId );
 
     this.editor = editor;
     this.materialId = materialId;
@@ -633,9 +632,9 @@ SelectMaterialCommand.prototype = Object.assign( Object.create( Object.prototype
 } );
 
 //////////////////////////////////////////////////////////////////////////////
-SelectMaterialCommand.prototype.Do = function()
+SelectMaterialCommand.prototype.do = function()
 {
-    console.log( "SelectMaterialCommand.Do: materialId: " + this.materialId );
+    //console.log( "SelectMaterialCommand.do: materialId: " + this.materialId );
 
     //Deselect old stuff
     this.editor.deselect( this.oldSelection );
@@ -645,9 +644,9 @@ SelectMaterialCommand.prototype.Do = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-SelectMaterialCommand.prototype.Undo = function()
+SelectMaterialCommand.prototype.undo = function()
 {
-    console.log( "SelectMaterialCommand.Undo: materialId: " + this.materialId );
+    //console.log( "SelectMaterialCommand.undo: materialId: " + this.materialId );
 
     //Deselect new stuff
     this.editor.deselect( { materialId: this.materialId } );
@@ -657,9 +656,9 @@ SelectMaterialCommand.prototype.Undo = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-SelectMaterialCommand.prototype.Redo = function()
+SelectMaterialCommand.prototype.redo = function()
 {
-    console.log( "SelectMaterialCommand.Redo: materialId: " + this.materialId );
+    //console.log( "SelectMaterialCommand.redo: materialId: " + this.materialId );
 
     //Deselect old stuff
     this.editor.deselect( this.oldSelection );
@@ -671,7 +670,7 @@ SelectMaterialCommand.prototype.Redo = function()
 //////////////////////////////////////////////////////////////////////////////
 function SelectGeometryCommand( editor, geometryId )
 {
-    console.log( "SelectGeometryCommand: geometryId: " + geometryId );
+    //console.log( "SelectGeometryCommand: geometryId: " + geometryId );
 
     this.editor = editor;
     this.geometryId = geometryId;
@@ -686,9 +685,9 @@ SelectGeometryCommand.prototype = Object.assign( Object.create( Object.prototype
 } );
 
 //////////////////////////////////////////////////////////////////////////////
-SelectGeometryCommand.prototype.Do = function()
+SelectGeometryCommand.prototype.do = function()
 {
-    console.log( "SelectGeometryCommand.Do: geometryId: " + this.geometryId );
+    //console.log( "SelectGeometryCommand.do: geometryId: " + this.geometryId );
 
     //Deselect old stuff
     this.editor.deselect( this.oldSelection );
@@ -698,9 +697,9 @@ SelectGeometryCommand.prototype.Do = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-SelectGeometryCommand.prototype.Undo = function()
+SelectGeometryCommand.prototype.undo = function()
 {
-    console.log( "SelectGeometryCommand.Undo: geometryId: " + this.geometryId );
+    //console.log( "SelectGeometryCommand.undo: geometryId: " + this.geometryId );
 
     //Deselect new stuff
     this.editor.select( { geometryId: this.geometryId } )
@@ -710,9 +709,9 @@ SelectGeometryCommand.prototype.Undo = function()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-SelectGeometryCommand.prototype.Redo = function()
+SelectGeometryCommand.prototype.redo = function()
 {
-    console.log( "SelectGeometryCommand.Redo: geometryId: " + this.geometryId );
+    //console.log( "SelectGeometryCommand.redo: geometryId: " + this.geometryId );
 
     //Deselect old stuff
     this.editor.deselect( this.oldSelection );

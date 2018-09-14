@@ -96,28 +96,33 @@ Editor.prototype = Object.assign( Object.create( UI.prototype ),
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.init = function() 
 {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.sceneHelpers = new THREE.Scene();
     this.sceneGizmos  = new THREE.Scene();
     this.sceneGizmos.autoUpdate = false;
     this.scenePicking = new THREE.Scene();
     this.scenePicking.autoUpdate = false;
     this.sceneHUD     = new THREE.Scene();
-
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.scene = new THREE.Scene();
     this.scene.name = "Scene";
     this.sceneObjectAdd( this.scene, { dontAddToScene: true } );
     this.eventDispatcher.dispatchEvent( "onSceneCreated", this.scene );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.defaultTexture = this.loadTexture( "textures/UV_Grid_Sm.jpg" );
-
     this.eventDispatcher.dispatchEvent( "onSceneMaterialAdded", { materialId: this.materialsParentId, parentMaterialId: -1, name: "Materials" } );
     this.eventDispatcher.dispatchEvent( "onSceneGeometryAdded", { geometryId: this.geometriesParentId, parentMaterialId: -1, name: "Geometries" } );
 
-    var defaultGeoemtry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
-    defaultGeoemtry.name = "default geometry";
-    this.defaultGeometryId = this.addGeometry( defaultGeoemtry );
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.defaultTexture = this.loadTexture( "textures/UV_Grid_Sm.jpg" );
+  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    var defaultGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+    defaultGeometry.name = "default geometry";
+    this.defaultGeometryId = this.addGeometry( defaultGeometry );
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     var defaultMaterial = new THREE.MeshPhysicalMaterial(  {
                                                                 color: 0x3F51B5,
                                                                 roughness: 0.7,
@@ -129,9 +134,10 @@ Editor.prototype.init = function()
     defaultMaterial.name = "default material";
     this.defaultMaterialId = this.addMaterial( defaultMaterial );
 
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.eventDispatcher.dispatchEvent( "onEditorInitialized", this );
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.initDefaultScene();
     this.eventDispatcher.dispatchEvent( "onSceneInitialized", this.scene );
 }
@@ -198,8 +204,8 @@ Editor.prototype.render = function()
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.viewCameraTransform = function( viewId, oldPosition, oldRotation, newPosition, newRotation )
 {
-    this.doUndoManager.AddCommand( new ViewCameraTransformedCommand( this, viewId, oldPosition, oldRotation, newPosition, newRotation ) );
-    this.doUndoManager.Do();
+    this.doUndoManager.addCommand( new ViewCameraTransformedCommand( this, viewId, oldPosition, oldRotation, newPosition, newRotation ) );
+    this.doUndoManager.do();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -223,12 +229,12 @@ Editor.prototype.onKeyDown = function( event )
 {
     if( (event.key == "z" ) && (event.ctrlKey == true) )
     {
-        this.doUndoManager.Undo();
+        this.doUndoManager.undo();
     }
 
     if( (event.key == "y" ) && (event.ctrlKey == true) )
     {
-        this.doUndoManager.Redo();
+        this.doUndoManager.redo();
     }
 }
 

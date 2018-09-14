@@ -20,16 +20,12 @@ Editor.prototype.addMaterial = function( material )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.removeMaterial = function( materialId )
 {
-    var material = this.material[ materialId ];
+    this.eventDispatcher.dispatchEvent( "onSceneMaterialRemoved", { materialId: materialId } );
+
+    var material = this.materials[ materialId ];
     this.materials[ materialId ] = undefined;
 
     return material;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Editor.prototype.getMaterial = function( materialId )
-{
-    return this.materials[ materialId ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,15 +43,15 @@ Editor.prototype.getMaterialFromEditorId = function( materialId )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneMaterialSelect = function( materialId )
 {
-    this.doUndoManager.AddCommand( new SelectMaterialCommand( this, materialId ) );
-    this.doUndoManager.Do();
+    this.doUndoManager.addCommand( new SelectMaterialCommand( this, materialId ) );
+    this.doUndoManager.do();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneMaterialDeselect = function( materialId )
 {
-    this.doUndoManager.AddCommand( new DeselectMaterialCommand( this, materialId ) );
-    this.doUndoManager.Do();
+    this.doUndoManager.addCommand( new DeselectMaterialCommand( this, materialId ) );
+    this.doUndoManager.do();
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -852,12 +852,12 @@
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
-			if ( pointer.button === 0 || pointer.button === undefined ) {
-
+			if ( pointer.button === 0 || pointer.button === undefined )
+			{
 				var intersect = intersectObjects( pointer, _gizmo[ _mode ].pickers.children );
 
-				if ( intersect ) {
-
+				if ( intersect )
+				{
 					event.preventDefault();
 					event.stopPropagation();
 
@@ -873,8 +873,8 @@
 
 					var planeIntersect = intersectObjects( pointer, [ _gizmo[ _mode ].activePlane ] );
 
-					if ( planeIntersect ) {
-
+					if ( planeIntersect )
+					{
 						oldPosition.copy( scope.object.position );
 						oldScale.copy( scope.object.scale );
 						oldRotation.copy( scope.object.rotation );
@@ -882,15 +882,20 @@
 						oldRotationMatrix.extractRotation( scope.object.matrix );
 						worldRotationMatrix.extractRotation( scope.object.matrixWorld );
 
-						parentRotationMatrix.extractRotation( scope.object.parent.matrixWorld );
-						parentScale.setFromMatrixScale( tempMatrix.getInverse( scope.object.parent.matrixWorld ) );
+						if( scope.object.parent != null )
+						{
+							parentRotationMatrix.extractRotation( scope.object.parent.matrixWorld );
+							parentScale.setFromMatrixScale( tempMatrix.getInverse( scope.object.parent.matrixWorld ) );
+						}
+						else
+						{
+							parentRotationMatrix.identity();
+							parentScale.set( 1, 1, 1 );
+						}
 
 						offset.copy( planeIntersect.point );
-
 					}
-
 				}
-
 			}
 
 			_dragging = true;

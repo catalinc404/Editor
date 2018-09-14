@@ -20,6 +20,8 @@ Editor.prototype.addGeometry = function( geometry )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.removeGeometry = function( geometryId )
 {
+    this.eventDispatcher.dispatchEvent( "onSceneGeometryRemoved", { geometryId: geometryId } );
+
     var geometry = this.geometries[ geometryId ];
     this.geometries[ geometryId ] = undefined;
 
@@ -41,15 +43,15 @@ Editor.prototype.getGeometryFromEditorId = function( geometryId )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneGeometrySelect = function( geometryId )
 {
-    this.doUndoManager.AddCommand( new SelectGeometryCommand( this, geometryId ) );
-    this.doUndoManager.Do();
+    this.doUndoManager.addCommand( new SelectGeometryCommand( this, geometryId ) );
+    this.doUndoManager.do();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneGeometryDeselect = function( geometryId )
 {
-    this.doUndoManager.AddCommand( new DeselectGeometryCommand( this, geometryId ) );
-    this.doUndoManager.Do();
+    this.doUndoManager.addCommand( new DeselectGeometryCommand( this, geometryId ) );
+    this.doUndoManager.do();
 }
 
 //////////////////////////////////////////////////////////////////////////////

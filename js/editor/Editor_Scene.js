@@ -104,24 +104,42 @@ Editor.prototype.loadFBX = function ( path, objectName, callback )
                             {
                                 object.name = object.name || name;
 
-                                editor.resetObjectXForm( object );
-
-                                if( callback !== undefined )
+                                if( callback != null )
                                 {
                                     callback( object );
                                 }
-
-                                object.children[0].material = new THREE.MeshStandardMaterial( 
-                                                                                                {
-                                                                                                    color: 0xFFFFFF,
-                                                                                                    roughness: 0.5,
-                                                                                                    metalness: 0.7,
-                                                                                                } );
-
-                                object.children[0].material.name = object.children[0].name + "_StandardMaterial";
-
-                                editor.sceneObjectAdd( object );
                             } );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.postLoadFBX = function ( object )
+{
+    editor.resetObjectXForm( object );
+
+    if( object.children.length > 0 )
+    {
+        var child = object.children[0];
+        if( child instanceof THREE.Mesh )
+        {
+            child.castShadow = true;
+            child.receiveShadow = true;
+
+            
+
+            //TODO
+            var materialParameters = 
+            {
+                color: 0xFFFFFF,
+                roughness: 0.5,
+                metalness: 0.5,
+            }
+
+            child.material = new THREE.MeshStandardMaterial( materialParameters );
+            child.material.name = child.name + "_StandardMaterial";
+        }
+    }
+
+    editor.sceneObjectAdd( object );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,55 +150,163 @@ Editor.prototype.loadPLYMesh = function ( path, objectName, callback )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.loadGLTF = function ( path, objectName, callback )
+{
+    var gltfLoader = new THREE.GLTFLoader();
+    gltfLoader.load( path,  function( gltf ) 
+                            { 
+                                if( callback != null )
+                                {
+                                    callback( gltf );
+                                }
+                            },
+                            function ( xhr ) { console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' ); },
+                            function ( error ) { messageBox( { title: "loadGLTF", contents: "<br>ERROR: Failed to load object<br><br>", type: EMessageBox.OK }); } );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.postLoadGLTF = function ( object )
+{
+    if( object.scene.children.length > 0 )
+    {
+        var child = object.scene.children[0];
+        if( child instanceof THREE.Mesh )
+        {
+            child.castShadow = true;
+            child.receiveShadow = true;
+
+            if( child.material instanceof THREE.MeshStandardMaterial )
+            {
+                child.material.normalScale.y = -child.material.normalScale.y;
+            }
+            else
+            {
+                if( child.material instanceof Array )
+                {
+                    var length = child.material.length;
+                    for( var i = 0; i < length; ++i )
+                    {
+                        if( child.material[ i ] instanceof THREE.MeshStandardMaterial )
+                        {
+                            child.material[ i ].normalScale.y = -child.material[ i ].normalScale.y;
+                        }
+                    }
+                }
+            }
+        }
+
+        editor.sceneObjectAdd( object.scene.children[0] );
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.loadPLYMesh = function ( path, objectName, callback )
+{
+    var plyLoader = new THREE.PLYLoader();
+    plyLoader.load( path, callback );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.saveGLB = function ( object, fileName )
+{
+    var GLTFExporter = new THREE.GLTFExporter();
+    GLTFExporter.parse( this.selection.object.object,   function( result )
+                                                        {
+                                                            var blob = new Blob( [result], { type: "application/octet-stream" } );
+                                                            saveAs( blob, fileName );
+                                                        }, { binary: true } );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.saveGLTF = function ( object, fileName )
+{
+    var GLTFExporter = new THREE.GLTFExporter();
+    GLTFExporter.parse( this.selection.object.object,   function( result )
+                                                        {
+                                                            var output = stringify( result, null, 2 );
+                                                            var blob = new Blob( [ output ], { type: "text/plain" } );
+                                                            console.log( "blob size: " + blob.size );
+                                                            saveAs( blob, fileName );
+                                                            console.log( "Saved!" );
+                                                        }, { binary: true } );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneNew = function ()
 {
-    //TODO
-    messageBox( { title: "New scene", contents: "<br>TODO<br><br>", type: EMessageBox.OK });
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.deselect( this.getSelection() );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //this.sceneObjects = [];
+    this.selection = {  object: null, material: null, geometry: null };
+    this.objectTransformMode  = ETransformMode.TRANSLATE;
+    this.objectTransformSpace = ETransformSpace.GLOBAL;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //this.geometries = {};
-   
+    var objectsCount = this.sceneObjects.length;
+    var objects = [];
+    for( var i = 0; i < objectsCount; ++i )
+    {
+        objects.push( this.sceneObjects[ i ].object );
+    }
+    for( var i = objectsCount - 1; i >= 0; --i )
+    {
+        this.sceneObjectRemove( objects[ i ] );
+    }
+    this.sceneObjects = [];
+    this.sceneObjectsId = 0;
+    this.sceneObjectCreationId = 0;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //this.materials = {};
+    for(var materialId in this.materials )
+    {
+        if( this.materials.hasOwnProperty( materialId ) )
+        {
+            this.removeMaterial( parseInt( materialId ) );
+        }
+    }
+
+    this.eventDispatcher.dispatchEvent( "onSceneMaterialRemoved", { materialId: this.materialsParentId } );
+    
+    this.materials = {};
+    this.materialsId = 200000;
+    this.materialsParentId = 200000;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    for(var geometryId in this.geometries )
+    {
+        if( this.geometries.hasOwnProperty( geometryId ) )
+        {
+            this.removeGeometry( parseInt( geometryId ) );
+        }
+    }
+    
+    this.eventDispatcher.dispatchEvent( "onSceneGeometryRemoved", { geometryId: this.geometriesParentId } );
+
+    this.geometries = {};
+    this.geometriesId = 100000;
+    this.geometriesParentId = 100000;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.doUndoManager.clearCommands();
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneNewDefault = function ()
 {
     this.sceneNew();
-    //createDefaultScene( this );
+    createDefaultScene( this );
 }
-
-function downloadObjectAsJson( object, name )
-{
-    var output = JSON.stringify( object, null, 2 );
-    console.log( output );
-
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( output );
-    var downloadAnchorNode = document.createElement( "a" );
-    downloadAnchorNode.setAttribute( "href", dataStr);
-    downloadAnchorNode.setAttribute( "download", name );
-    document.body.appendChild( downloadAnchorNode ); // required for firefox
-
-    downloadAnchorNode.click( );
-    
-    downloadAnchorNode.remove( );
-  }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.exportSelected = function()
 {
     if( this.selection.object != null )
     {
-        var name = this.selection.object.object.name + ".gltf";
-        var GLTFExporter = new THREE.GLTFExporter();
-        GLTFExporter.parse( this.selection.object.object,  function( result )
-                                                    {
-                                                        downloadObjectAsJson( result, name );
-                                                    } );
+        this.saveGLB( this.selection.object.object, this.selection.object.object.name + ".glb" );
     }
     else
     {
@@ -191,64 +317,6 @@ Editor.prototype.exportSelected = function()
 //////////////////////////////////////////////////////////////////////////////
 function sceneOpen() 
 {
-    var fileSelector = document.createElement( "input" );
-    fileSelector.type = 'file';
-    fileSelector.multiple = true;
-    fileSelector.addEventListener('change', function( event ) 
-                                            {
-                                                if( event.target.files.length > 0 )
-                                                {
-                                                    var length = event.target.files.length;
-                                                    for( var i = 0; i < length; ++i )
-                                                    {
-                                                        var file = event.target.files[i];
-                                                        
-                                                        if( file.name.match(/\.(json|js)$/) ) 
-                                                        {
-                                                            var tmpPath = URL.createObjectURL( file );
-                                                            var loader = new THREE.ObjectLoader();
-                                                            loader.load( tmpPath, function ( obj ) { editor.sceneObjectAdd( obj ); } );
-                                                        }
-                                                        else
-                                                        if( file.name.match(/\.dae$/) ) 
-                                                        {
-                                                            var tmpPath = URL.createObjectURL( file );
-                                                            editor.loadDAE( tmpPath, file.name );
-                                                        }
-                                                        else
-                                                        if( file.name.match(/\.fbx$/) ) 
-                                                        {
-                                                            var tmpPath = URL.createObjectURL( file );
-                                                            editor.loadFBX( tmpPath, file.name,  );
-                                                        }
-                                                        else
-                                                        if( file.name.match(/\.obj$/) ) 
-                                                        {
-                                                            var tmpPath = URL.createObjectURL( file );
-                                                            editor.loadOBJ( tmpPath, file.name,  );
-                                                        }
-                                                        else
-                                                        if( file.name.match(/\.mtl$/) ) 
-                                                        {
-                                                            var tmpPath = URL.createObjectURL( file );
-                                                            editor.loadMTL( tmpPath, file.name,  );
-                                                        }
-                                                        else
-                                                        if( file.name.match(/\.png$/) ) 
-                                                        {
-                                                            var tmpPath = URL.createObjectURL( file );
-                                                            editor.loadPNG( tmpPath, file.name,  );
-                                                        }
-                                                        else
-                                                        if( file.name.match(/\.bmp$/) ) 
-                                                        {
-                                                            var tmpPath = URL.createObjectURL( file );
-                                                            editor.loadBMP( tmpPath, file.name,  );
-                                                        }
-                                                    }
-                                                }
-                                            } );
-    fileSelector.click();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -304,16 +372,22 @@ function sceneImport()
                                                             editor.loadDAE( tmpPath, file.name );
                                                         }
                                                         else
-                                                        if( file.name.match(/\.fbx$/) ) 
+                                                        if( file.name.match(/\.(fbx|FBX)$/) ) 
                                                         {
                                                             var tmpPath = URL.createObjectURL( file );
-                                                            editor.loadFBX( tmpPath, file.name,  );
+                                                            editor.loadFBX( tmpPath, file.name, editor.postLoadFBX );
                                                         }
                                                         else
                                                         if( file.name.match(/\.obj$/) ) 
                                                         {
                                                             var tmpPath = URL.createObjectURL( file );
-                                                            editor.loadOBJ( tmpPath, file.name,  );
+                                                            editor.loadOBJ( tmpPath, file.name  );
+                                                        }
+                                                        else
+                                                        if( file.name.match(/\.(gltf|glb)$/) ) 
+                                                        {
+                                                            var tmpPath = URL.createObjectURL( file );
+                                                            editor.loadGLTF( tmpPath, file.name, editor.postLoadGLTF );
                                                         }
                                                         else
                                                         if( file.name.match(/\.mtl$/) ) 
