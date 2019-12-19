@@ -122,19 +122,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Main
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-html,
-body 
-{
-    /* set margin to 0 and overflow to hidden, to use the complete page */
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    min-width: 900;
-    min-height: 600;
-}
-
 .nosize
 {
     width: 0px;
@@ -197,7 +184,7 @@ body
     color: @color;
 }
 
-.base-elemennt
+.base-element
 {
     position: absolute;    
     overflow: hidden;
@@ -205,17 +192,22 @@ body
 
 .element 
 {
-    visibility: hidden;
-
-    .base-elemennt;
+    .base-element;
     .nosize;
 }
 
 .page_element 
 {
-    .base-elemennt;
+    .base-element;
     .background-color(@color: @element-color-background);
     .borderinside;
+}
+
+.svg_element 
+{
+    .base-element;
+    .background-color(@color: @element-color-background);
+    display: block;
 }
 
 .resizerX 
@@ -280,6 +272,11 @@ body
     user-select: none;              /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 
+.text
+{
+    .text(11px);
+}
+
 .text11
 {
     .text(12px);
@@ -313,6 +310,21 @@ body
 .border-solid-1px
 {
     .border-solid(@size: 1px; @color: @element-color-border);
+}
+
+html,
+body 
+{
+    /* set margin to 0 and overflow to hidden, to use the complete page */
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    min-width: 900;
+    min-height: 600;
+
+    .background-color;
 }
 
 //------------------------------------------------------------------------------
@@ -588,7 +600,6 @@ ul.vtree
     .noselect;
     cursor: pointer;
 }
-
 
 .vtree a.vtree-leaf-label 
 {

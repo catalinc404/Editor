@@ -1,31 +1,45 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var ui = new UI( editorPageLayout );
+var ui = null;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function setup()
 {
-    ui.setupLayoutClasses( ui.UIData );
-    eventDispatcher.dispatchEvent( "onUISetup" );
+    if( ui == null )
+    {
+        ui = new UI( editorPageLayout );
 
-    resize();
+        __UI = new _UI( eventDispatcher );
+    
+        ui.setupLayoutClasses( ui.UIData );
+        eventDispatcher.dispatchEvent( "onUISetup" );
 
-    eventDispatcher.dispatchEvent( "onUIReady" );
+        resize();
 
-    window.addEventListener( "keydown", editor.onKeyDown.bind( editor ), false );
+        eventDispatcher.dispatchEvent( "onUIReady" );
 
-    createInitialScene( editor );
+        window.addEventListener( "keydown", editor.onKeyDown.bind( editor ), false );
+
+        createInitialScene( editor );
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function resize()
 {
-    var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-    var area = { left: 0, top: 0, width: width, height: height };
-    
-    ui.setupLayout( area, ui.UIData );
+    if( ui == null )
+    {
+        setup();
+    }
+    else
+    {
+        var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var area = { left: 0, top: 0, width: width, height: height };
 
-    eventDispatcher.dispatchEvent( "onUIResize" );
+        ui.setupLayout( area, ui.UIData );
+
+        eventDispatcher.dispatchEvent( "onUIResize" );
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,8 +51,9 @@ function changeTheme( theme )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function about()
 {
-    messageBox( { title: "About", contents: "<br>WebGL Editor<br>version 0.0.1<br><br>", type: EMessageBox.OK });
+    messageBox( { width: 300, height: 200, title: "About", contents: "<br>WebGL Editor<br>version 0.0.1<br><br>", type: EMessageBox.OK });
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function changeViewHelpersRender( id, viewId, helper )

@@ -5,36 +5,84 @@
     "version": "0.2.0",
     "configurations": 
     [
+        //------------------------------------------------------------------
         {
-            "type": "chrome",
+            "type": "node",
             "request": "launch",
-            "name": "Launch Chrome H - editor.html",
-            "url": "file:///C:/Users/Catalin/Documents/Visual%20Studio%20Code/Editor/editor.html",
-            "webRoot": "${workspaceRoot}/editor.html",
-            "runtimeArgs": [
-                "--allow-file-access-from-files"
-            ]
-            
+            "name": "Electron: Main - Flow",
+            "protocol": "inspector",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "runtimeArgs": [ "--remote-debugging-port=9223", "electron-flow.js" ],
+            "windows": { "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd" },
+        },
+        {
+            "name": "Electron: Renderer - Flow",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9223,
+            "webRoot": "${workspaceFolder}",
+            "timeout": 15000,
         },
 
+        //------------------------------------------------------------------
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Electron: Main - Editor",
+            "protocol": "inspector",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "runtimeArgs": [ "--remote-debugging-port=9223", "electron-editor.js" ],
+            "windows": { "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd" },
+        },
+        {
+            "name": "Electron: Renderer - Editor",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9223,
+            "webRoot": "${workspaceFolder}",
+            "timeout": 5000,
+        },
+
+        //------------------------------------------------------------------
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Launch Chrome W - editor.html",
+            "name": "Launch Chrome - Editor",
             "url": "file:///D:/Catalin/Projects/_CodeProjects/Editor/editor.html",
             "webRoot": "${workspaceRoot}/editor.html",
-            "runtimeArgs": [
-                "--allow-file-access-from-files"
-            ]
-            
+            "runtimeArgs": [ "--allow-file-access-from-files" ],
         },
 
+        //------------------------------------------------------------------
         {
-            "name": "Launch Firefox W - editor.html",
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome - Flow",
+            "url": "file:///D:/Catalin/Projects/_CodeProjects/Editor/flow.html",
+            "webRoot": "${workspaceRoot}/flow.html",
+            "runtimeArgs": [ "--allow-file-access-from-files" ],
+        },
+
+        //------------------------------------------------------------------
+        {
+            "name": "Launch Firefox - Editor",
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
             "file": "${workspaceFolder}/editor.html"
+        },
+    ],
+
+    "compounds":
+    [
+        {
+            "name": "Electron: All - Flow",
+            "configurations":
+            [
+                "Electron: Main - Flow",
+                "Electron: Renderer - Flow",
+            ]
         }
     ]
+
 }

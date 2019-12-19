@@ -8,12 +8,14 @@ function PropertyView( eventDispatcher, element )
     this.scrollbarVVisible = false;
    
     //////////////////////////////////////////////////////////////////////////////
-    this.eventDispatcher.addEventListener( "onSceneObjectSelected",     this.onSceneObjectSelected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectDeselected",   this.onSceneObjectDeselected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneMaterialSelected",   this.onSceneMaterialSelected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneMaterialDeselected", this.onSceneMaterialDeselected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneGeometrySelected",   this.onSceneGeometrySelected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneGeometryDeselected", this.onSceneGeometryDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectSelected",         this.onSceneObjectSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectDeselected",       this.onSceneObjectDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneMaterialSelected",       this.onSceneMaterialSelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneMaterialDeselected",     this.onSceneMaterialDeselected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneGeometrySelected",       this.onSceneGeometrySelected.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneGeometryDeselected",     this.onSceneGeometryDeselected.bind( this ) );
+    
+    this.eventDispatcher.addEventListener( "onComponentPropertyChanged",    this.onComponentPropertyChanged.bind( this ) );
 
     //////////////////////////////////////////////////////////////////////////////
     this.fnRequestRender = this.requestRender.bind( this );
@@ -81,7 +83,7 @@ PropertyView.prototype.onSceneObjectSelected = function( objectId )
         var object = this.eventDispatcher.runCommand( "getObjectFromEditorId", objectId );
         if( object != null )
         {
-            propertiesSet = this.setObjectProperties( object );
+            propertiesSet = this.setProperties( { id: objectId, object: object } );
         }
     }
 
@@ -106,7 +108,7 @@ PropertyView.prototype.onSceneMaterialSelected = function( materialId )
         var material = this.eventDispatcher.runCommand( "getMaterialFromEditorId", materialId );
         if( material != null )
         {
-            propertiesSet = this.setMaterialProperties( material );
+            propertiesSet = this.setProperties( { id: materialId, material: material } );
         }
     }
 
@@ -117,7 +119,7 @@ PropertyView.prototype.onSceneMaterialSelected = function( materialId )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.onSceneMaterialDeselected = function( objectId )
+PropertyView.prototype.onSceneMaterialDeselected = function( materialId )
 {
     this.clearProperties();
 }
@@ -131,7 +133,7 @@ PropertyView.prototype.onSceneGeometrySelected = function( geometryId )
         var geometry = this.eventDispatcher.runCommand( "getGeometryFromEditorId", geometryId );
         if( geometry != null )
         {
-            propertiesSet = this.setGeometryProperties( geometry );
+            propertiesSet = this.setProperties( { id: geometryId, geometry: geometry } );
         }
     }
 
@@ -142,9 +144,43 @@ PropertyView.prototype.onSceneGeometrySelected = function( geometryId )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.onSceneGeometryDeselected = function( objectId )
+PropertyView.prototype.onSceneGeometryDeselected = function( geometryId )
 {
     this.clearProperties();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.onComponentPropertyChanged = function( data )
+{
+    if( ( this.objectData != null ) && ( this.objectData.id === data.id ) )
+    {
+        this.setProperties( this.objectData );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.setProperties = function( objectData )
+{
+    this.objectData = objectData;
+
+    if( objectData.object != null )
+    {
+        this.setObjectProperties( objectData.id, objectData.object );
+    }
+    else
+    if( objectData.material != null )
+    {
+        this.setMaterialProperties( objectData.id, objectData.material );
+    }
+    else
+    if( objectData.geometry != null )
+    {
+        this.setGeometryProperties( objectData.id, objectData.geometry );
+    }
+    else
+    {
+        this.clearProperties();
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -160,6 +196,8 @@ PropertyView.prototype.clearProperties = function()
         this.gui.destroy();
         this.gui = undefined;
     }
+
+    this.objectData = null;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -184,9 +222,11 @@ PropertyView.prototype.createMapGUI = function( gui, map, callback )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.createTextureGUI = function( gui, material, textureName, callback )
+PropertyView.prototype.createTextureGUI = function( gui, material, textureName, callback, folderName )
 {
     var _this = this;
+
+    //TODO: remove this and add it to Editor_scene
     var textureGUIButtons =
     [ 
         { 
@@ -202,6 +242,10 @@ PropertyView.prototype.createTextureGUI = function( gui, material, textureName, 
             callback: function() 
             { 
                 console.log( "PropertyView.createTextureGUI.remove" );
+
+                material[ textureName ] = undefined;
+                callback();
+
                 return true;
             }
         },
@@ -225,8 +269,9 @@ PropertyView.prototype.createTextureGUI = function( gui, material, textureName, 
                                                         {
                                                             if( event.target.files.length > 0 )
                                                             {
+                                                                //TODO: use Editor_Scene
                                                                 var file = event.target.files[0];
-                                                                if( file.name.match(/\.png$/) ) 
+                                                                if( file.name.match(/\.(png|jpg|tga|TGA)$/) ) 
                                                                 {
                                                                     var name = file.name.substr( file.name.lastIndexOf( "/" ) + 1 )
                                                                     name = name.substr(0, name.lastIndexOf( "." ));
@@ -237,6 +282,7 @@ PropertyView.prototype.createTextureGUI = function( gui, material, textureName, 
                                                                                                                                 texture.name = name;
                                                                                                                                 material[ textureName ] = texture;
                                                                                                                                 _this.createTextureGUI( gui, material, textureName, callback );
+                                                                                                                                
                                                                                                                                 callback();
                                                                                                                             } );
                                                                 }
@@ -266,7 +312,7 @@ PropertyView.prototype.createTextureGUI = function( gui, material, textureName, 
         gui.removeFolder( folder );
     }
 
-    var textureGUI = gui.addFolder( "Texture", textureGUIButtons, beforeElement );
+    var textureGUI = gui.addFolder( folderName || "Texture", textureGUIButtons, beforeElement );
     var texture = material[ textureName ];
 
     if( texture != null )
@@ -285,20 +331,30 @@ PropertyView.prototype.createTextureGUI = function( gui, material, textureName, 
                                                EquirectangularReflectionMapping: 303, EquirectangularRefractionMapping: 304, 
                                                SphericalReflectionMapping: 305, CubeUVReflectionMapping: 306, 
                                                CubeUVRefractionMapping: 307
-                                             } ).onChange( callback );
+                                             } ).onChange( function( newValue ) { texture.mapping = parseInt( newValue); callback(); } );
 
-        textureGUI.add( texture, "wrapS",  {  RepeatWrapping: 1000 ,ClampToEdgeWrapping: 1001, MirroredRepeatWrapping: 1002 } ).onChange( callback );
-        textureGUI.add( texture, "wrapT",  {  RepeatWrapping: 1000 ,ClampToEdgeWrapping: 1001, MirroredRepeatWrapping: 1002 } ).onChange( callback );
-        textureGUI.add( texture, "magFilter",  { NearestFilter: 1003, LinearFilter: 1006 } ).onChange( callback );
-        textureGUI.add( texture, "minFilter",  { NearestFilter: 1003, NearestMipMapNearestFilter: 1004, NearestMipMapLinearFilter: 1005, LinearFilter: 1006, 
-                                                LinearMipMapNearestFilter: 1007, LinearMipMapLinearFilterNearestFilter: 1008 } ).onChange( callback );
-        textureGUI.add( texture, "anisotropy" ).min( 1 ).onChange( callback ); 
-        textureGUI.add( texture, "format", { AlphaFormat: 1021, RGBFormat: 1022, RGBAFormat: 1023, 
-                                             LuminanceFormat: 1024, LuminanceAlphaFormat: 1025, 
-                                             RGBEFormat: 1026, DepthFormat: 1027, DepthStencilFormat: 1028 } ).onChange( callback );
-        textureGUI.add( texture, "type", { UnsignedByteType: 1009, ByteType: 1009, ShortType: 1009, UnsignedShortType: 1009, IntType: 1009,
-                                           UnsignedIntType: 1009, FloatType: 1009, HalfFloatType: 1009, UnsignedShort4444Type: 1009,
-                                           UnsignedShort5551Type: 1009, UnsignedShort565Type: 1009, UnsignedInt248Type: 1009 } ).onChange( callback );
+        textureGUI.add( texture, "wrapS",  {  Repeat: 1000, ClampToEdge: 1001, MirroredRepeat: 1002 } ).onChange( function( newValue ) 
+                                                                                                                  {
+                                                                                                                       texture.wrapS = parseInt( newValue); 
+                                                                                                                       callback();
+                                                                                                                  } );
+        textureGUI.add( texture, "wrapT",  {  Repeat: 1000, ClampToEdge: 1001, MirroredRepeat: 1002 } ).onChange( function( newValue ) 
+                                                                                                                  {
+                                                                                                                      texture.wrapT = parseInt( newValue); 
+                                                                                                                      callback();
+                                                                                                                  } );
+
+        textureGUI.add( texture, "magFilter",  { Nearest: 1003, Linear: 1006 } ).onChange( function( newValue ) { texture.magFilter = parseInt( newValue); callback(); } );
+        textureGUI.add( texture, "minFilter",  { Nearest: 1003, NearestMipMapNearest: 1004, NearestMipMapLinear: 1005, Linear: 1006, 
+                                                LinearMipMapNearest: 1007, LinearMipMapLinearNearest: 1008 } ).onChange( function( newValue ) { texture.minFilter = parseInt( newValue); callback(); } );
+
+        textureGUI.add( texture, "anisotropy" ).min( 1 ).onChange( callback );
+
+        textureGUI.add( texture, "format", { Alpha: 1021, RGB: 1022, RGBA: 1023, Luminance: 1024, LuminanceAlpha: 1025, 
+                                             RGBE: 1026, Depth: 1027, DepthStencil: 1028 } ).onChange( function( newValue ) { texture.format = parseInt( newValue); callback(); } );
+        textureGUI.add( texture, "type", { UnsignedByte: 1009, Byte: 1009, Short: 1009, UnsignedShort: 1009, Int: 1009,
+                                           UnsignedInt: 1009, Float: 1009, HalfFloat: 1009, UnsignedShort4444: 1009,
+                                           UnsignedShort5551: 1009, UnsignedShort565: 1009, UnsignedInt248: 1009 } ).onChange( function( newValue ) { texture.type = parseInt( newValue); callback(); } );
 
         var offsetGUI = textureGUI.addFolder( "Offset" );
         offsetGUI.add( texture.offset, "x" ).onChange( callback );
@@ -322,9 +378,9 @@ PropertyView.prototype.createTextureGUI = function( gui, material, textureName, 
 
         textureGUI.add( texture, "encoding", { LinearEncoding: 3000, sRGBEncoding: 3001, GammaEncoding: 3002, RGBEEncoding: 3003,
                                                LogLuvEncoding: 3004, RGBM7Encoding: 3005, RGBM16Encoding: 3006, RGBDEncoding: 3007,
-                                               BasicDepthPacking: 3008, RGBADepthPacking: 3009 } ).onChange( function() 
+                                               BasicDepthPacking: 3008, RGBADepthPacking: 3009 } ).onChange( function( newValue ) 
                                                                                                              { 
-                                                                                                                material.needsUpdate = true; 
+                                                                                                                texture.encoding = parseInt( newValue );
                                                                                                                 callback();
                                                                                                              } );
         textureGUI.add( { refresh : function() { texture.needsUpdate = true; callback(); } }, "refresh" );
@@ -336,6 +392,647 @@ PropertyView.prototype.createTextureGUI = function( gui, material, textureName, 
 
     return textureGUI;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createNodeTextureGUI = function( gui, nodeTexture, callback, textureName )
+{
+    var _this = this;
+
+    //TODO: remove this and add it to Editor_scene
+    var textureGUIButtons =
+    [ 
+        { 
+            name : "Remove",
+            class : "",
+            style: "float: right; margin-right: 16px; margin-top: 3px;",
+            span: 
+            { 
+                class: "icon-trash icon-hover",
+                style: "width: 24px; height: 24px; zorder:10; padding-top: 6px;",
+            },
+            
+            callback: function() 
+            { 
+                console.log( "PropertyView.createNodeTextureGUI.remove" );
+
+                nodeTexture.value = undefined;
+                callback();
+
+                return true;
+            }
+        },
+        { 
+            name : "Open",
+            class : "",
+            style: "float: right; margin-right: 6px; margin-top: 3px;",
+            span: 
+            { 
+                class: "icon-file-directory icon-hover",
+                style: "width: 24px; height: 24px; zorder:10; padding-top: 6px;",
+            },
+            
+            callback: function() 
+            { 
+                console.log( "PropertyView.createNodeTextureGUI.open" );
+
+                var fileSelector = document.createElement( "input" );
+                fileSelector.type = 'file';
+                fileSelector.addEventListener('change', function( event ) 
+                                                        {
+                                                            if( event.target.files.length > 0 )
+                                                            {
+                                                                //TODO: use Editor_Scene
+                                                                var file = event.target.files[0];
+                                                                if( file.name.match(/\.(png|jpg|tga|TGA)$/) ) 
+                                                                {
+                                                                    var name = file.name.substr( file.name.lastIndexOf( "/" ) + 1 )
+                                                                    name = name.substr(0, name.lastIndexOf( "." ));
+
+                                                                    var tmpPath = URL.createObjectURL( file );
+                                                                    var texture = new THREE.TextureLoader().load( tmpPath, function()
+                                                                                                                            {
+                                                                                                                                texture.name = name;
+                                                                                                                                nodeTexture.value = texture;
+                                                                                                                                _this.createNodeTextureGUI( gui, nodeTexture, textureName, callback );
+                                                                                                                                
+                                                                                                                                callback();
+                                                                                                                            } );
+                                                                }
+                                                            }
+                                                        } );
+                fileSelector.click();
+
+                return true;
+            }
+        },
+    ]
+
+    var beforeElement = null;
+    if( gui.__folders[ "Texture" ] != null )
+    {
+        var folder = gui.__folders[ "Texture" ];
+
+        var length = gui.domElement.children[0].children.length;
+        for( var i = 0; i < length; ++i )
+        {
+            if( gui.domElement.children[ 0 ].children[ i ] === folder.domElement.parentElement )
+            {
+                beforeElement = ( i + 1 < length ) ? gui.domElement.children[ 0 ].children[ i + 1 ] : null;
+            }
+        }
+
+        gui.removeFolder( folder );
+    }
+
+    var textureGUI = gui.addFolder( textureName || "Texture", textureGUIButtons, beforeElement );
+    var texture = nodeTexture.value;
+
+    if( texture != null )
+    {
+        textureGUI.add( texture, "name" );
+        if( texture.image != null )
+        {
+            textureGUI.add( texture.image, "src" ).onChange( callback );
+        }
+        else
+        {
+            textureGUI.add( { image: "none" }, "image" );
+        }
+
+        textureGUI.add( texture, "mapping",  { 
+                                               UVMapping: 300, CubeReflectionMapping: 301, CubeRefractionMapping: 302, 
+                                               EquirectangularReflectionMapping: 303, EquirectangularRefractionMapping: 304, 
+                                               SphericalReflectionMapping: 305, CubeUVReflectionMapping: 306, 
+                                               CubeUVRefractionMapping: 307
+                                              } ).onChange( function( newValue ) { texture.mapping = parseInt( newValue); callback(); } );
+
+        textureGUI.add( texture, "wrapS",  {  Repeat: 1000, ClampToEdge: 1001, MirroredRepeat: 1002 } ).onChange( function( newValue ) 
+                                                                                                                {
+                                                                                                                    texture.wrapS = parseInt( newValue); 
+                                                                                                                    callback();
+                                                                                                                } );
+        textureGUI.add( texture, "wrapT",  {  Repeat: 1000, ClampToEdge: 1001, MirroredRepeat: 1002 } ).onChange( function( newValue ) 
+                                                                                                                {
+                                                                                                                    texture.wrapT = parseInt( newValue); 
+                                                                                                                    callback();
+                                                                                                                } );
+
+        textureGUI.add( texture, "magFilter",  { Nearest: 1003, Linear: 1006 } ).onChange( function( newValue ) { texture.magFilter = parseInt( newValue); callback(); } );
+        textureGUI.add( texture, "minFilter",  { Nearest: 1003, NearestMipMapNearest: 1004, NearestMipMapLinear: 1005, Linear: 1006, 
+                                                LinearMipMapNearest: 1007, LinearMipMapLinearNearest: 1008 } ).onChange( function( newValue ) { texture.minFilter = parseInt( newValue); callback(); } );
+
+        textureGUI.add( texture, "anisotropy" ).min( 1 ).onChange( callback );
+
+        textureGUI.add( texture, "format", { Alpha: 1021, RGB: 1022, RGBA: 1023, Luminance: 1024, LuminanceAlpha: 1025, 
+                                            RGBE: 1026, Depth: 1027, DepthStencil: 1028 } ).onChange( function( newValue ) { texture.format = parseInt( newValue); callback(); } );
+        textureGUI.add( texture, "type", { UnsignedByte: 1009, Byte: 1009, Short: 1009, UnsignedShort: 1009, Int: 1009,
+                                        UnsignedInt: 1009, Float: 1009, HalfFloat: 1009, UnsignedShort4444: 1009,
+                                        UnsignedShort5551: 1009, UnsignedShort565: 1009, UnsignedInt248: 1009 } ).onChange( function( newValue ) { texture.type = parseInt( newValue); callback(); } );
+
+        var  updateUVTansformCallback = callback;                                       
+        if( nodeTexture.uv instanceof THREE.UVTransformNode )
+        {
+            updateUVTansformCallback = function()
+            {
+                nodeTexture.uv.setUvTransform( texture.offset.x, texture.offset.y, texture.repeat.x, texture.repeat.y, texture.rotation, texture.center.x, texture.center.y );
+                callback();
+            }
+        }
+
+        var offsetGUI = textureGUI.addFolder( "Offset" );
+        offsetGUI.add( texture.offset, "x" ).min( -1.0 ).max( 1.0 ).step( 0.00001 ).onChange( updateUVTansformCallback );
+        offsetGUI.add( texture.offset, "y" ).min( -1.0 ).max( 1.0 ).step( 0.00001 ).onChange( updateUVTansformCallback );
+
+        var repeatGUI = textureGUI.addFolder( "Repeat" );
+        repeatGUI.add( texture.repeat, "x" ).onChange( updateUVTansformCallback );
+        repeatGUI.add( texture.repeat, "y" ).onChange( updateUVTansformCallback );
+
+        var proxyRotation = { rotation: THREE.Math.radToDeg( texture.rotation ) };
+        textureGUI.add( proxyRotation, "rotation" ).min( -360 ).max( 360 ).onChange( function( newValue )
+        {
+            texture.rotation = THREE.Math.degToRad( newValue );
+            nodeTextureUVUpdater();
+        } );
+
+        var centerGUI = textureGUI.addFolder( "Center" );
+        centerGUI.add( texture.center, "x" ).min( 0 ).max( 1.0 ).onChange( updateUVTansformCallback );
+        centerGUI.add( texture.center, "y" ).min( 0 ).max( 1.0 ).onChange( updateUVTansformCallback );
+
+        textureGUI.add( texture, "matrixAutoUpdate" ).onChange( callback );
+        textureGUI.add( texture, "generateMipmaps" ).onChange( callback );
+        textureGUI.add( texture, "premultiplyAlpha" ).onChange( callback );
+        textureGUI.add( texture, "flipY" ).onChange( callback );
+        textureGUI.add( texture, "unpackAlignment" ).min( 1 ).onChange( callback );
+
+        textureGUI.add( texture, "encoding", { LinearEncoding: 3000, sRGBEncoding: 3001, GammaEncoding: 3002, RGBEEncoding: 3003,
+                                            LogLuvEncoding: 3004, RGBM7Encoding: 3005, RGBM16Encoding: 3006, RGBDEncoding: 3007,
+                                            BasicDepthPacking: 3008, RGBADepthPacking: 3009 } ).onChange( function( newValue ) 
+                                                                                                            { 
+                                                                                                                texture.encoding = parseInt( newValue );
+                                                                                                                callback();
+                                                                                                            } );
+        textureGUI.add( { refresh : function() { texture.needsUpdate = true; callback(); } }, "refresh" );
+    }
+    else
+    {
+        textureGUI.add( { image: "none" }, "image" );
+    }
+
+    return textureGUI;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createNodeMaterialGUI = function( gui, material, properties, callback )
+{
+    if( properties.type == "folder" )
+    {
+        var nodeMaterialGUI = gui.addFolder( properties.name );
+
+        var propertiesLength = properties.properties.length;
+        for( var i = 0; i < propertiesLength; ++i )
+        {
+            let property = properties.properties[ i ];
+
+            switch( property.type )
+            {
+                case "float":
+                case "int":
+                case "bool":
+                case "text":
+                {
+                    nodeMaterialGUI.add( property.object, property.field ).name( property.name ).onChange( callback );
+                }
+                break;
+                case "nodeTexture":
+                {
+                    this.createNodeTextureGUI( nodeMaterialGUI, property.object, callback, property.name );
+                }
+                break;
+                case "boolFloat":
+                {
+                    var propertyValue = ( property.object[ property.field ] > 0.0 ) ? true : false;
+                    var propertyName = property.name;
+
+                    var proxyObject = {};
+                    proxyObject[ propertyName ] = propertyValue;
+
+                    nodeMaterialGUI.add( proxyObject, propertyName ).onChange( 
+                        function( newValue )
+                        {
+                            property.object[ property.field ] = ( newValue == false ) ? 0.0 : 1.0;
+                            callback();
+                        } );
+                }
+                break;
+                case "color":
+                {
+                    nodeMaterialGUI.addColor( property.object, property.field ).name( property.name ).onChange( callback );
+                }
+                break;
+                case "folder":
+                {
+                    this.createNodeMaterialGUI( nodeMaterialGUI, material, property, callback );
+                }
+                break;
+                default:
+                {
+                    console.log( "undefined property type" );
+                }
+                break;
+            }
+        }
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createMeshStandardMaterialGUI = function( gui, material, callback )
+{
+    var standardMaterialGUI = gui.addFolder( "Mesh Standard Material" );
+
+    var diffuseMapGUI = standardMaterialGUI.addFolder( "diffuse" );
+    diffuseMapGUI.addColor( material, "color" ).onChange( callback );
+    this.createTextureGUI( diffuseMapGUI, material, "map", callback );
+
+    var alphaMapGUI = standardMaterialGUI.addFolder( "alphaMap" );
+    this.createTextureGUI( alphaMapGUI, material, "alphaMap", callback );
+
+    var aoMapGUI = standardMaterialGUI.addFolder( "aoMap" );
+    aoMapGUI.add( material, "aoMapIntensity" ).min( 0 ).onChange( callback );            
+    this.createTextureGUI( aoMapGUI, material, "aoMap", callback );
+
+    var bumpMapGUI = standardMaterialGUI.addFolder( "bumpMap" );
+    bumpMapGUI.add( material, "bumpScale" ).min( 0 ).max( 1 ).onChange( callback );
+    this.createTextureGUI( bumpMapGUI, material, "bumpMap", callback );
+
+    var displacementMapGUI = standardMaterialGUI.addFolder( "displacementMap" );
+    displacementMapGUI.add( material, "displacementScale" ).onChange( callback ); 
+    displacementMapGUI.add( material, "displacementBias" ).onChange( callback ); 
+    this.createTextureGUI( displacementMapGUI, material, "displacementMap", callback );
+
+    var emissiveGUI = standardMaterialGUI.addFolder( "emissive" );
+    emissiveGUI.addColor( material, "emissive" ).onChange( callback ); 
+    emissiveGUI.add( material, "emissiveIntensity" ).onChange( callback );
+    this.createTextureGUI( emissiveGUI, material, "emissiveMap", callback );
+
+    var envMapGUI = standardMaterialGUI.addFolder( "envMap" );
+    envMapGUI.add( material, "envMapIntensity" ).onChange( callback );
+    this.createTextureGUI( envMapGUI, material, "envMap", callback );
+
+    var lightMapGUI = standardMaterialGUI.addFolder( "lightMap" );
+    lightMapGUI.add( material, "lightMapIntensity" ).onChange( callback );
+    this.createTextureGUI( lightMapGUI, material, "lightMap", callback );
+
+    var metalnessMapGUI = standardMaterialGUI.addFolder( "metalnessMap" );
+    metalnessMapGUI.add( material, "metalness" ).onChange( callback );
+    this.createTextureGUI( metalnessMapGUI, material, "metalnessMap", callback );
+
+    var roughnessMapGUI = standardMaterialGUI.addFolder( "roughnessMap" );
+    roughnessMapGUI.add( material, "roughness" ).onChange( callback );
+    this.createTextureGUI( roughnessMapGUI, material, "roughnessMap", callback );
+
+    var normalMapGUI = standardMaterialGUI.addFolder( "normalMap" );
+    var normalScaleGUI = normalMapGUI.addFolder( "normalScale" );
+    normalScaleGUI.add( material.normalScale, "x" ).onChange( callback );
+    normalScaleGUI.add( material.normalScale, "y" ).onChange( callback );
+    this.createTextureGUI( normalMapGUI, material, "normalMap", callback );
+
+    standardMaterialGUI.add( material, "refractionRatio" ).max( 1 ).onChange( callback );
+
+    var wireframeGUI = standardMaterialGUI.addFolder( "wireframe" );
+    wireframeGUI.add( material, "wireframe" ).onChange( callback );
+    wireframeGUI.add( material, "wireframeLinecap", ["butt", "round", "square"] ).onChange( callback );
+    wireframeGUI.add( material, "wireframeLinejoin", ["round", "bevel", "miter"] ).onChange( callback );
+    wireframeGUI.add( material, "wireframeLinewidth" ).onChange( callback );
+
+    standardMaterialGUI.add( material, "skinning" ).onChange( callback );
+
+    standardMaterialGUI.add( material, "morphNormals" ).onChange( callback );
+    standardMaterialGUI.add( material, "morphTargets" ).onChange( callback );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createMeshPhysicalMaterialGUI = function( gui, material, callback )
+{
+    var physicallMaterialGUI = gui.addFolder( "Mesh Physical Material Material" );
+
+    physicallMaterialGUI.add( material, "clearCoat" ).min( 0 ).max( 1 ).onChange( callback );
+    physicallMaterialGUI.add( material, "clearCoatRoughness" ).min( 0 ).max( 1 ).onChange( callback );
+    physicallMaterialGUI.add( material, "reflectivity" ).min( 0 ).max( 1 ).onChange( callback );
+
+    this.createMeshStandardMaterialGUI( gui, material, callback );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createStandardNodeMaterialGUI = function( gui, material, callback )
+{
+    var standardNodeMaterialGUI = gui.addFolder( "Standard Node Material" );
+    this.createNodeMaterialGUI( standardNodeMaterialGUI, material, material.userData["properties"], callback ); 
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createCommonMaterialGUI = function( gui, material, callback )
+{
+    gui.add( material, "fog" ).onChange( callback );
+    gui.add( material, "lights" ).onChange( callback );
+
+    gui.add( material, "blending",  { 
+                                        NoBlending: THREE.NoBlending, 
+                                        NormalBlending: THREE.NormalBlending, 
+                                        AdditiveBlending: THREE.AdditiveBlending,
+                                        SubtractiveBlending: THREE.SubtractiveBlending,
+                                        MultiplyBlending: THREE.MultiplyBlending,
+                                        CustomBlending: THREE.CustomBlending 
+                                    } ).onChange( callback );
+
+    gui.add( material, "side", { FrontSide: THREE.FrontSide, BackSide: THREE.BackSide, DoubleSide: THREE.DoubleSide } ).onChange( callback );
+    gui.add( material, "flatShading" ).onChange( callback );
+    gui.add( material, "vertexColors", { NoColors: THREE.NoColors, VertexColors: THREE.VertexColors, FaceColors: THREE.FaceColors } ).onChange( callback );
+
+    gui.add( material, "opacity" ).min( 0.0 ).max( 1.0 ).onChange( callback );
+    gui.add( material, "transparent" ).onChange( callback );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createMaterialGUI = function( gui, id, material )
+{
+    if( material !== undefined )
+    {
+        var renderFunction = this.fnRequestRender;
+        var requestMateriaUpdate = function()
+        {
+            material.needsUpdate = true;
+            renderFunction();
+        };
+        var requestNodeMateriaUpdate = function()
+        {
+            renderFunction();
+        };
+
+        var _this = this;
+        var materialGUI = gui;
+
+        materialGUI.add( material, "name" ).onChange( function( newValue ) 
+                                                      { 
+                                                          _this.eventDispatcher.dispatchEvent( "onSceneMaterialPropertyChanged", 
+                                                                                               { id: id, property: "name", value: newValue } );
+                                                      } );
+
+        var materialGUI = gui;                                                      
+        
+        if( material instanceof THREE.MeshPhysicalMaterial )
+        {
+            this.createMeshPhysicalMaterialGUI( materialGUI, material, requestMateriaUpdate );
+        }
+        else
+        if( material instanceof THREE.MeshStandardMaterial )
+        {
+            this.createMeshStandardMaterialGUI( materialGUI, material, requestMateriaUpdate );
+        }
+        else
+        if( material instanceof THREE.StandardNodeMaterial )
+        {
+            this.createStandardNodeMaterialGUI( materialGUI, material, requestNodeMateriaUpdate );
+        }
+        else
+        {
+            console.log("unknown material type for: " + material );
+        }
+
+        //////////////////////////////////////////////////////////////////////////////
+        //Base Material
+        this.createCommonMaterialGUI( materialGUI, material, requestMateriaUpdate );
+
+        //////////////////////////////////////////////////////////////////////////////
+        //Defines 
+        //this.createMaterialDefinesGUI( materialGUI, material, requestMateriaUpdate );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createMaterialsGUI = function( gui, materials )
+{
+    if( materials instanceof Array )
+    {
+        var materialsGUI = gui.addFolder( "Materials" );
+
+        var length = materials.length
+        for( var i = 0; i < length; ++i ) 
+        {
+            var materialGUI = materialsGUI.addFolder( "Material" + ( i + 1 ) );
+
+            var material = materials[i];
+            var materialId = this.eventDispatcher.runCommand( "getEditorIdFromMaterial", material );
+
+            this.createMaterialGUI( materialGUI, materialId, material );
+        }
+    }
+    else
+    if( materials instanceof THREE.Material )
+    {
+        var materialGUI = gui.addFolder( "Material" );
+
+        var material = materials;
+        var materialId = this.eventDispatcher.runCommand( "getEditorIdFromMaterial", material );
+
+        this.createMaterialGUI( materialGUI, materialId, material );
+    }
+    else
+    {
+        console.log( "unknown type of material" );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createGeometryGUI = function( gui, id, geometry )
+{
+    if( geometry !== undefined )
+    {
+        var _this = this;
+        var geometryGUI = gui;
+
+        geometryGUI.add( geometry, "name" ).onChange( function( newValue ) 
+                                                      { 
+                                                          _this.eventDispatcher.dispatchEvent( "onSceneGeometryPropertyChanged", 
+                                                                                               { id: id, property: "name", value: newValue } );
+                                                      } );
+
+        if( geometry instanceof THREE.Mesh )
+        {
+            //TODO:
+        }
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.createLightGUI = function( gui, object )
+{
+    var lightGUI = gui.addFolder( "Light" );
+    lightGUI.addColor( object, "color" ).onChange( this.fnColorChange );
+    lightGUI.add( object, "intensity" ).onChange( this.fnRequestRender );
+
+    if( object instanceof THREE.AmbientLight )
+    {
+        //No specific parameters
+    }
+    else
+    if( object instanceof THREE.DirectionalLight )
+    {
+        var directionalLightGUI = lightGUI.addFolder( "Directional Light" );
+        var targetGUI = directionalLightGUI.addFolder( "Target" );
+        targetGUI.add( object.target.position, "x" ).onChange( this.fnRequestRender );
+        targetGUI.add( object.target.position, "y" ).onChange( this.fnRequestRender );
+        targetGUI.add( object.target.position, "z" ).onChange( this.fnRequestRender );
+    }
+    else
+    if( object instanceof THREE.HemisphereLight )
+    {
+        var hemisphereLightGUI = lightGUI.addFolder( "Hemisphere Light" );
+        hemisphereLightGUI.addColor( object, "groundColor" ).onChange( this.fnColorChange );                
+    }
+    else
+    if( object instanceof THREE.PointLight )
+    {
+        var pointLightGUI = lightGUI.addFolder( "Point Light" );
+        pointLightGUI.add( object, "power" ).onChange( this.fnRequestRender );
+        pointLightGUI.add( object, "distance" ).onChange( this.fnRequestRender );
+        pointLightGUI.add( object, "decay" ).onChange( this.fnRequestRender );
+    }
+    else          
+    if( object instanceof THREE.SpotLight )
+    {
+        var spotLightGUI = lightGUI.addFolder( "Spot Light" );
+        spotLightGUI.add( object, "power" ).onChange( this.fnRequestRender );
+        spotLightGUI.add( object, "distance" ).onChange( this.fnRequestRender );
+        spotLightGUI.add( object, "angle" ).onChange( this.fnRequestRender );
+        spotLightGUI.add( object, "penumbra" ).onChange( this.fnRequestRender );
+        spotLightGUI.add( object, "decay" ).onChange( this.fnRequestRender );
+    }
+    else
+    if( object instanceof THREE.RectAreaLight )
+    {
+        var rectAreaLightGUI = lightGUI.addFolder( "RectArea Light" );
+        rectAreaLightGUI.add( object, "width" ).onChange( this.fnRequestRender );
+        rectAreaLightGUI.add( object, "height" ).onChange( this.fnRequestRender );
+    }
+    else
+    {
+        console.log("unknown light type for: " + object );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.setObjectProperties = function( id, object )
+{
+    var width = parseInt( this.element.style.width, 10 ) - 1;
+    gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width, resizeCallback: this.onPropertiesPanelResize.bind(this) } );
+    this.element.appendChild( gui.domElement );
+    this.gui = gui;
+
+    var _this = this;
+
+    gui.add( object, "name" ).onChange( function( newValue ) 
+                                        { 
+                                            _this.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", 
+                                                                                 { id: id, property: "name", value: newValue } );
+                                        } );
+
+    var controllerType = gui.add( object, "type" );
+    controllerType.__input.readOnly = true;
+
+    if( object instanceof THREE.Scene )
+    {
+    }
+    else
+    if( object instanceof THREE.Object3D )
+    {
+        if( object.visible !== undefined ) gui.add( object, "visible" ).onChange( this.fnRequestRender );
+        if( object.castShadow !== undefined ) gui.add( object, "castShadow" ).onChange( this.fnRequestRender );
+        if( object.receiveShadow !== undefined ) gui.add( object, "receiveShadow" ).onChange( this.fnRequestRender );
+
+        
+        var fnTransformChange = function() 
+                                { 
+                                    _this.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", { id: id, property: "transform", value: undefined } );
+                                    _this.requestRender();
+                                }
+        var transformGUI = gui.addFolder( "Transform" );                                
+
+        var positionGUI = transformGUI.addFolder( "Position" );
+        positionGUI.add( object.position, "x" ).onChange( fnTransformChange );
+        positionGUI.add( object.position, "y" ).onChange( fnTransformChange );
+        positionGUI.add( object.position, "z" ).onChange( fnTransformChange );
+
+        var rotationGUI = transformGUI.addFolder( "Rotation" );
+        rotationGUI.add( object.rotation, "x" ).step( 0.001 ).onChange( fnTransformChange );
+        rotationGUI.add( object.rotation, "y" ).step( 0.001 ).onChange( fnTransformChange );
+        rotationGUI.add( object.rotation, "z" ).step( 0.001 ).onChange( fnTransformChange );
+
+        var scaleGUI = transformGUI.addFolder( "Scale" );
+        scaleGUI.add( object.scale, "x" ).min( Epsilon ).onChange( fnTransformChange );
+        scaleGUI.add( object.scale, "y" ).min( Epsilon ).onChange( fnTransformChange );
+        scaleGUI.add( object.scale, "z" ).min( Epsilon ).onChange( fnTransformChange );
+
+        if( object instanceof THREE.Mesh )
+        {
+            this.createMaterialsGUI( gui, object.material );
+
+            var geometry = object.geometry;
+            var geometryId = this.eventDispatcher.runCommand( "getEditorIdFromGeometry", geometry );
+
+            var geometryGUI = gui.addFolder( "Geometry" );
+            this.createGeometryGUI( geometryGUI, geometryId, geometry );
+        }
+        else
+        if( object instanceof THREE.Light )
+        {
+            this.createLightGUI( gui, object );
+        }
+    }
+    else
+    {
+        console.log( "Cannot set properties for object wit id=" + id );
+    }
+
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.setMaterialProperties = function( id, material )
+{
+    var width = parseInt( this.element.style.width, 10 ) - 1;
+    gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width, resizeCallback: this.onPropertiesPanelResize.bind(this) } );
+    this.element.appendChild( gui.domElement );
+    this.gui = gui;
+
+    this.createMaterialGUI( gui, id, material );
+
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.setGeometryProperties = function( id, geometry )
+{
+    var width = parseInt( this.element.style.width, 10 ) - 1;
+    gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width, resizeCallback: this.onPropertiesPanelResize.bind(this) } );
+    this.element.appendChild( gui.domElement );
+    this.gui = gui;
+
+    this.createGeometryGUI( gui, id, geometry );
+
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+PropertyView.prototype.requestRender = function()
+{
+    this.eventDispatcher.runCommand( "render" ); 
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Material defines
+//////////////////////////////////////////////////////////////////////////////
+
+//TODO: Discard this?
 
 //////////////////////////////////////////////////////////////////////////////
 PropertyView.prototype.addMaterialDefine = function( gui, material, key, callback )
@@ -476,437 +1173,4 @@ PropertyView.prototype.createMaterialDefinesGUI = function( gui, material, callb
             }
         }
     }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.createMaterialGUI = function( gui, material )
-{
-    if( material !== undefined )
-    {
-        var renderFunction = this.fnRequestRender;
-        var requestMateriaUpdate = function()
-        {
-            material.needsUpdate = true;
-            renderFunction();
-        }
-
-        var materialGUI = gui;
-        materialGUI.add( material, "name" );
-        
-        if( material instanceof THREE.LineBasicMaterial )
-        {
-            var lineBasicMaterialGUI = materialGUI.addFolder( "LineBasic Material" );
-        }
-        else
-        if( material instanceof THREE.LineDashedMaterial )
-        {
-            var lineDashedMaterialGUI = materialGUI.addFolder( "LineDashed Material" );
-        }
-        else
-        if( material instanceof THREE.MeshBasicMaterial )
-        {
-            var basicMaterialGUI = materialGUI.addFolder( "MeshBasic Material" );
-        }
-        else
-        if( material instanceof THREE.MeshDepthMaterial )
-        {
-            var depthMaterialGUI = materialGUI.addFolder( "MeshDepth Material" );
-        }
-        else
-        if( material instanceof THREE.MeshLambertMaterial )
-        {
-            var lambertMaterialGUI = materialGUI.addFolder( "MeshLambert Material" );
-        }
-        else
-        if( material instanceof THREE.MeshNormalMaterial )
-        {
-            var normalMaterialGUI = materialGUI.addFolder( "MeshNormal Material" );
-        }
-        else
-        if( material instanceof THREE.MeshPhongMaterial )
-        {
-            var phongMaterialGUI = materialGUI.addFolder( "MeshPhong Material" );
-            
-            phongMaterialGUI.addColor( material, "color" ).onChange( requestMateriaUpdate );
-            
-            phongMaterialGUI.addColor( material, "specular" ).onChange( requestMateriaUpdate );
-            phongMaterialGUI.add( material, "shininess" ).onChange( requestMateriaUpdate );
-
-            var mapGUI = phongMaterialGUI.addFolder( "map" );
-            this.createMapGUI( mapGUI, material.map, requestMateriaUpdate );
-
-            var lightMapGUI = phongMaterialGUI.addFolder( "lightMap" );
-            lightMapGUI.add( material, "lightMapIntensity" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( lightMapGUI, material.lightMap, requestMateriaUpdate );
-
-            var aoMapGUI = phongMaterialGUI.addFolder( "aoMap" );
-            aoMapGUI.add( material, "lightMapIntensity" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( aoMapGUI, material.lightMap, requestMateriaUpdate );
-        
-            var emmisiveMapGUI = phongMaterialGUI.addFolder( "emmissiveMap" );
-            emmisiveMapGUI.addColor( material, "emissive" ).onChange( requestMateriaUpdate );
-            emmisiveMapGUI.add( material, "emissiveIntensity" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( emmisiveMapGUI, material.emissiveMap, requestMateriaUpdate );
-
-            var bumpMapGUI = phongMaterialGUI.addFolder( "bumpMap" );
-            bumpMapGUI.add( material, "bumpScale" ).onChange( requestMateriaUpdate );;
-            this.createMapGUI( bumpMapGUI, material.bumpMap, requestMateriaUpdate );
-
-            var normalMapGUI = phongMaterialGUI.addFolder( "normalMap" );
-            var normalMapScaleGUI = normalMapGUI.addFolder( "scale" );
-            normalMapScaleGUI.add( material.normalScale, "x" ).onChange( requestMateriaUpdate );
-            normalMapScaleGUI.add( material.normalScale, "y" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( normalMapGUI, material.normalMap, requestMateriaUpdate );
-
-            var displacementMapGUI = phongMaterialGUI.addFolder( "displacementMap" );
-            displacementMapGUI.add( material, "displacementScale" ).onChange( requestMateriaUpdate );
-            displacementMapGUI.add( material, "displacementBias" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( displacementMapGUI, material.displacementMap, requestMateriaUpdate );
-
-            var specularMapGUI = phongMaterialGUI.addFolder( "specularMap" );
-            this.createMapGUI( specularMapGUI, material.specularMap, requestMateriaUpdate );
-
-            var alphaMapGUI = phongMaterialGUI.addFolder( "alphaMap" )
-            this.createMapGUI( alphaMapGUI, material.alphaMap, requestMateriaUpdate );
-
-            var envMapGUI = phongMaterialGUI.addFolder( "envMap" )
-            this.createMapGUI( envMapGUI, material.envMap, requestMateriaUpdate );
-
-            phongMaterialGUI.add( material, "combine", { MultiplyOperation: 0, MixOperation: 1, AddOperation: 2 } ).onChange( requestMateriaUpdate );
-
-            phongMaterialGUI.add( material, "reflectivity" ).onChange( requestMateriaUpdate );
-            phongMaterialGUI.add( material, "refractionRatio" ).onChange( requestMateriaUpdate );
-
-            phongMaterialGUI.add( material, "wireframe" ).onChange( requestMateriaUpdate );
-            phongMaterialGUI.add( material, "wireframeLinewidth" ).onChange( requestMateriaUpdate );
-            phongMaterialGUI.add( material, "wireframeLinecap" ).onChange( requestMateriaUpdate );
-            phongMaterialGUI.add( material, "wireframeLinejoin" ).onChange( requestMateriaUpdate );
-            
-            phongMaterialGUI.add( material, "skinning" ).onChange( requestMateriaUpdate );
-            phongMaterialGUI.add( material, "morphTargets" ).onChange( requestMateriaUpdate );
-            phongMaterialGUI.add( material, "morphNormals" ).onChange( requestMateriaUpdate );
-        }
-        else
-        if( material instanceof THREE.MeshStandardMaterial )
-        {
-            if( material instanceof THREE.MeshPhysicalMaterial )
-            {
-                var physicallMaterialGUI = materialGUI.addFolder( "Physical Material" );
-                physicallMaterialGUI.add( material, "clearCoat" ).min( 0 ).max( 1 ).onChange( requestMateriaUpdate );
-                physicallMaterialGUI.add( material, "clearCoatRoughness" ).min( 0 ).max( 1 ).onChange( requestMateriaUpdate );
-                physicallMaterialGUI.add( material, "reflectivity" ).min( 0 ).max( 1 ).onChange( requestMateriaUpdate );
-            }
-
-            var standardMaterialGUI = materialGUI.addFolder( "Standard Material" );
-
-            var diffuseMapGUI = standardMaterialGUI.addFolder( "diffuse" );
-            this.createTextureGUI( diffuseMapGUI, material, "map", requestMateriaUpdate );
-            diffuseMapGUI.addColor( material, "color" ).onChange( requestMateriaUpdate );
-
-            var alphaMapGUI = standardMaterialGUI.addFolder( "alphaMap" );
-            this.createMapGUI( alphaMapGUI, material.alphaMap, requestMateriaUpdate );
-
-            var aoMapGUI = standardMaterialGUI.addFolder( "aoMap" );
-            aoMapGUI.add( material, "aoMapIntensity" ).min( 0 ).onChange( requestMateriaUpdate );
-            this.createMapGUI( aoMapGUI, material.aoMap, requestMateriaUpdate );
-
-            var bumpMapGUI = standardMaterialGUI.addFolder( "bumpMap" );
-            bumpMapGUI.add( material, "bumpScale" ).min( 0 ).max( 1 ).onChange( requestMateriaUpdate );
-            this.createMapGUI( bumpMapGUI, material.bumpMap, requestMateriaUpdate );
-            
-            var displacementMapGUI = standardMaterialGUI.addFolder( "displacementMap" );
-            displacementMapGUI.add( material, "displacementScale" ).onChange( requestMateriaUpdate ); 
-            displacementMapGUI.add( material, "displacementBias" ).onChange( requestMateriaUpdate ); 
-            this.createMapGUI( displacementMapGUI, material.displacementMap, requestMateriaUpdate );
-
-            var emissiveGUI = standardMaterialGUI.addFolder( "emissive" );
-            emissiveGUI.addColor( material, "emissive" ).onChange( requestMateriaUpdate ); 
-            emissiveGUI.add( material, "emissiveIntensity" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( emissiveGUI, material.emissiveMap, requestMateriaUpdate );
-
-            var envMapGUI = standardMaterialGUI.addFolder( "envMap" );
-            envMapGUI.add( material, "envMapIntensity" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( envMapGUI, material.envMap, requestMateriaUpdate );
-
-            var lightMapGUI = standardMaterialGUI.addFolder( "lightMap" );
-            lightMapGUI.add( material, "lightMapIntensity" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( lightMapGUI, material.lightMap, requestMateriaUpdate );
-          
-            var metalnessMapGUI = standardMaterialGUI.addFolder( "metalnessMap" );
-            metalnessMapGUI.add( material, "metalness" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( metalnessMapGUI, material.metalnessMap, requestMateriaUpdate );
-            
-            var roughnessMapGUI = standardMaterialGUI.addFolder( "roughnessMap" );
-            roughnessMapGUI.add( material, "roughness" ).onChange( requestMateriaUpdate );
-            this.createMapGUI( roughnessMapGUI, material.roughnessMap, requestMateriaUpdate );
-
-            var normalMapGUI = standardMaterialGUI.addFolder( "normalMap" );
-            this.createTextureGUI( normalMapGUI, material, "normalMap", requestMateriaUpdate );
-            var normalScaleGUI = normalMapGUI.addFolder( "normalScale" );
-            normalScaleGUI.add( material.normalScale, "x" ).onChange( requestMateriaUpdate );
-            normalScaleGUI.add( material.normalScale, "y" ).onChange( requestMateriaUpdate );
-
-            standardMaterialGUI.add( material, "refractionRatio" ).max( 1 ).onChange( requestMateriaUpdate );
-
-            var wireframeGUI = standardMaterialGUI.addFolder( "wireframe" );
-            wireframeGUI.add( material, "wireframe" ).onChange( requestMateriaUpdate );
-            wireframeGUI.add( material, "wireframeLinecap", ["butt", "round", "square"] ).onChange( requestMateriaUpdate );
-            wireframeGUI.add( material, "wireframeLinejoin", ["round", "bevel", "miter"] ).onChange( requestMateriaUpdate );
-            wireframeGUI.add( material, "wireframeLinewidth" ).onChange( requestMateriaUpdate );
-
-            standardMaterialGUI.add( material, "skinning" ).onChange( requestMateriaUpdate );
-
-            standardMaterialGUI.add( material, "morphNormals" ).onChange( requestMateriaUpdate );
-            standardMaterialGUI.add( material, "morphTargets" ).onChange( requestMateriaUpdate );
-        }
-        else
-        if( material instanceof THREE.MeshToonMaterial )
-        {
-            var toonMaterialGUI = materialGUI.addFolder( "MeshToon Material" );
-        }
-        else
-        if( material instanceof THREE.PointsMaterial )
-        {
-            var pointsMaterialGUI = materialGUI.addFolder( "Points Material" );
-        }
-        else
-        if( material instanceof THREE.RawShaderMaterial )
-        {
-            var rawShaderMaterialGUI = materialGUI.addFolder( "RawShader Material" );
-        }
-        else
-        if( material instanceof THREE.ShaderMaterial )
-        {
-            var shaderMaterialGUI = materialGUI.addFolder( "Shader Material" );
-        }
-        else
-        if( material instanceof THREE.ShadowMaterial )
-        {
-            var shadowMaterialGUI = materialGUI.addFolder( "Shadow Material" );
-        }
-        else
-        if( material instanceof THREE.SpriteMaterial )
-        {
-            var spriteMaterialGUI = materialGUI.addFolder( "Sprite Material" );            
-        }
-        else
-        {
-            console.log("unknown material type for: " + material );
-        }
-
-        //////////////////////////////////////////////////////////////////////////////
-        //Base Material
-        materialGUI.add( material, "fog" ).onChange( requestMateriaUpdate );
-        materialGUI.add( material, "lights" ).onChange( requestMateriaUpdate );
-
-        materialGUI.add( material, "blending",  { 
-                                                    NoBlending: THREE.NoBlending, 
-                                                    NormalBlending: THREE.NormalBlending, 
-                                                    AdditiveBlending: THREE.AdditiveBlending,
-                                                    SubtractiveBlending: THREE.SubtractiveBlending,
-                                                    MultiplyBlending: THREE.MultiplyBlending,
-                                                    CustomBlending: THREE.CustomBlending 
-                                                } ).onChange( requestMateriaUpdate );
-        
-        materialGUI.add( material, "side", { FrontSide: THREE.FrontSide, BackSide: THREE.BackSide, DoubleSide: THREE.DoubleSide } ).onChange( requestMateriaUpdate );
-        materialGUI.add( material, "flatShading" ).onChange( requestMateriaUpdate );
-        materialGUI.add( material, "vertexColors", { NoColors: THREE.NoColors, VertexColors: THREE.VertexColors, FaceColors: THREE.FaceColors } ).onChange( requestMateriaUpdate );
-
-        materialGUI.add( material, "opacity" ).min( 0.0 ).max( 1.0 ).onChange( requestMateriaUpdate );
-        materialGUI.add( material, "transparent" ).onChange( requestMateriaUpdate );
-
-        //////////////////////////////////////////////////////////////////////////////
-        this.createMaterialDefinesGUI( materialGUI, material, requestMateriaUpdate );
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.createMaterialsGUI = function( gui, materials )
-{
-    if( materials instanceof Array )
-    {
-        var materialsGUI = gui.addFolder( "Materials" );
-
-        var length = materials.length
-        for( var i = 0; i < length; ++i ) 
-        {
-            var materialGUI = materialsGUI.addFolder( "Material" + ( i + 1 ) );
-            this.createMaterialGUI( materialGUI, materials[i] );
-        }
-    }
-    else
-    if( materials instanceof THREE.Material )
-    {
-        var materialGUI = gui.addFolder( "Material" );
-
-        this.createMaterialGUI( materialGUI, materials );
-    }
-    else
-    {
-        gui.addFolder( "Materials" );
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.createGeometryGUI = function( gui, geometry, createChildGUI )
-{
-    if( geometry !== undefined )
-    {
-        var geometryGUI = ( createChildGUI === false ) ? gui : gui.addFolder( "Geometry" );
-        geometryGUI.add( geometry, "name" );
-
-        if( geometry instanceof THREE.Mesh )
-        {
-        }
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.createLightGUI = function( gui, object )
-{
-    var lightGUI = gui.addFolder( "Light" );
-    lightGUI.addColor( object, "color" ).onChange( this.fnColorChange );
-    lightGUI.add( object, "intensity" ).onChange( this.fnRequestRender );
-
-    if( object instanceof THREE.AmbientLight )
-    {
-        //No specific parameters
-    }
-    else
-    if( object instanceof THREE.DirectionalLight )
-    {
-        var directionalLightGUI = lightGUI.addFolder( "Directional Light" );
-        var targetGUI = directionalLightGUI.addFolder( "Target" );
-        targetGUI.add( object.target.position, "x" ).onChange( this.fnRequestRender );
-        targetGUI.add( object.target.position, "y" ).onChange( this.fnRequestRender );
-        targetGUI.add( object.target.position, "z" ).onChange( this.fnRequestRender );
-    }
-    else
-    if( object instanceof THREE.HemisphereLight )
-    {
-        var hemisphereLightGUI = lightGUI.addFolder( "Hemisphere Light" );
-        hemisphereLightGUI.addColor( object, "groundColor" ).onChange( this.fnColorChange );                
-    }
-    else
-    if( object instanceof THREE.PointLight )
-    {
-        var pointLightGUI = lightGUI.addFolder( "Point Light" );
-        pointLightGUI.add( object, "power" ).onChange( this.fnRequestRender );
-        pointLightGUI.add( object, "distance" ).onChange( this.fnRequestRender );
-        pointLightGUI.add( object, "decay" ).onChange( this.fnRequestRender );
-    }
-    else          
-    if( object instanceof THREE.SpotLight )
-    {
-        var spotLightGUI = lightGUI.addFolder( "Spot Light" );
-        spotLightGUI.add( object, "power" ).onChange( this.fnRequestRender );
-        spotLightGUI.add( object, "distance" ).onChange( this.fnRequestRender );
-        spotLightGUI.add( object, "angle" ).onChange( this.fnRequestRender );
-        spotLightGUI.add( object, "penumbra" ).onChange( this.fnRequestRender );
-        spotLightGUI.add( object, "decay" ).onChange( this.fnRequestRender );
-    }
-    else
-    if( object instanceof THREE.RectAreaLight )
-    {
-        var rectAreaLightGUI = lightGUI.addFolder( "RectArea Light" );
-        rectAreaLightGUI.add( object, "width" ).onChange( this.fnRequestRender );
-        rectAreaLightGUI.add( object, "height" ).onChange( this.fnRequestRender );
-    }
-    else
-    {
-        console.log("unknown light type for: " + object );
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.setObjectProperties = function( object )
-{
-    var width = parseInt( this.element.style.width, 10 ) - 1;
-    gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width, resizeCallback: this.onPropertiesPanelResize.bind(this) } );
-    this.element.appendChild( gui.domElement );
-    this.gui = gui;
-
-    gui.add( object, "name" );
-    var controllerType = gui.add( object, "type" );
-    controllerType.__input.readOnly = true;
-
-    if( object instanceof THREE.Scene )
-    {
-    }
-    else
-    {
-        if( object.visible !== undefined ) gui.add( object, "visible" ).onChange( this.fnRequestRender );
-        if( object.castShadow !== undefined ) gui.add( object, "castShadow" ).onChange( this.fnRequestRender );
-        if( object.receiveShadow !== undefined ) gui.add( object, "receiveShadow" ).onChange( this.fnRequestRender );
-
-        if( object.position !== undefined )
-        {
-            var positionGUI = gui.addFolder( "Position" );
-            positionGUI.add( object.position, "x" ).onChange( this.fnRequestRender );
-            positionGUI.add( object.position, "y" ).onChange( this.fnRequestRender );
-            positionGUI.add( object.position, "z" ).onChange( this.fnRequestRender );
-        }
-
-        if( object.rotation !== undefined  )
-        {
-            var rotationGUI = gui.addFolder( "Rotation" );
-            rotationGUI.add( object.rotation, "x" ).step( 0.010 ).onChange( this.fnRequestRender );
-            rotationGUI.add( object.rotation, "y" ).step( 0.010 ).onChange( this.fnRequestRender );
-            rotationGUI.add( object.rotation, "z" ).step( 0.010 ).onChange( this.fnRequestRender );
-        }
-
-        if( object.scale !== undefined  )
-        {
-            var scaleGUI = gui.addFolder( "Scale" );
-            scaleGUI.add( object.scale, "x" ).min( Epsilon ).onChange( this.fnRequestRender );
-            scaleGUI.add( object.scale, "y" ).min( Epsilon ).onChange( this.fnRequestRender );
-            scaleGUI.add( object.scale, "z" ).min( Epsilon ).onChange( this.fnRequestRender );
-        }
-
-        if( object instanceof THREE.Mesh )
-        {
-            this.createMaterialsGUI( gui, object.material );
-            this.createGeometryGUI( gui, object.geometry );
-        }
-        else
-        if( object instanceof THREE.Light )
-        {
-            this.createLightGUI( gui, object );
-        }
-    }
-
-    return true;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.setMaterialProperties = function( material )
-{
-    var width = parseInt( this.element.style.width, 10 ) - 1;
-    gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width, resizeCallback: this.onPropertiesPanelResize.bind(this) } );
-    this.element.appendChild( gui.domElement );
-    this.gui = gui;
-
-    this.createMaterialGUI( gui, material );
-
-    return true;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.setGeometryProperties = function( geometry )
-{
-    var width = parseInt( this.element.style.width, 10 ) - 1;
-    gui = new dat.GUI( { closeOnTop: false, autoPlace: false, hideable: false, width: width, resizeCallback: this.onPropertiesPanelResize.bind(this) } );
-    this.element.appendChild( gui.domElement );
-    this.gui = gui;
-
-    this.createGeometryGUI( gui, geometry, false );
-
-    return true;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-PropertyView.prototype.requestRender = function()
-{
-    this.eventDispatcher.runCommand( "render" ); 
 }

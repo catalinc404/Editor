@@ -39,6 +39,8 @@ function ViewWebGL( eventDispatcher, element, configuration )
     this.fnRequestRender = this.requestRender.bind( this );
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.eventDispatcher.addEventListener( "onSceneObjectAdded",            this.onSceneObjectAdded.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectRemoved",          this.onSceneObjectRemoved.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectSelected",         this.onSceneObjectSelected.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectDeselected",       this.onSceneObjectDeselected.bind( this ) );
     this.eventDispatcher.addEventListener( "onObjectTransformModeChanged",  this.onObjectTransformModeChanged.bind( this ) );
@@ -95,9 +97,7 @@ ViewWebGL.prototype.init = function( editor )
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.autoClear = false;
     this.renderer.setClearColor( this.clearColor );
-
     this.renderer.physicallyCorrectLights = true;
-    this.renderer.gammaInput = true;
     this.renderer.gammaOutput = true;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
@@ -187,7 +187,7 @@ ViewWebGL.prototype.resize = function( width, height )
     }
     else
     {
-        console.log( "ViewWebGL.prototype.resize: invalid camera type!" );
+        //console.log( "ViewWebGL.prototype.resize: invalid camera type!" );
     }
 
     this.camera.updateProjectionMatrix();
@@ -476,9 +476,21 @@ ViewWebGL.prototype.onMouseLeave = function( event )
 },
 
 //////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.onSceneObjectAdded = function( objectData )
+{
+    this.requestRender();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+ViewWebGL.prototype.onSceneObjectRemoved = function( objectId )
+{
+    this.requestRender();
+}
+
+//////////////////////////////////////////////////////////////////////////////
 ViewWebGL.prototype.onSceneObjectSelected = function( objectId )
 {
-    console.log( "ViewWebGL2.prototype.onMouseLeave, viewId = " + this.viewId + ", objectId: " + objectId );
+    //console.log( "ViewWebGL2.prototype.onMouseLeave, viewId = " + this.viewId + ", objectId: " + objectId );
 
     if( objectId != null )
     {
@@ -501,7 +513,7 @@ ViewWebGL.prototype.onSceneObjectSelected = function( objectId )
 //////////////////////////////////////////////////////////////////////////////
 ViewWebGL.prototype.onSceneObjectDeselected = function( object )
 {
-    console.log( "ViewWebGL2.prototype.onSceneObjectDeselected, viewId = " + this.viewId + ", object: " + object );
+    //console.log( "ViewWebGL2.prototype.onSceneObjectDeselected, viewId = " + this.viewId + ", object: " + object );
 
     this.transformControls.detach();
     this.transformControlsData.object = null;

@@ -1,13 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function createInitialScene( editor )
 {
-    createDefaultScene( editor );
+    //createDefaultScene( editor );
     //createDemoScene( editor );
     //createPBRTScene( editor );
     //createPBRTScene2( editor );
     //createUnrealArchDemoScene( editor );
     //createCornellBoxScene( editor );
     //createCornellBoxScene2( editor );
+    //createMaterialNodeScene( editor );
+    createMaterialNodeScene2( editor );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,15 +27,15 @@ function createDefaultScene( editor )
     light.castShadow = true;
     light.shadow.mapSize.width = 1024;
     light.shadow.mapSize.heigth = 1024;
-    light.shadow.radius = 1.5;
-    light.position.set( 0, 5, 0 );
+    light.shadow.radius = 15;
 
     var lightGeometry = new THREE.SphereGeometry( 0 );
     var lightMesh = new THREE.Mesh( lightGeometry, lightMaterial );
     lightMesh.name = "light geometry";
-    light.add( lightMesh );
+    lightMesh.add( light );
+    lightMesh.position.set( 0, 5, 0 );
     light.name = "light";
-    editor.sceneObjectAdd( light );
+    editor.sceneObjectAdd( lightMesh );
 
     var hemisphereLight = new THREE.HemisphereLight( 0x303F9F, 0x000000, 1 );
     hemisphereLight.name = "hemisphereLight";
@@ -288,8 +290,7 @@ function createPBRTScene2( editor )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function createUnrealArchDemoScene( editor )
 {
-    editor.loadOBJ( "../Data/Room/Room.obj", undefined, function( object ) { object.scale.x = 0.01; object.scale.y = 0.01; object.scale.z = 0.01; } );
-    editor.loadOBJ( "../Data/Room/Room.obj" );
+    editor.loadOBJ( "../Data/Room/Room.obj", "../Data/Room/Room.obj", editor.postLoadOBJ.bind( editor ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -453,7 +454,7 @@ function createCornellBoxScene2( editor )
     editor.sceneObjectAdd( sphere2 );
               
 
-    editor.loadOBJ( "../Data/CornellBox/CornellBox-Original.obj", "CornellBox", function( object )
+    var cornellBox = editor.loadOBJ( "../Data/CornellBox/CornellBox-Original.obj", "CornellBox", function( object )
     {
         for( var i = 0, count = object.children.length; i < count; ++i )
         {
@@ -482,6 +483,7 @@ function createCornellBoxScene2( editor )
         }
     } );
 
+    editor.sceneObjectAdd( cornellBox );
     
     var lightMaterial = new THREE.MeshStandardMaterial(
     {
@@ -513,4 +515,328 @@ function createCornellBoxScene2( editor )
 
     editor.render();
 
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function createMaterialNodeScene( editor )
+{
+    /*
+    var ambientLight = new THREE.AmbientLight( 0xffffff, 1 );
+    ambientLight.name = "ambientLight";
+    editor.sceneObjectAdd( ambientLight );
+    */
+
+    /*
+    var hemisphereLight = new THREE.HemisphereLight( 0x303F9F, 0x000000, 1 );
+    hemisphereLight.name = "hemisphereLight";
+    hemisphereLight.position.set( 0, 8, 0 );
+    editor.sceneObjectAdd( hemisphereLight );
+    */
+
+    /*
+    var lightMaterial = new THREE.MeshStandardMaterial(
+        {
+            emissive: 0xffffee,
+            emissiveIntensity: 1,
+            color: 0x000000
+        });
+    */
+
+    var light1 = new THREE.PointLight( 0xffffff, 1, 20, 2 );
+    light1.power = 1700;
+    light1.castShadow = true;
+    light1.shadow.mapSize.width = 1024;
+    light1.shadow.mapSize.heigth = 1024;
+    light1.shadow.radius = 15;
+    light1.name = "light1";
+    light1.position.set( 0, 5, 0 );
+
+    editor.sceneObjectAdd( light1 );
+
+    /*
+    var lightGeometry = new THREE.SphereGeometry( 0 );
+
+    var lightMesh1 = new THREE.Mesh( lightGeometry, lightMaterial );
+    lightMesh1.name = "light geometry1";
+    lightMesh1.add( light1 );
+    lightMesh1.position.set( 0, 5, 0 );
+
+    editor.sceneObjectAdd( lightMesh1 );
+    */
+
+    /*
+    var light2 = new THREE.PointLight( 0xffffff, 1, 20, 2 );
+    light2.power = 1700;
+    light2.castShadow = true;
+    light2.shadow.mapSize.width = 1024;
+    light2.shadow.mapSize.heigth = 1024;
+    light2.shadow.radius = 15;
+    light2.name = "light2";
+    light2.position.set( 0, 6, 0 );
+    editor.sceneObjectAdd( light2 );
+    */
+
+    /*
+    var lightMesh2 = new THREE.Mesh( lightGeometry, lightMaterial );
+    lightMesh2.name = "light geometry1";
+    lightMesh2.add( light2 );
+    lightMesh2.position.set( 10, 5, 0 );
+
+    editor.sceneObjectAdd( lightMesh2 );
+    */
+
+    var textureDiffuse     = editor.loadTexture( "textures/AI39_003_wood_floor_diff_1k.png" );
+    var textureNormal      = editor.loadTexture( "textures/AIUE_V02_001_bathroom_floor_normal_original.png" );
+    var textureRoughness   = editor.loadTexture( "textures/dirt_019_1k.png" );
+
+    var mtl = new THREE.MeshStandardNodeMaterial();
+
+    mtl.map = textureDiffuse;
+    mtl.color = new THREE.ColorNode( 0xFFFFFF );
+
+    /*
+    mtl.map = new THREE.ColorAdjustmentNode(
+        new THREE.TextureNode( textureDiffuse ),
+        new THREE.FloatNode( 0.2 ),
+        THREE.ColorAdjustmentNode.SATURATION
+    );
+    */
+       
+    mtl.normalMap = textureNormal;
+    mtl.normalScale = new THREE.Vector2( 1.0, 1.0 );
+
+    mtl.roughness = .5;
+    mtl.roughnessMap = new THREE.TextureNode( textureRoughness );
+
+    mtl.metalness = .5;
+
+    /*
+    var roughnessMetallicTextureNode = new THREE.TextureNode( textureRoughness );
+    roughnessMetallicTextureNode.uv = new THREE.UVTransformNode();
+    roughnessMetallicTextureNode.uv.setUvTransform( textureRoughness.offset.x, textureRoughness.offset.y, textureRoughness.repeat.x, textureRoughness.repeat.y, textureRoughness.rotation, textureRoughness.center.x, textureRoughness.center.y );
+    roughnessMetallicTextureNode.name = "roughnessMetallicTextureNode"; 
+    
+    var roughnessTextureComponentNode = new THREE.SwitchNode( roughnessMetallicTextureNode, 'r' );
+    roughnessTextureComponentNode.name = "roughnessTextureComponentNode";
+
+    var roughnessTextureInvertedNode = new THREE.Math1Node( roughnessTextureComponentNode, THREE.Math1Node.INVERT );
+    roughnessTextureInvertedNode.name = "roughnessTextureInvertedNode";
+
+    var roughnessTextureInvertedSelectorNode = new THREE.FloatNode( 0.99 );
+    roughnessTextureInvertedSelectorNode.name = "roughnessTextureInvertedSelectorNode";
+
+    var roughnessTextureStage1Node = new THREE.Math3Node( roughnessTextureComponentNode, roughnessTextureInvertedNode, roughnessTextureInvertedSelectorNode, THREE.Math3Node.MIX );
+    roughnessTextureStage1Node.name = "roughnessTextureStage1Node";
+    var roughnessTextureContrastNode = new THREE.FloatNode( 1.0 );
+    roughnessTextureContrastNode.name = "roughnessTextureContrastNode";
+
+    var roughnessTextureStage2Node = new THREE.Math2Node( roughnessTextureStage1Node, roughnessTextureContrastNode, THREE.Math2Node.POW );
+    roughnessTextureStage2Node.name = "roughnessTextureStage2Node";
+
+    var roughnessConstantNode = new THREE.FloatNode( 0.2 );
+    roughnessConstantNode.name = "roughnessConstantNode";
+
+    var roughnessConstantVsTextureNode = new THREE.FloatNode( 0.8 );
+    roughnessConstantVsTextureNode.name = "roughnessConstantVsTextureNode";
+
+    var roughnessNode = new THREE.Math3Node( roughnessConstantNode, roughnessTextureStage2Node, roughnessConstantVsTextureNode, THREE.Math3Node.MIX );
+
+    mtl.roughness = roughnessNode;
+
+    mtl.userData = mtl.userData || {};
+    mtl.userData[ "properties" ] = 
+    { 
+        pro
+        type: "folder",
+        name: "StandardNodeMaterial_UE",
+        properties:
+        [
+            {
+                type: "folder",
+                name: "diffuse",
+                properties:
+                [
+                    //TODO: UVTransform separate, dont use Texture 
+                    { type: "nodeTexture",  name: "diffuseTexture",              object: diffuseTextureNode,         field: "value" },
+                ]
+            },
+            {
+                type: "folder",
+                name: "roughness",
+                properties:
+                [
+                    //TODO: UVTransform separate, dont use Texture 
+                    { type: "nodeTexture",  name: "roughnessTexture",              object: roughnessMetallicTextureNode,         field: "value" },
+                    { type: "text",         name: "roughnessTextureChannels",      object: roughnessTextureComponentNode,        field: "components" },
+                    { type: "boolFloat",    name: "roughnessTextureInvert",        object: roughnessTextureInvertedSelectorNode, field: "value" },
+                    { type: "float",        name: "roughnessTextureContrast",      object: roughnessTextureContrastNode,         field: "value" },
+                    { type: "float",        name: "roughnessTextureConstantNode",  object: roughnessConstantNode,                field: "value" },
+                    { type: "float",        name: "roughnessTextureConstantBlend", object: roughnessConstantVsTextureNode,       field: "value" },
+                ]
+            },
+            {
+                type: "folder",
+                name: "normal",
+                properties:
+                [
+                    //TODO: UVTransform separate, dont use Texture 
+                    { type: "nodeTexture",  name: "normalTexture",              object: normalTextureNode,         field: "value" },
+                ]
+            },
+        ],
+    };
+    */    
+
+   var materialParameters = 
+   {
+       color: 0xFFFFFF,
+       roughness: 0.5,
+       metalness: 0.5,
+   }
+   var stdMaterial = new THREE.MeshStandardMaterial( materialParameters );
+
+   stdMaterial.map = textureDiffuse;
+   stdMaterial.roughnessMap = textureRoughness;
+   stdMaterial.normalMap = textureNormal;
+
+   stdMaterial.needsUpdate = true;
+
+    var mesh = editor.loadOBJ( "textures/arch_floor_04_UV1.OBJ", "Test", function( obj ) 
+    { 
+        var child = obj.children[0];
+        obj.remove( child );
+
+        child.castShadow = true;
+        child.receiveShadow = true;
+
+        var childWithNodeMaterial = child;
+        var childWithStdMaterial = child.clone();
+
+        childWithNodeMaterial.name = "TestNodeMaterial"
+        childWithNodeMaterial.material = mtl;
+        childWithNodeMaterial.scale.set( 0.02, 0.02, 0.02 );
+        childWithNodeMaterial.position.set( 0.0, 0.0, 0.0 );
+
+        editor.sceneObjectAdd( childWithNodeMaterial );
+
+        childWithStdMaterial.name = "TestStandardMaterial"
+        childWithStdMaterial.material = stdMaterial;
+        childWithStdMaterial.scale.set( 0.02, 0.02, 0.02 );
+        childWithStdMaterial.position.set( 8.0, 0.0, 0.0 );
+
+        editor.sceneObjectAdd( childWithStdMaterial );
+    } );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function createMaterialNodeScene2( editor )
+{
+    var light1 = new THREE.PointLight( 0xffffff, 1, 20, 2 );
+    light1.power = 1700;
+    light1.castShadow = true;
+    light1.shadow.mapSize.width = 1024;
+    light1.shadow.mapSize.heigth = 1024;
+    light1.shadow.radius = 15;
+    light1.name = "light1";
+    light1.position.set( 0, 5, 0 );
+
+    editor.sceneObjectAdd( light1 );
+
+    var textureDiffuse     = editor.loadTexture( "textures/AI39_003_wood_floor_diff_1k.png" );
+    var textureNormal      = editor.loadTexture( "textures/AIUE_V02_001_bathroom_floor_normal_original.png" );
+    var textureRoughness   = editor.loadTexture( "textures/dirt_019_1k.png" );
+
+    var standardNodeMaterial = new THREE.StandardNodeMaterial();
+    
+    var diffuseTexture = new THREE.TextureNode( textureDiffuse ); diffuseTexture.name = "diffuseTexture";
+    var diffuseTextureContrast = new THREE.FloatNode( 1.0 ); diffuseTextureContrast.name = "diffuseTextureContrast";
+    var diffuse1 = new THREE.Math2Node( diffuseTexture, diffuseTextureContrast, THREE.Math2Node.POW );
+
+    var diffuseColor = new THREE.ColorNode( 0xffffff ); diffuseColor.name = "diffuseColor";
+    var diffuseTextureAmount = new THREE.FloatNode( 1.0 ); diffuseTextureAmount.name = "diffuseTextureAmount";
+    var diffuse2 = new THREE.Math3Node( diffuseColor, diffuse1, diffuseTextureAmount, THREE.Math3Node.MIX );
+
+    var diffuseColorOverlay = new THREE.ColorNode( 0xffffff ); diffuseColorOverlay.name = "diffuseColorOverlay";
+    var diffuse3 = new THREE.OperatorNode( diffuse2, diffuseColorOverlay, THREE.OperatorNode.MUL );
+
+    var diffuseMultiplier = new THREE.FloatNode( 1.0 ); diffuseMultiplier.name = "diffuseMultiplier";
+    var diffuse4 = new THREE.OperatorNode( diffuse3, diffuseMultiplier, THREE.OperatorNode.MUL );
+    
+    standardNodeMaterial.color = diffuse4;
+
+    var roughnessTexture = new THREE.TextureNode( textureRoughness ); roughnessTexture.name = "roughnessTexture";
+    var roughnessMultiplier = new THREE.FloatNode( 0.5 ); roughnessMultiplier.name = "roughnessMultiplier";
+    var roughness1 = new THREE.OperatorNode( roughnessTexture, roughnessMultiplier, THREE.OperatorNode.MUL );
+    
+    standardNodeMaterial.roughness = roughness1;
+    
+    standardNodeMaterial.normal = new THREE.NormalMapNode( new THREE.TextureNode( textureNormal ) );
+ 
+    standardNodeMaterial.build();
+
+    standardNodeMaterial.userData = standardNodeMaterial.userData || {};
+    standardNodeMaterial.userData[ "properties" ] = 
+    { 
+        type: "folder",
+        name: "StandardNodeMaterial_UE1",
+        properties:
+        [
+            {
+                type: "folder",
+                name: "diffuse",
+                properties:
+                [
+                    { type: "nodeTexture",   name: "diffuseTexture",            object: diffuseTexture,             field: "value" },
+                    { type: "float",         name: "diffuseTextureContrast",    object: diffuseTextureContrast,     field: "value" },
+                    
+                    { type: "color",         name: "diffuseColor",              object: diffuseColor,               field: "value" },
+                    { type: "float",         name: "diffuseTextureAmount",      object: diffuseTextureAmount,       field: "value" },
+
+                    { type: "color",         name: "diffuseColorOverlay",       object: diffuseColorOverlay,        field: "value" },
+                    
+                    { type: "float",         name: "diffuseMultiplier",         object: diffuseMultiplier,          field: "value" },
+                ]
+            },
+        ]
+    }
+
+   var standardMaterialParameters = 
+   {
+       color: 0xFFFFFF,
+       roughness: 0.5,
+       metalness: 0.5,
+   }
+   var stdandardMaterial = new THREE.MeshStandardMaterial( standardMaterialParameters );
+
+   stdandardMaterial.color.setRGB( 1, 1, 1 );
+   stdandardMaterial.map = textureDiffuse;
+   stdandardMaterial.roughnessMap = textureRoughness;
+   stdandardMaterial.normalMap = textureNormal;
+
+   stdandardMaterial.needsUpdate = true;
+
+    var mesh = editor.loadOBJ( "textures/arch_floor_04_UV1.OBJ", "Test", function( obj ) 
+    { 
+        var child = obj.children[0];
+        obj.remove( child );
+
+        child.castShadow = true;
+        child.receiveShadow = true;
+
+        var childWithStandardNodeMaterial = child;
+        var childWithStdandardMaterial = child.clone();
+
+        childWithStandardNodeMaterial.name = "TestNodeMaterial"
+        childWithStandardNodeMaterial.material = standardNodeMaterial;
+        childWithStandardNodeMaterial.scale.set( 0.02, 0.02, 0.02 );
+        childWithStandardNodeMaterial.position.set( 0.0, 0.0, 0.0 );
+        editor.sceneObjectAdd( childWithStandardNodeMaterial );
+
+        childWithStdandardMaterial.name = "TestStandardMaterial"
+        childWithStdandardMaterial.material = stdandardMaterial;
+        childWithStdandardMaterial.scale.set( 0.02, 0.02, 0.02 );
+        childWithStdandardMaterial.position.set( 8.0, 0.0, 0.0 );
+
+        editor.sceneObjectAdd( childWithStdandardMaterial );
+    } );
 }

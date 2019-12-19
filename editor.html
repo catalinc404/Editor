@@ -2,63 +2,73 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
     <!-- ----------------------------------------------------------------------------- -->
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
 
         <!-- DEBUG------------------------------------------------------------------------ -->
-        <script src="http://benvanik.github.com/WebGL-Inspector/core/embed.js"></script>
+        <!-- <script src="http://benvanik.github.com/WebGL-Inspector/core/embed.js"></script> -->
 
         <!-- LESS ------------------------------------------------------------------------ -->
         <link rel="stylesheet/less" type="text/css" href="css/styles.less"/>
         <script>less = { env: 'development' };</script>
-        <script src="js/libs/less.min.js" data-env="development" type="text/javascript"></script>
-        <script src="js/libs/inflate.min.js"></script>
-        <script src="js/libs/FileSaver.js"></script>
+        <script src="./js/libs/less.min.js" data-env="development" type="text/javascript"></script>
+        
+        <script src="./js/libs/inflate.min.js"></script>
+        <script src="./js/libs/FileSaver.js"></script>
         
         <!-- THREE.js--------------------------------------------------------------------- -->
-        <script src="js/libs/three.js/three.js"></script>
-        <script src="js/libs/three.js/TransformControls.js"></script>
+        <script src="./js/libs/three.js/three.js"></script>
+        <!-- <script src="./js/libs/three.js/nodes/THREE.Nodes.js" type="module"></script> -->
+        <script src="./js/libs/three.js/three.nodes.js"></script>
+        <script src="./js/libs/three.js/TransformControls.js"></script>
 
-        <script src="js/libs/three.js/loaders/DDSLoader.js"></script>
-		<script src="js/libs/three.js/loaders/MTLLoader.js"></script>
-        <script src="js/libs/three.js/loaders/OBJLoader.js"></script>
-        <script src="js/libs/three.js/loaders/ColladaLoader.js"></script>
-        <script src="js/libs/three.js/loaders/TDSLoader.js"></script>
-        <script src="js/libs/three.js/loaders/PLYLoader.js"></script>
-        <script src="js/libs/three.js/loaders/FBXLoader.js"></script>
-        <script src="js/libs/three.js/loaders/GLTFLoader.js"></script>
-        <script src="js/libs/three.js/exporters/GLTFExporter.js"></script>
+        <script src="./js/libs/three.js/loaders/NodeMaterialLoader.js"></script>
+        <script src="./js/libs/three.js/loaders/DDSLoader.js"></script>
+		<script src="./js/libs/three.js/loaders/MTLLoader.js"></script>
+        <script src="./js/libs/three.js/loaders/OBJLoader.js"></script>
+        <script src="./js/libs/three.js/loaders/ColladaLoader.js"></script>
+        <script src="./js/libs/three.js/loaders/TDSLoader.js"></script>
+        <script src="./js/libs/three.js/loaders/PLYLoader.js"></script>
+        <script src="./js/libs/three.js/loaders/FBXLoader.js"></script>
+        <script src="./js/libs/three.js/loaders/GLTFLoader.js"></script>
+        <script src="./js/libs/three.js/exporters/GLTFExporter.js"></script>
 
         <!-- UI -------------------------------------------------------------------------- -->
-        <script src="js/libs/vanillatree.js"></script>
-        <script src="js/libs/dat.gui.min.js"></script>
+        <script src="./js/libs/vanillatree.js"></script>
+        <script src="./js/libs/dat.gui.js"></script>
         
-        <script src="js/ui/EventDispatcher.js"></script>
-        <script src="js/ui/Theme.js"></script>
-        <script src="js/ui/Resizer.js"></script>
-        <script src="js/ui/Tabs.js"></script>
-        <script src="js/ui/Toolbar.js"></script>
-        <script src="js/ui/PropertiesView.js"></script>
-        <script src="js/ui/TreeView.js"></script>
-        <script src="js/ui/Layout.js"></script>
-        <script src="js/ui/MessageBox.js"></script>
-        <script src="js/ui/DoUndo.js"></script>
+        <script src="./js/ui/EventDispatcher.js"></script>
+        <script src="./js/ui/Theme.js"></script>
+        <script src="./js/ui/Resizer.js"></script>
+        <script src="./js/ui/Tabs.js"></script>
+        <script src="./js/ui/Toolbar.js"></script>
+        <script src="./js/ui/PropertiesView.js"></script>
+        <script src="./js/ui/TreeView.js"></script>
+        <script src="./js/ui/Layout.js"></script>
+        <script src="./js/ui/MessageBox.js"></script>
+        <script src="./js/ui/DoUndo.js"></script>
+        <script src="./js/ui/UI.js"></script>
+        <script src="./js/ui/Element.js"></script>
+
+        <!-- Utils------------------------------------------------------------------------ -->
+        <script src="./js/libs/utils/LoadSaveFile.js"></script>
 
         <!-- EDITOR ---------------------------------------------------------------------- -->
-        <script src="js/editor/Editor_Basics.js"></script>
-        <script src="js/editor/Editor_Layout.js"></script>
-        <script src="js/editor/Editor_view.js"></script>
-        <script src="js/editor/Editor_ViewWebGL.js"></script>
-        <script src="js/editor/Editor.js"></script>
-        <script src="js/editor/Editor_Materials.js"></script>
-        <script src="js/editor/Editor_Geometries.js"></script>
-        <script src="js/editor/Editor_Objects.js"></script>
-        <script src="js/editor/Editor_ObjectUtils.js"></script>
-        <script src="js/editor/Editor_Scene.js"></script>
-        <script src="js/editor/Editor_Commands.js"></script>
+        <script src="./js/editor/Editor_Basics.js"></script>
+        <script src="./js/editor/Editor_Layout.js"></script>
+        <script src="./js/editor/Editor_view.js"></script>
+        <script src="./js/editor/Editor_ViewWebGL.js"></script>
+        <script src="./js/editor/Editor.js"></script>
+        <script src="./js/editor/Editor_Materials.js"></script>
+        <script src="./js/editor/Editor_Geometries.js"></script>
+        <script src="./js/editor/Editor_Objects.js"></script>
+        <script src="./js/editor/Editor_ObjectUtils.js"></script>
+        <script src="./js/editor/Editor_Scene.js"></script>
+        <script src="./js/editor/Editor_Commands.js"></script>
+        <script src="./js/editor/Editor_Components.js"></script>
 
         <!-- MAIN ------------------------------------------------------------------------ -->
-        <script src="js/scenes.js"></script>
-        <script src="js/main.js"></script>
+        <script src="./js/scenes.js"></script>
+        <script src="./js/main.js"></script>
 
     </head>
     <!-- ----------------------------------------------------------------------------- -->
@@ -76,8 +86,10 @@
                             <li><a href="#">Save scene</a></li>
                             <li><a href="#">Save scene as...</a></li>
                             <li class="divider"></li>
-                            <li><a href="#" onclick="sceneImport();">Import object</a></li>
+                            <li><a href="#" onclick="sceneImportObject();">Import object</a></li>
                             <li><a href="#" onclick="sceneExportSelected();">Export selected object</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#" onclick="sceneImportMaterial();">Import Material</a></li>
                         </ul>
                     </li>
                     <li><a href="#" class="text13">Edit</a></li>
@@ -162,33 +174,54 @@
             <!-- First row                                                                     -->
             <!-- ----------------------------------------------------------------------------- -->
             <div id="panelViewTL" class="page_element">
-                <canvas id="viewTL" class="element noselect"></canvas>
-                <nav id="menu" class="menu background-color-element" style="left:4px; top:4px;height: 22px; width: 24px;">
-                    <ul>
-                        <li><a href="#" class="text13 noselect">+</a>
-                            <ul>
-                                <li><a href="#">Render<span class="icon-triangle-right" style="float:right; padding-top: 3px;"></span></a>
-                                    <ul>
-                                        <li><a href="#">Mode<span class="icon-triangle-right" style="float:right; padding-top: 3px;"></span></a>
-                                            <ul>
-                                                <li><a href="#">Color</a></li>
-                                                <li><a href="#">Color Wireframe</a></li>
-                                                <li><a href="#">Depth</a></li>
-                                                <li><a href="#">Picking</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="#">Helpers<span class="icon-triangle-right" style="float:right; padding-top: 3px;"></span></a>
-                                            <ul>
-                                                <li><a href="#" onclick="changeViewHelpersRender('viewTLRenderHelpersHELPERS', EView.TL, ERenderHelpersMode.HELPERS);">Helpers<span id="viewTLRenderHelpersHELPERS" class="icon-checked" style="float:right; padding-top: 3px;"></span></a></li>
-                                                <li><a href="#" onclick="changeViewHelpersRender('viewTLRenderHelpersGIZMOS',  EView.TL, ERenderHelpersMode.GIZMOS);">Gizmos<span id="viewTLRenderHelpersGIZMOS" class="icon-checked" style="float:right; padding-top: 3px;"></span></a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </nav>
+                <!--
+                <select class="menu background-color-element" style="right:20px; top:4px; height: 22px; position: absolute;">
+                    <option value="3dView">3D view</option>
+                    <option value="materialView">Material</option>
+                    <option value="objectView">Object viewer</option>
+                </select>
+
+                <div id="panelViewTL3DView" class="page_element"> -->
+                    <canvas id="viewTL" class="element noselect"></canvas>
+                    <nav id="menu" class="menu background-color-element" style="left:4px; top:4px;height: 22px; width: 24px;">
+                        <ul>
+                            <li><a href="#" class="text13 noselect">+</a>
+                                <ul>
+                                    <li><a href="#">Render<span class="icon-triangle-right" style="float:right; padding-top: 3px;"></span></a>
+                                        <ul>
+                                            <li><a href="#">Mode<span class="icon-triangle-right" style="float:right; padding-top: 3px;"></span></a>
+                                                <ul>
+                                                    <li><a href="#">Color</a></li>
+                                                    <li><a href="#">Color Wireframe</a></li>
+                                                    <li><a href="#">Depth</a></li>
+                                                    <li><a href="#">Picking</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a href="#">Helpers<span class="icon-triangle-right" style="float:right; padding-top: 3px;"></span></a>
+                                                <ul>
+                                                    <li><a href="#" onclick="changeViewHelpersRender('viewTLRenderHelpersHELPERS', EView.TL, ERenderHelpersMode.HELPERS);">Helpers<span id="viewTLRenderHelpersHELPERS" class="icon-checked" style="float:right; padding-top: 3px;"></span></a></li>
+                                                    <li><a href="#" onclick="changeViewHelpersRender('viewTLRenderHelpersGIZMOS',  EView.TL, ERenderHelpersMode.GIZMOS);">Gizmos<span id="viewTLRenderHelpersGIZMOS" class="icon-checked" style="float:right; padding-top: 3px;"></span></a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+                <!--
+                </div>
+
+                <div id="panelViewTL3DView" class="page_element">
+                    <canvas id="viewMaterialTL" class="element noselect"></canvas>
+                    <nav id="menumaterialviewTL" class="menu background-color-element" style="left:4px; top:4px;height: 22px; width: 24px;">
+                        <ul>
+                            <li><a href="#" class="text13 noselect">+</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                -->
             </div>
             <div id="resizerXTop" class="resizerX"></div>
             <div id="panelViewTR" class="page_element">
@@ -221,6 +254,7 @@
 
         <div id="footer" class="page_element background-color-lighter"></div>
 
+        <!--
         <div id="messageboxcontainer" class="page_element noselect" style="visibility:hidden; float:left; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1000000;">
             <div id="messagebox" class="page_element border-solid-1px" style="left:calc(50% - 200px); top:40%; width:400px;">
                 <div id="messageboxtitle" class="text13 background-color border-bottom-page-element" style="height:26px; padding-top: 8px; padding-left: 6px;"></div>
@@ -272,6 +306,7 @@
                 </div>
             </div>
         </div>
+        -->
     </body>
     <!-- ----------------------------------------------------------------------------- -->
 </html>

@@ -362,6 +362,7 @@ TranslateObjectCommand.prototype.do = function()
     //console.log( "TranslateObjectCommand.do: objectId:" + this.objectId );
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectTranslated", this.objectId );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", { id: this.objectId, property: "transform", value: undefined } );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -377,6 +378,7 @@ TranslateObjectCommand.prototype.undo = function()
     object.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectTranslated", this.objectId );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", { id: this.objectId, property: "transform", value: undefined } );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -392,12 +394,13 @@ TranslateObjectCommand.prototype.redo = function()
     object.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectTranslated", this.objectId );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", { id: this.objectId, property: "transform", value: undefined } );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 function ScaleObjectCommand( editor, objectId, oldScale, newScale )
 {
-    console.log( "ScaleObjectCommand: objectId:" + objectId );
+    //console.log( "ScaleObjectCommand: objectId:" + objectId );
 
     this.editor = editor;
     this.objectId = objectId;
@@ -426,6 +429,7 @@ ScaleObjectCommand.prototype.do = function()
     //console.log( "ScaleObjectCommand.do: objectId:" + this.objectId );
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.objectId );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", { id: this.objectId, property: "transform", value: undefined } );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -441,6 +445,7 @@ ScaleObjectCommand.prototype.undo = function()
     object.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.objectId );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", { id: this.objectId, property: "transform", value: undefined } );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -456,6 +461,7 @@ ScaleObjectCommand.prototype.redo = function()
     this.object.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectScaled", this.objectId );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", { id: this.objectId, property: "transform", value: undefined } );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -492,6 +498,7 @@ RotateObjectCommand.prototype.do = function()
     //console.log( "RotateObjectCommand.do: objectId:" + this.objectId );
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.objectId );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", { id: this.objectId, property: "transform", value: undefined } );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -508,6 +515,7 @@ RotateObjectCommand.prototype.undo = function()
     object.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.objectId );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", { id: this.objectId, property: "transform", value: undefined } );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -524,6 +532,7 @@ RotateObjectCommand.prototype.redo = function()
     this.object.matrixWorldNeedsUpdate = true;
 
     this.editor.eventDispatcher.dispatchEvent( "onSceneObjectRotated", this.objectId );
+    this.editor.eventDispatcher.dispatchEvent( "onSceneObjectPropertyChanged", { id: this.objectId, property: "transform", value: undefined } );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -718,4 +727,63 @@ SelectGeometryCommand.prototype.redo = function()
 
     //Select new stuff
     this.editor.select( { geometryId: this.geometryId } );
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+function SetMaterialCommand( editor, objectId, materialId )
+{
+    //TODO: multiple materials
+    
+    //console.log( "SetMaterialCommand: materialId: " + materialId );
+
+    this.editor = editor;
+    this.objectId = objectId;
+    this.materialId = materialId;
+    
+    this.oldMaterialId = editor.getMaterialId( editor.getObjectFromEditorId( this.objectId ).material );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+SetMaterialCommand.prototype = Object.assign( Object.create( Object.prototype ), 
+{
+    //////////////////////////////////////////////////////////////////////////////
+    constructor: SetMaterialCommand
+} );
+
+//////////////////////////////////////////////////////////////////////////////
+SetMaterialCommand.prototype.do = function()
+{
+    //console.log( "SetMaterialCommand.do: objectId: " + this.objectId + ", materialId: " + this.materialId );
+    var object = editor.getObjectFromEditorId( this.objectId );
+    var material = editor.getMaterial( this.materialId );
+
+    if( ( object != null ) && ( material != null ) )
+    {
+        object.material = material;
+        this.editor.eventDispatcher.dispatchEvent( "onComponentPropertyChanged", { id: this.objectId, property: "material", value: material } );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+SetMaterialCommand.prototype.undo = function()
+{
+    //console.log( "SetMaterialCommand.undo: objectId: " + this.objectId + ", materialId: " + this.materialId );
+
+    var object = editor.getObjectFromEditorId( this.objectId );
+    var material = editor.getMaterial( this.oldMaterialId );
+
+    if( ( object != null ) && ( material != null ) )
+    {
+        object.material = material;
+        this.editor.eventDispatcher.dispatchEvent( "onComponentPropertyChanged", { id: this.objectId, property: "material", value: material } );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+SetMaterialCommand.prototype.redo = function()
+{
+    //console.log( "SetMaterialCommand.redo: objectId: " + this.objectId + ", materialId: " + this.materialId );
+
+    this.do();
 }

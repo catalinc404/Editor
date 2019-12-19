@@ -6,7 +6,7 @@ Editor.prototype.getSelection = function()
     selection.materialId = this.selection.materialId;
     selection.geometryId = this.selection.geometryId;
 
-    console.log( "Editor.GetCurrentSelection: objectId:" + selection.objectId + ", materialId: " + selection.materialId + ", geometryId: " + selection.geometryId );
+    //console.log( "Editor.GetCurrentSelection: objectId:" + selection.objectId + ", materialId: " + selection.materialId + ", geometryId: " + selection.geometryId );
 
     return selection;
 };
@@ -14,14 +14,14 @@ Editor.prototype.getSelection = function()
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.select = function( componentData )
 {
-    console.log( "Editor.Select: objectId:" + componentData.objectId + ", materialId: " + componentData.materialId + ", geometryId: " + componentData.geometryId );
+    //console.log( "Editor.Select: objectId:" + componentData.objectId + ", materialId: " + componentData.materialId + ", geometryId: " + componentData.geometryId );
 
     if( componentData.objectId != null )
     {
         var object = this.getEditorObjectFromEditorId( componentData.objectId );
         if( object != null )
         {
-            this.selection.object = this.getEditorObjectFromEditorId( componentData.objectId )
+            this.selection.object = object;
             this.eventDispatcher.dispatchEvent( "onSceneObjectSelected", componentData.objectId );
         }
     }
@@ -50,7 +50,7 @@ Editor.prototype.select = function( componentData )
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.deselect = function( componentData )
 {
-    console.log( "Editor.Deselect: objectId:" + componentData.objectId + ", materialId: " + componentData.materialId + ", geometryId: " + componentData.geometryId );
+    //console.log( "Editor.Deselect: objectId:" + componentData.objectId + ", materialId: " + componentData.materialId + ", geometryId: " + componentData.geometryId );
 
     if( componentData.objectId != null )
     {
@@ -72,29 +72,50 @@ Editor.prototype.deselect = function( componentData )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.resetObjectXForm = function( object )
+Editor.prototype.objectTransformGet = function( object )
 {
-    object.scale.set( 1.0, 1.0, 1.0 );
+    var transform = { position: new THREE.Vector3(), rotation: new THREE.Euler(), scale: new THREE.Vector3() };
+
+    transform.position.copy( object.position );
+    transform.rotation.copy( object.rotation );
+    transform.scale.copy( object.scale );
+
+    return transform;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.objectTransformSet = function( object, transform )
+{
+    object.position.copy( transform.position );
+    object.rotation.copy( transform.rotation );
+    object.scale.copy( transform.scale );
+
+    object.updateMatrixWorld( true );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.objectTransformReset = function( object )
+{
+    object.position.set( 0.0, 0.0, 0.0 );
     object.rotation.set( 0.0, 0.0, 0.0 );
-    object.updateMatrixWorld();
+    object.scale.set( 1.0, 1.0, 1.0 );
 
-    var length = object.children.length;
-    for( var i = 0; i < length; ++i )
-    {
-        this.resetObjectXForm( object.children[i] );
-    }
-
-    object.updateMatrixWorld();
+    object.updateMatrixWorld( true );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 Editor.prototype.sceneObjectAdd = function( object, parameters  )
 {
+    var length = 0;
+
     var editorObject = {}
     parameters = parameters || {};
 
     editorObject.id = parameters.objectId || ++this.sceneObjectsId;
     object.name = object.name || "object_" + editorObject.id;
+
+    var transform = this.objectTransformGet( object );
+    this.objectTransformReset( object );
 
     if( parameters.dontAddToScene !== true )
     {
@@ -109,30 +130,41 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
         }
     }
 
-    //this.resetObjectXForm( object );
-
     editorObject.object = object;
     editorObject.helpers = [];
     editorObject.gizmos  = [];
-
-    var position = new THREE.Vector3();
-    position.copy( object.position );
-    object.position.set( 0, 0, 0 );
-    object.updateMatrixWorld();
 
     if( object instanceof THREE.Scene )
     {
     }
     else
-    if( object instanceof THREE.Mesh )
+    if( object instanceof THREE.Group )
     {
-        var selectionHelper = new THREE.BoxHelper( object );
+        var selectionHelper = new THREE.BoxHelper( object, undefined, { local: true } );
         selectionHelper.visible = false;
         selectionHelper.matrixWorld = object.matrixWorld;
         selectionHelper.matrixAutoUpdate = false;
         editorObject.gizmos.push( selectionHelper );
 
-        var objectPicking = object.clone();
+        /*
+        var objectPicking = object.clone( false );
+        objectPicking.material = new THREE.MeshBasicMaterial( { color: editorObject.id } );
+        objectPicking.matrixWorld = object.matrixWorld;
+        objectPicking.matrixAutoUpdate = false;
+        this.scenePicking.add( objectPicking );
+        editorObject.objectPicking = objectPicking;
+        */
+    }
+    else
+    if( object instanceof THREE.Mesh )
+    {
+        var selectionHelper = new THREE.BoxHelper( object, undefined, { withoutChildren: true, local: true } );
+        selectionHelper.visible = false;
+        selectionHelper.matrixWorld = object.matrixWorld;
+        selectionHelper.matrixAutoUpdate = false;
+        editorObject.gizmos.push( selectionHelper );
+
+        var objectPicking = object.clone( false );
         objectPicking.material = new THREE.MeshBasicMaterial( { color: editorObject.id } );
         objectPicking.matrixWorld = object.matrixWorld;
         objectPicking.matrixAutoUpdate = false;
@@ -142,7 +174,8 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
         if( object.material instanceof Array )
         {
             var materials = object.material;
-            var length = materials.length;
+           
+            length = materials.length;
             for( var i = 0; i < length; ++i )
             {
                 var material = materials[i];
@@ -174,7 +207,7 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
     else
     if( object instanceof THREE.PointLight )
     {
-        editorObject.helpers.push( new THREE.PointLightHelper( object ) );
+        //editorObject.helpers.push( new THREE.PointLightHelper( object ) );
     }
     else
     if( object instanceof THREE.DirectionalLight )
@@ -191,7 +224,7 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
         this.scenePicking.add( objectPicking );
         editorObject.objectPicking = objectPicking;
 
-        var selectionHelper = new THREE.BoxHelper( objectPicking );
+        var selectionHelper = new THREE.BoxHelper( objectPicking, undefined, { withoutChildren: true } );
         selectionHelper.visible = false;
         editorObject.gizmos.push( selectionHelper );
 
@@ -226,7 +259,7 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
         selectionHelper.matrixAutoUpdate = false;
         editorObject.gizmos.push( selectionHelper );
 
-        var objectPicking = object.clone();
+        var objectPicking = object.clone( false );
         objectPicking.material = new THREE.MeshBasicMaterial( { color: editorObject.id } );
         objectPicking.matrixWorld = object.matrixWorld;
         objectPicking.matrixAutoUpdate = false;
@@ -234,15 +267,14 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
         editorObject.objectPicking = objectPicking;
     }
 
-    if( editorObject.helpers.length > 0 )
+    length = editorObject.helpers.length;
+    for( var i = 0; i < length; ++i )
     {
-        for( var i = 0; i < editorObject.helpers.length; ++i )
-        {
-            this.sceneHelpers.add( editorObject.helpers[i] );
-        }
+        this.sceneHelpers.add( editorObject.helpers[i] );
     }
 
-    for( var i = 0; i < editorObject.gizmos.length; ++i )
+    length = editorObject.gizmos.length;
+    for( var i = 0; i < length; ++i )
     {
         this.sceneGizmos.add( editorObject.gizmos[i] );
     }
@@ -252,13 +284,13 @@ Editor.prototype.sceneObjectAdd = function( object, parameters  )
     var parentId = ( object.parent !== undefined ) ? this.getEditorIdFromObject( object.parent ) : undefined;
     this.eventDispatcher.dispatchEvent( "onSceneObjectAdded", { objectId: editorObject.id, parentId: parentId, name: editorObject.object.name } );
   
-    for( var i = 0; i < object.children.length; ++i )
+    length = object.children.length
+    for( var i = 0; i < length; ++i )
     {
         this.sceneObjectAdd( object.children[i], { dontAddToScene : true } );
     }
 
-    object.position.set( position.x, position.y, position.z );
-    object.updateMatrixWorld();
+    this.objectTransformSet( object, transform );
 
     return editorObject.id;
 }
@@ -276,11 +308,38 @@ Editor.prototype.sceneObjectRemove = function( object )
         var length = this.sceneObjects.length;
         for( var i = 0; i < length; ++i )
         {
-            if( this.sceneObjects[i].object === object )
+            var editorObject = this.sceneObjects[i];
+
+            if( editorObject.object === object )
             {
-                if( ( this.selection.object != null ) && ( this.sceneObjects[i].id == this.selection.object.id ) )
+                if( ( this.selection.object != null ) && ( editorObject.id == this.selection.object.id ) )
                 {
-                    this.deselect( { objectId: this.sceneObjects[i].id } );
+                    this.deselect( { objectId: editorObject.id } );
+                }
+
+                var helpersLength = editorObject.helpers.length;
+                for( var j = 0 ; j < helpersLength; ++j )
+                {
+                    var helper = editorObject.helpers[ j ];
+                    if( helper.parent != null )
+                    {
+                        helper.parent.remove( helper );
+                    }
+                }
+
+                var gizmosLength = editorObject.gizmos.length;
+                for( var j = 0 ; j < gizmosLength; ++j )
+                {
+                    var gizmo = editorObject.gizmos[ j ];
+                    if( gizmo.parent != null )
+                    {
+                        gizmo.parent.remove( gizmo );
+                    }
+                }
+
+                if( editorObject.objectPicking != null )
+                {
+                    editorObject.objectPicking.parent.remove( editorObject.objectPicking );
                 }
 
                 this.eventDispatcher.dispatchEvent( "onSceneObjectRemoved", this.sceneObjects[i].id );
@@ -288,7 +347,10 @@ Editor.prototype.sceneObjectRemove = function( object )
                 {
                     this.sceneObjects[i].object.parent.remove( this.sceneObjects[i].object );
                 }
+
                 this.sceneObjects.splice( i, 1 );
+
+                break;
             }
         }
     }
@@ -341,7 +403,7 @@ Editor.prototype.onSceneObjectSelected = function( objectId )
         {
             if( editorObject.gizmos.length > 0 )
             {
-                editorObject.gizmos[0].visible = true;
+                editorObject.gizmos[ EHelperSlots.SELECTION ].visible = true;
             }
         }
     }
@@ -369,7 +431,10 @@ Editor.prototype.onSceneObjectDeselected = function( objectId )
         {
             if( editorObject.gizmos.length > 0 )
             {
-                editorObject.gizmos[0].visible = false;
+                if( editorObject.gizmos.length > 0 )
+                {
+                    editorObject.gizmos[ EHelperSlots.SELECTION ].visible = false;
+                }
             }
         }
     }
@@ -414,7 +479,7 @@ Editor.prototype.sceneObjectTranslate = function( objectId, oldPosition, newPosi
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.onSceneObjectsTranslated = function( objectId )
+Editor.prototype.onSceneObjectTranslated = function( objectId )
 {
     this.render();
 }
@@ -427,7 +492,7 @@ Editor.prototype.sceneObjectScale = function( objectId, oldScale, newScale )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.onSceneObjectsScaled = function( objectId )
+Editor.prototype.onSceneObjectScaled = function( objectId )
 {
     var editorObject = this.getEditorObjectFromEditorId( objectId );
     var object = editorObject.object;
@@ -446,7 +511,53 @@ Editor.prototype.sceneObjectRotate = function( objectId, oldRotation, newRotatio
 }
 
 //////////////////////////////////////////////////////////////////////////////
-Editor.prototype.onSceneObjectsRotated = function( objectId )
+Editor.prototype.onSceneObjectRotated = function( objectId )
 {
     this.render();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.onSceneObjectPropertyChanged = function( data )
+{
+    switch( data.property )
+    {
+        case "transform":
+        {
+            this.sceneObjectUpdateSelectionHelpers( data.id );
+        }
+        break;
+
+        default:
+        break;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+Editor.prototype.sceneObjectUpdateSelectionHelpers = function( id, fromChild )
+{
+    var editorObject = this.getEditorObjectFromEditorId( id );
+    if( editorObject != null )
+    {
+        if( ( editorObject.object instanceof THREE.Group ) && ( fromChild == false ) ) {}
+        else
+        if( ( editorObject.object instanceof THREE.Scene ) && ( fromChild == false ) ) {}
+        else
+        {
+            if( editorObject.gizmos.length > 0 )
+            {
+                var boxHelper = editorObject.gizmos[ EHelperSlots.SELECTION ];
+                if( boxHelper instanceof THREE.BoxHelper )
+                {
+                    boxHelper.update();
+                }
+            }
+
+            var parent = editorObject.object.parent;
+            if( parent instanceof THREE.Group )
+            {
+                var parentId = this.getEditorIdFromObject( parent );
+                this.sceneObjectUpdateSelectionHelpers( parentId, true );
+            }
+        }
+    }
 }

@@ -4,43 +4,32 @@ var EMessageBox = { OK: 1, OKCancel: 2 };
 //////////////////////////////////////////////////////////////////////////////
 function messageBox( parameters )
 {
-    var messageBoxContainer = document.getElementById( "messageboxcontainer" );
-    messageBoxContainer.style.visibility = "visible";
+    var width  = parameters.width || 400;
+    var height = parameters.height || 300;
 
-    var messageBox = document.getElementById( "messagebox" );
-    messageBox.style.visibility = "visible";
+    var background               = new _UI.Element( null, { tag: "div", properties: { id: "messageboxcontainer", className: "noselect", style: "display: block; float:left; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:10000;" } } );
+    var windowFrame              = new _UI.WindowElement( background, "messageboxWindow", { left: "center", top: "center", width: width, height: height } );
+    var windowTitle              = new _UI.TextElement( windowFrame, "messageboxTitle", { left: 10, top: 6, width: "calc(100% - " + 20 + "px)", height: 16 }, parameters.title || "Message" );
+    var windowTitleSeparator     = new _UI.HLineElement( windowFrame, "messageboxTitleSeparator", { left: 0, top: 24  } );
+    var windowContents           = new _UI.TextElement( windowFrame, "messageboxContents", { left: 10, top: 28, width: "calc(100% - " + 20 + "px)", height: (height - 70) }, parameters.contents || "" );
+    var windowContentsSeparator  = new _UI.HLineElement( windowFrame, "messageboxContentsSeparator", { left: 0, top: (height - 38) } );
 
-    var messageBoxTitle = document.getElementById( "messageboxtitle" );
-    messageBoxTitle.innerHTML  =  parameters.title || "Message";
-
-    var messageBoxcontents = document.getElementById( "messageboxcontents_text" );
-    messageBoxcontents.style.display = "block";
-    messageBoxcontents.innerHTML  =  parameters.contents || "";
-    
     switch( parameters.type )
     {
         case EMessageBox.OK:
         default:
         {
-            var messageBoxButtonOK = document.getElementById( "messageboxbuttonok" ); 
-            messageBoxButtonOK.style.visibility = "visible";
-            messageBoxButtonOK.onclick = function()
+            var onClickOKCallback = function()
             {
-                messageBoxContainer.style.visibility = "hidden";
-                messageBox.style.visibility = "hidden";
-                messageBoxButtonOK.style.visibility = "hidden";
-                messageBoxcontents.style.display = "none";
+                var element = document.getElementById( "messageboxcontainer" );
+                element.parentNode.removeChild( element );
+
                 if( parameters.onOK !== undefined )
                 {
                     parameters.onOK();
-                }
+                }                
             }
-
-            var messageBoxButtonSpacer = document.getElementById( "messageboxbuttonspacer" ); 
-            messageBoxButtonSpacer.style.visibility = "hidden";
-            
-            var messageBoxButtonCancel = document.getElementById( "messageboxbuttoncancel" ); 
-            messageBoxButtonCancel.style.visibility = "hidden";
+            var buttonOK = new _UI.ButtonElement( windowFrame, "messageboxbuttonok", { left: "center", top: (height - 28), width: 40, height: 20 }, "OK", onClickOKCallback );
         }
         break;
     }
@@ -49,6 +38,7 @@ function messageBox( parameters )
 //////////////////////////////////////////////////////////////////////////////
 function stringPairBox( parameters )
 {
+    /*
     var messageBoxContainer = document.getElementById( "messageboxcontainer" );
     messageBoxContainer.style.visibility = "visible";
 
@@ -113,11 +103,13 @@ function stringPairBox( parameters )
         messageBoxcontents_stringPair.style.display = "none";
         messageBox.style.visibility = "hidden";
     }
+    */
 }
 
 //////////////////////////////////////////////////////////////////////////////
 function stringBox( parameters )
 {
+    /*
     var messageBoxContainer = document.getElementById( "messageboxcontainer" );
     messageBoxContainer.style.visibility = "visible";
 
@@ -174,4 +166,5 @@ function stringBox( parameters )
         messageBoxcontents_string.style.display = "none";
         messageBox.style.visibility = "hidden";
     }
+    */
 }

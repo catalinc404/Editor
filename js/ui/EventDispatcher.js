@@ -12,18 +12,18 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     addEventListener : function( event, listener )
     {
-        if( this.listeners === undefined )
+        if( this.listeners == null )
         {
             this.listeners = {};
         }
 
         var listeners = this.listeners;
-        if( listeners[event] === undefined )
+        if( listeners[event] == null )
         {
             listeners[event] = [];
         }
 
-        if( listeners[event].indexOf( listener ) === -1 )
+        if( listeners[event].indexOf( listener ) == -1 )
         {
             listeners[event].push( listener );
         }
@@ -31,13 +31,13 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
 
     removeEventListener : function( event, listener )
     {
-        if( this.listeners === undefined )
+        if( this.listeners == null )
         {
             return;
         }
 
         var eventListeners = this.listeners[event];
-        if( eventListeners === undefined )
+        if( eventListeners == null )
         {
             return;
         }
@@ -61,18 +61,18 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
         //console.log( data );
         //console.log( "--------------------------------------------------" )
 
-        if( this.listeners === undefined )
+        if( this.listeners == null )
         {
             return;
         }
 
         var eventListeners = this.listeners[event];
-        if( eventListeners === undefined )
+        if( eventListeners == null )
         {
             return;
         }
 
-        for( var index = 0; index < eventListeners.length; ++index )
+        for( var index = 0, length = eventListeners.length; index < length; ++index )
         {
             eventListeners[index]( data );
         }
@@ -81,7 +81,7 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     addCommandHandler : function( command, handler )
     {
-        if( this.commandHandlers === undefined )
+        if( this.commandHandlers == null )
         {
             this.commandHandlers = {};
         }
@@ -91,13 +91,13 @@ EventDispatcher.prototype = Object.assign( Object.create( Object.prototype ),
 
     removeCommandHandler : function( command, handler )
     {
-        if( this.commandHandlers === undefined )
+        if( this.commandHandlers == null )
         {
             return;
         }
 
         var commandHandler = this.commandHandlers[command];
-        if( commandHandler === undefined )
+        if( commandHandler == null )
         {
             return;
         }

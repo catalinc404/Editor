@@ -54,12 +54,16 @@ function Editor( eventDispatcher, UIData )
     this.eventDispatcher.addEventListener( "onSceneObjectCreated",          this.onSceneObjectCreated.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectDeleted",          this.onSceneObjectDeleted.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectAdded",            this.onSceneObjectAdded.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectRemoved",          this.onSceneObjectAdded.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectRemoved",          this.onSceneObjectRemoved.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectSelected",         this.onSceneObjectSelected.bind( this ) );
     this.eventDispatcher.addEventListener( "onSceneObjectDeselected",       this.onSceneObjectDeselected.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectTranslated",       this.onSceneObjectsTranslated.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectScaled",           this.onSceneObjectsScaled.bind( this ) );
-    this.eventDispatcher.addEventListener( "onSceneObjectRotated",          this.onSceneObjectsRotated.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectTranslated",       this.onSceneObjectTranslated.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectScaled",           this.onSceneObjectScaled.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectRotated",          this.onSceneObjectRotated.bind( this ) );
+    this.eventDispatcher.addEventListener( "onSceneObjectPropertyChanged",  this.onSceneObjectPropertyChanged.bind( this ) );
+    
+    this.eventDispatcher.addEventListener( "onComponentDragged",            this.onComponentDragged.bind( this ) );
+    this.eventDispatcher.addEventListener( "onComponentPropertyChanged",    this.onComponentPropertyChanged.bind( this ) );
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.eventDispatcher.addEventListener( "onToolbarButtonActivated",      this.onToolbarButtonActivated.bind( this ) );
@@ -67,18 +71,26 @@ function Editor( eventDispatcher, UIData )
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.eventDispatcher.addCommandHandler( "render",                       this.render.bind( this ) );
+
     this.eventDispatcher.addCommandHandler( "sceneObjectCreate",            this.sceneObjectCreate.bind( this ) );
     this.eventDispatcher.addCommandHandler( "sceneObjectDelete",            this.sceneObjectDelete.bind( this ) );
     this.eventDispatcher.addCommandHandler( "sceneObjectSelect",            this.sceneObjectSelect.bind( this ) );
     this.eventDispatcher.addCommandHandler( "sceneObjectDeselect",          this.sceneObjectDeselect.bind( this ) );
+    
     this.eventDispatcher.addCommandHandler( "sceneMaterialSelect",          this.sceneMaterialSelect.bind( this ) );
     this.eventDispatcher.addCommandHandler( "sceneMaterialDeselect",        this.sceneMaterialDeselect.bind( this ) );
+    
     this.eventDispatcher.addCommandHandler( "sceneGeometrySelect",          this.sceneGeometrySelect.bind( this ) );
     this.eventDispatcher.addCommandHandler( "sceneGeometryDeselect",        this.sceneGeometryDeselect.bind( this ) );
     this.eventDispatcher.addCommandHandler( "getObjectFromEditorId",        this.getObjectFromEditorId.bind( this ) );
+
     this.eventDispatcher.addCommandHandler( "getMaterialFromEditorId",      this.getMaterialFromEditorId.bind( this ) );
-    this.eventDispatcher.addCommandHandler( "getGeometryFromEditorId",      this.getGeometryFromEditorId.bind( this ) );    
-    this.eventDispatcher.addCommandHandler( "getTypeFromId",                this.getTypeFromId.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "getEditorIdFromMaterial",      this.getEditorIdFromMaterial.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "getGeometryFromEditorId",      this.getGeometryFromEditorId.bind( this ) );
+    this.eventDispatcher.addCommandHandler( "getEditorIdFromGeometry",      this.getEditorIdFromGeometry.bind( this ) );    
+    this.eventDispatcher.addCommandHandler( "getTypeInfoFromId",            this.getTypeInfoFromId.bind( this ) );
+
+    this.eventDispatcher.addCommandHandler( "executeCommand",               this.executeCommand.bind( this ) );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     editor = this;
@@ -152,9 +164,9 @@ Editor.prototype.initDefaultScene = function()
     helper.material.opacity = 0.25;
     helper.material.transparent = true;
     this.sceneHelpers.add( helper );
-
+ 
     var ambientLight = new THREE.AmbientLight( 0xffffff, 1 );
-    ambientLight.name = "ambientLight";
+    ambientLight.name = "Ambient Light";
     this.sceneObjectAdd( ambientLight );
 }
 
@@ -294,29 +306,106 @@ Editor.prototype.onToolbarButtonActivated = function( event )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Editor.prototype.onToolbarButtonDeactivated = function( event )
 {
-    if( event.parent == "ToolbarGeneralTranformMode" )
+    if( event.parent == "ToolbarGeneralTransformMode" )
     {
         this.objectTransformMode = ETransformMode.NONE;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Editor.prototype.getTypeFromId = function( id )
+Editor.prototype.getTypeInfoFromId = function( id )
 {
-    var type;
+    var info;
 
-    if( id >= this.materialsParentId )
-        type = "material";
+    if( id > this.materialsParentId )
+    {
+        //TODO: material type
+        info = { type: "material", detail: "", commands: [ { command: "clone", name: "Clone" }, { command: "deleteMaterial", name: "Delete" } ] };
+    }
     else
-    if( id >= this.geometriesParentId )
-        type = "geometry";
+    if( id == this.materialsParentId )
+    {
+        info = { type: "materialsManager", detail: "", commands: [ { command: "addMaterial", name: "Add material" }, { command: "deleteAllMaterials", name: "Delete all materials" } ] };
+    }
+    else
+    if( id > this.geometriesParentId )
+    {
+        //TODO: geometry type
+        info = { type: "geometry", detail: "", commands: [ { command: "clone", name: "Clone" }, { command: "deleteGeometry", name: "Delete" } ] };
+    }
+    else
+    if( id == this.geometriesParentId )
+    {
+        info = { type: "geometriesManager", detail: "", commands: [ { command: "addGeometry", name: "Add geometry " }, { command: "deleteAllGeometries", name: "Delete all geometries" } ] };
+    }
     else
     if( id > 1 )
-        type = "object";
+    {
+        info = { type: "object", detail: "", commands: [ { command: "clone", name: "Clone" }, { command: "deleteObject", name: "Delete" } ] };
+    }
     else
-        type = "scene";
+    {
+        info = { type: "scene", detail: "root", commands: [ { command: "addGroup", name: "Add group" } ] };
+    }
 
-    return type;
+    return info;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Editor.prototype.executeCommand = function( commandData )
+{
+    var id = commandData.id;
+
+    switch( commandData.command )
+    {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        case "select" : 
+        {
+            var type = this.getTypeInfoFromId( id ).type;
+            switch( type )
+            {
+                case "scene":
+                case "object":
+                {
+                    this.sceneObjectSelect( id );
+                }
+                break;
+                case "material":
+                {
+                    this.sceneMaterialSelect( id );
+                }
+                break;
+                case "geometry":
+                {
+                    this.sceneGeometrySelect( id );
+                }
+                break;
+                default:
+                break;
+            }
+        }
+        break;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        case "deselect" : 
+        {
+        }
+        break;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        case "deleteObject" : 
+        {
+            this.sceneObjectDelete( { objectId: id } );
+        }
+        break;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        default:
+        {
+            //console.log( "unknown command: " + commandData.command + ", id: " + id );
+        }
+        break;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

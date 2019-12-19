@@ -1,0 +1,3 @@
+1. Switch to Component instead of Object+Material+Geometry
+2. Use MaterialNode for custom improved materials
+3. Invert RoughnessMap option
